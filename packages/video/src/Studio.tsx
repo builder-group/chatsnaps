@@ -10,7 +10,7 @@ export const Studio: React.FC = () => {
 			<Composition
 				id="iMessage"
 				component={IMessageComp}
-				durationInFrames={60 * 30}
+				durationInFrames={30 * 30} // 30s * 30fpx
 				fps={30}
 				width={1080}
 				height={1920}

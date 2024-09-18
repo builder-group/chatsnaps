@@ -50,7 +50,6 @@ export const IMessageComp: React.FC<TIMessageCompProps> = (props) => {
 	const { title, script } = props;
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
-	const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
 	const messages = React.useMemo(() => {
 		let currentTime = 0;
@@ -70,42 +69,66 @@ export const IMessageComp: React.FC<TIMessageCompProps> = (props) => {
 		}, [] as TMessage[]);
 	}, [script, fps]);
 
-	const messageComponents = messages
-		.map((message, index) => {
-			if (message.startFrame > frame) {
-				return null;
-			}
+	const visibleMessages = messages.filter((message) => message.startFrame <= frame);
 
-			const progress = spring({
-				frame: frame - message.startFrame,
-				fps,
-				config: { damping: 15, stiffness: 150, mass: 0.5 }
-			});
-			const isLeft = message.speaker === 'Zoe';
+	const MESSAGE_HEIGHT = 115; // Approximate height of each message
+	const SCROLL_DURATION = 15; // Number of frames for scroll animation
 
-			return (
-				<MessageBubble
-					key={index}
-					message={message.message}
-					startFrame={message.startFrame}
-					isLeft={isLeft}
-					progress={progress}
-				/>
+	const calculateScrollPosition = () => {
+		const totalHeight = visibleMessages.length * MESSAGE_HEIGHT;
+		const lastVisibleMessage = visibleMessages[visibleMessages.length - 1];
+		const scrollTarget = Math.max(0, totalHeight - height);
+
+		if (frame - lastVisibleMessage.startFrame < SCROLL_DURATION) {
+			// Rapid scroll to the new message
+			return interpolate(
+				frame - lastVisibleMessage.startFrame,
+				[0, SCROLL_DURATION],
+				[Math.max(0, scrollTarget - MESSAGE_HEIGHT), scrollTarget],
+				{
+					extrapolateRight: 'clamp',
+					easing: (t) =>
+						spring({ frame: t * 60, fps: 60, config: { damping: 15, stiffness: 150, mass: 0.5 } })
+				}
 			);
-		})
-		.filter(Boolean);
-
-	React.useEffect(() => {
-		if (messagesEndRef.current != null) {
-			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		} else {
+			// Stay at the current scroll position
+			return scrollTarget;
 		}
-	}, [messageComponents.length]);
+	};
+
+	const scrollPosition = calculateScrollPosition();
+
+	const messageComponents = visibleMessages.map((message, index) => {
+		const progress = spring({
+			frame: frame - message.startFrame,
+			fps,
+			config: { damping: 15, stiffness: 150, mass: 0.5 }
+		});
+		const isLeft = message.speaker === 'Zoe';
+
+		return (
+			<MessageBubble
+				key={index}
+				message={message.message}
+				startFrame={message.startFrame}
+				isLeft={isLeft}
+				progress={progress}
+			/>
+		);
+	});
 
 	return (
-		<AbsoluteFill className="no-scrollbar flex flex-col bg-gray-100" style={{ width, height }}>
-			<div className="flex flex-1 flex-col space-y-4 overflow-y-auto p-6">
+		<AbsoluteFill className="bg-gray-100" style={{ width, height }}>
+			<div
+				className="flex flex-col space-y-4 p-6"
+				style={{
+					transform: `translateY(-${scrollPosition}px)`,
+					height: visibleMessages.length * MESSAGE_HEIGHT,
+					transition: 'transform 0.2s ease-out' // Smooth transition for scroll movements
+				}}
+			>
 				{messageComponents}
-				<div ref={messagesEndRef} />
 			</div>
 		</AbsoluteFill>
 	);
