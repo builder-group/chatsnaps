@@ -49,7 +49,7 @@ export const HelloWorld: React.FC<z.infer<typeof myCompSchema>> = ({
 
 	// A <AbsoluteFill> is just a absolutely positioned <div>!
 	return (
-		<AbsoluteFill style={{ backgroundColor: 'white' }}>
+		<AbsoluteFill className="bg-red-400">
 			<AbsoluteFill style={{ opacity }}>
 				<AbsoluteFill style={{ transform: `translateY(${logoTranslation}px)` }}>
 					<Logo logoColor1={logoColor1} logoColor2={logoColor2} />

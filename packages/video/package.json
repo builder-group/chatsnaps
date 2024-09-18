@@ -28,6 +28,7 @@
 	},
 	"homepage": "",
 	"dependencies": {
+		"@remotion/bundler": "^4.0.212",
 		"@remotion/cli": "4.0.212",
 		"@remotion/zod-types": "4.0.212",
 		"react": "^18.3.1",
@@ -37,6 +38,7 @@
 	},
 	"devDependencies": {
 		"@remotion/eslint-config": "4.0.212",
+		"@remotion/tailwind": "^4.0.212",
 		"@types/react": "^18.3.7",
 		"@types/web": "^0.0.163"
 	},
