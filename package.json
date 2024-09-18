@@ -6,6 +6,7 @@
 		"build": "turbo build",
 		"start:dev": "turbo dev",
 		"clean": "turbo run clean && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
 		"update:latest": "chmod +x ./scripts/update_deps.sh && sh ./scripts/update_deps.sh"
