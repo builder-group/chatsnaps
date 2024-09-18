@@ -42,6 +42,7 @@
 		"@remotion/tailwind": "^4.0.212",
 		"@types/react": "^18.3.7",
 		"@types/web": "^0.0.163",
+		"daisyui": "^4.12.10",
 		"tailwindcss": "^3.4.12"
 	},
 	"files": [
