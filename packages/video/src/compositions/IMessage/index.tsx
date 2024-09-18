@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
@@ -50,54 +50,62 @@ export const IMessageComp: React.FC<TIMessageCompProps> = (props) => {
 	const { title, script } = props;
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
+	const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-	const messages: TMessage[] = useMemo(() => {
+	const messages = React.useMemo(() => {
 		let currentTime = 0;
-		const messages: TMessage[] = [];
-
-		for (const item of script) {
-			switch (item.type) {
-				case 'Message': {
-					const startFrame = Math.floor(currentTime * fps);
-					currentTime += 0.5;
-					messages.push({
-						message: item.message,
-						speaker: item.speaker,
-						startFrame
-					});
-					break;
-				}
-				case 'Pause': {
-					currentTime += item.duration_ms / 1000;
-					continue;
-				}
+		return script.reduce((acc, item) => {
+			if (item.type === 'Message') {
+				const startFrame = Math.floor(currentTime * fps);
+				currentTime += 0.5;
+				acc.push({
+					message: item.message,
+					speaker: item.speaker,
+					startFrame
+				});
+			} else if (item.type === 'Pause') {
+				currentTime += item.duration_ms / 1000;
 			}
-		}
-
-		return messages;
+			return acc;
+		}, [] as TMessage[]);
 	}, [script, fps]);
 
-	return (
-		<AbsoluteFill className="flex flex-col bg-gray-100" style={{ width, height }}>
-			<div className="flex flex-1 flex-col space-y-4 overflow-y-auto p-6">
-				{messages.map((message, index) => {
-					const progress = spring({
-						frame: frame - message.startFrame,
-						fps,
-						config: { damping: 15, stiffness: 150, mass: 0.5 }
-					});
-					const isLeft = message.speaker === 'Zoe';
+	const messageComponents = messages
+		.map((message, index) => {
+			if (message.startFrame > frame) {
+				return null;
+			}
 
-					return (
-						<MessageBubble
-							key={index}
-							message={message.message}
-							startFrame={message.startFrame}
-							isLeft={isLeft}
-							progress={progress}
-						/>
-					);
-				})}
+			const progress = spring({
+				frame: frame - message.startFrame,
+				fps,
+				config: { damping: 15, stiffness: 150, mass: 0.5 }
+			});
+			const isLeft = message.speaker === 'Zoe';
+
+			return (
+				<MessageBubble
+					key={index}
+					message={message.message}
+					startFrame={message.startFrame}
+					isLeft={isLeft}
+					progress={progress}
+				/>
+			);
+		})
+		.filter(Boolean);
+
+	React.useEffect(() => {
+		if (messagesEndRef.current != null) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	}, [messageComponents.length]);
+
+	return (
+		<AbsoluteFill className="no-scrollbar flex flex-col bg-gray-100" style={{ width, height }}>
+			<div className="flex flex-1 flex-col space-y-4 overflow-y-auto p-6">
+				{messageComponents}
+				<div ref={messagesEndRef} />
 			</div>
 		</AbsoluteFill>
 	);
