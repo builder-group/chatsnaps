@@ -36,7 +36,7 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
 
-  packages/chatsnap:
+  packages/video:
     dependencies:
       '@remotion/cli':
         specifier: 4.0.212
