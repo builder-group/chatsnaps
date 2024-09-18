@@ -4,8 +4,9 @@
 	"description": "ChatSnap Video",
 	"private": true,
 	"scripts": {
-		"start:dev": "remotion studio",
-		"build": "remotion render HelloWorld out/video.mp4",
+		"build": "shx rm -rf dist && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"css:build": "tailwindcss -i ./src/style.css -o ./dist/style.css",
+		"start:dev": "remotion studio ./studio.js",
 		"remotion:upgrade": "remotion upgrade",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
@@ -34,6 +35,7 @@
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"remotion": "4.0.212",
+		"tailwindcss": "^3.4.12",
 		"zod": "3.23.8"
 	},
 	"devDependencies": {

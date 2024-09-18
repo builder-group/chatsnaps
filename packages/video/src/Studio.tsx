@@ -4,9 +4,7 @@ import { IMessageComp, IMessageCompSchema } from './compositions';
 
 import './style.css';
 
-// Each <Composition> is an entry in the sidebar!
-
-export const RemotionRoot: React.FC = () => {
+export const Studio: React.FC = () => {
 	return (
 		<>
 			<Composition
