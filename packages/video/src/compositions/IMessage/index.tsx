@@ -145,8 +145,10 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 						durationInFrames: fps * 1
 					});
 
+					const speakerVoice = isLeft ? 'Sarah' : 'Rachel';
+
 					// Generate a unique hash for the message and voice
-					const hash = md5(`${item.message}-${isLeft ? 'Sarah' : 'Rachel'}`);
+					const hash = md5(`${item.message}-${speakerVoice}`);
 					const filePath = `.generated/elevenlabs/${hash}.mp3`;
 
 					const files = getStaticFiles();
@@ -155,10 +157,10 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 					// Generate voice
 					if (!fileNamesSet.has(filePath)) {
 						const audioStream = await elevenLabsClient.generateTextToSpeach({
-							voice: 'Rachel', // You might want to make this dynamic based on the speaker
+							voice: speakerVoice, // You might want to make this dynamic based on the speaker
 							text: item.message,
-							previousRequestIds: [],
-							nextRequestIds: []
+							previousRequestIds: [], // TODO
+							nextRequestIds: [] // TODO
 						});
 						if (audioStream.isOk()) {
 							const buffer = await streamToBuffer(audioStream.value);
