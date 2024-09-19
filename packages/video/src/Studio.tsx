@@ -1,6 +1,6 @@
 import { Composition } from 'remotion';
 
-import { IMessageComp, IMessageCompSchema } from './compositions';
+import { calculateMetadata, IMessageComp, IMessageCompSchema } from './compositions';
 
 import './style.css';
 
@@ -10,6 +10,7 @@ export const Studio: React.FC = () => {
 			<Composition
 				id="iMessage"
 				component={IMessageComp}
+				calculateMetadata={calculateMetadata}
 				durationInFrames={30 * 30} // 30s * 30fpx
 				fps={30}
 				width={1080}

@@ -12,6 +12,7 @@ dependencies=(
     # builder.group
     "@blgc/cli"
     "@blgc/config"
+    "elevenlabs-client"
     "eprel-client"
     "feature-fetch"
     "feature-form"

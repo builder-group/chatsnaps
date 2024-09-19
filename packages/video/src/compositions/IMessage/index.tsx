@@ -1,20 +1,32 @@
+import { writeStaticFile } from '@remotion/studio';
+import md5 from 'md5';
 import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
+	CalculateMetadataFunction,
+	getStaticFiles,
 	interpolate,
 	Sequence,
 	spring,
+	staticFile,
 	useCurrentFrame,
 	useVideoConfig
 } from 'remotion';
 import { z } from 'zod';
 
-import messageSound from '../../assets/message.mp3';
-import sendSound from '../../assets/send.mp3';
+import { elevenLabsClient } from '../../environment';
+import { streamToBuffer } from '../../lib';
 
-const MessageBubble: React.FC<TMessageBubbleProps> = (props) => {
-	const { message, isLeft, progress, startFrame } = props;
+const MessageBubble: React.FC<
+	Omit<TSequenceMessageContent, 'type'> & { startFrame: number; frame: number; fps: number }
+> = (props) => {
+	const { message, isLeft, startFrame, frame, fps } = props;
+	const progress = spring({
+		frame: frame - startFrame,
+		fps,
+		config: { damping: 15, stiffness: 150, mass: 0.5 }
+	});
 	const bubbleClass = isLeft
 		? 'bg-gray-300 rounded-tr-3xl rounded-br-3xl rounded-bl-3xl'
 		: 'bg-blue-500 text-white rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl';
@@ -31,114 +43,157 @@ const MessageBubble: React.FC<TMessageBubbleProps> = (props) => {
 				opacity
 			}}
 		>
-			<Sequence from={startFrame}>
-				<Audio src={isLeft ? messageSound : sendSound} />
-			</Sequence>
 			<div className={`${bubbleClass} p-4 text-5xl shadow-md`}>{message}</div>
 		</div>
 	);
 };
 
-interface TMessageBubbleProps {
-	message: string;
-	isLeft: boolean;
-	progress: number;
-	startFrame: number;
-}
-
 export const IMessageComp: React.FC<TIMessageCompProps> = (props) => {
-	const { title, script } = props;
+	const { sequence } = props;
 	const frame = useCurrentFrame();
-	const { fps, width, height } = useVideoConfig();
+	const { fps, height } = useVideoConfig();
+	const contentRef = React.useRef<HTMLDivElement>(null);
+	const [contentHeight, setContentHeight] = React.useState(0);
+	// const scale = useCurrentScale();
 
-	const messages = React.useMemo(() => {
-		let currentTime = 0;
-		return script.reduce((acc, item) => {
-			if (item.type === 'Message') {
-				const startFrame = Math.floor(currentTime * fps);
-				currentTime += 0.5;
-				acc.push({
-					message: item.message,
-					speaker: item.speaker,
-					startFrame
-				});
-			} else if (item.type === 'Pause') {
-				currentTime += item.duration_ms / 1000;
-			}
-			return acc;
-		}, [] as TMessage[]);
-	}, [script, fps]);
-
-	const visibleMessages = messages.filter((message) => message.startFrame <= frame);
-
-	const MESSAGE_HEIGHT = 115; // Approximate height of each message
-	const SCROLL_DURATION = 15; // Number of frames for scroll animation
-
-	const calculateScrollPosition = () => {
-		const totalHeight = visibleMessages.length * MESSAGE_HEIGHT;
-		const lastVisibleMessage = visibleMessages[visibleMessages.length - 1];
-		const scrollTarget = Math.max(0, totalHeight - height);
-
-		if (frame - lastVisibleMessage.startFrame < SCROLL_DURATION) {
-			// Rapid scroll to the new message
-			return interpolate(
-				frame - lastVisibleMessage.startFrame,
-				[0, SCROLL_DURATION],
-				[Math.max(0, scrollTarget - MESSAGE_HEIGHT), scrollTarget],
-				{
-					extrapolateRight: 'clamp',
-					easing: (t) =>
-						spring({ frame: t * 60, fps: 60, config: { damping: 15, stiffness: 150, mass: 0.5 } })
-				}
-			);
-		} else {
-			// Stay at the current scroll position
-			return scrollTarget;
+	// https://www.remotion.dev/docs/measuring
+	React.useEffect(() => {
+		if (contentRef.current != null) {
+			setContentHeight(contentRef.current.scrollHeight);
 		}
-	};
+	}, [frame]);
 
-	const scrollPosition = calculateScrollPosition();
-
-	const messageComponents = visibleMessages.map((message, index) => {
-		const progress = spring({
-			frame: frame - message.startFrame,
-			fps,
-			config: { damping: 15, stiffness: 150, mass: 0.5 }
-		});
-		const isLeft = message.speaker === 'Zoe';
-
-		return (
-			<MessageBubble
-				key={index}
-				message={message.message}
-				startFrame={message.startFrame}
-				isLeft={isLeft}
-				progress={progress}
-			/>
-		);
-	});
+	const scrollY = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className="bg-gray-100" style={{ width, height }}>
+		<AbsoluteFill className="bg-gray-100">
 			<div
-				className="flex flex-col space-y-4 p-6"
+				className="flex flex-col"
+				ref={contentRef}
 				style={{
-					transform: `translateY(-${scrollPosition}px)`,
-					height: visibleMessages.length * MESSAGE_HEIGHT,
-					transition: 'transform 0.2s ease-out' // Smooth transition for scroll movements
+					transform: `translateY(-${scrollY}px)`
 				}}
 			>
-				{messageComponents}
+				{sequence
+					.filter((item) => item.startFrame <= frame)
+					.map((item, index) => {
+						const { content, startFrame, durationInFrames } = item;
+
+						switch (content.type) {
+							case 'Message':
+								return (
+									<>
+										{content.src != null && (
+											<Sequence from={startFrame} durationInFrames={durationInFrames}>
+												<Audio src={staticFile(content.src)} />
+											</Sequence>
+										)}
+										<MessageBubble
+											key={`${item.content.type}-${index}`}
+											fps={fps}
+											frame={frame}
+											isLeft={content.isLeft}
+											message={content.message}
+											speaker={content.speaker}
+											startFrame={startFrame}
+										/>
+									</>
+								);
+							case 'Audio':
+								return (
+									<Sequence from={startFrame} durationInFrames={durationInFrames}>
+										<Audio src={staticFile(content.src)} />
+									</Sequence>
+								);
+						}
+					})}
 			</div>
 		</AbsoluteFill>
 	);
 };
 
-interface TMessage {
-	startFrame: number;
-	message: string;
-	speaker: string;
-}
+export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = async (
+	metadata
+) => {
+	const {
+		props: { script }
+	} = metadata;
+	const fps = 30;
+
+	const sequence: TSequence[] = [];
+	let currentTime = 0;
+
+	const firstMessage = script.find((item) => item.type === 'Message');
+	const firstSpeaker = firstMessage?.speaker;
+
+	for (const item of script) {
+		switch (item.type) {
+			case 'Message':
+				{
+					const startFrame = Math.floor(currentTime * fps);
+					currentTime += 0.5;
+
+					const isLeft = item.speaker === firstSpeaker;
+
+					// Push notification
+					sequence.push({
+						content: {
+							type: 'Audio',
+							src: isLeft ? 'static/message.mp3' : 'static/send.mp3'
+						},
+						startFrame,
+						durationInFrames: fps * 1
+					});
+
+					// Generate a unique hash for the message and voice
+					const hash = md5(`${item.message}-${isLeft ? 'Sarah' : 'Rachel'}`);
+					const filePath = `.generated/elevenlabs/${hash}.mp3`;
+
+					const files = getStaticFiles();
+					const fileNamesSet = new Set(files.map((file) => file.name));
+
+					// Generate voice
+					if (!fileNamesSet.has(filePath)) {
+						const audioStream = await elevenLabsClient.generateTextToSpeach({
+							voice: 'Rachel', // You might want to make this dynamic based on the speaker
+							text: item.message,
+							previousRequestIds: [],
+							nextRequestIds: []
+						});
+						if (audioStream.isOk()) {
+							const buffer = await streamToBuffer(audioStream.value);
+							writeStaticFile({
+								filePath: filePath,
+								contents: buffer
+							});
+						}
+					}
+
+					// Push message
+					sequence.push({
+						content: {
+							type: 'Message',
+							message: item.message,
+							speaker: item.speaker,
+							isLeft,
+							src: filePath
+						},
+						startFrame
+					});
+				}
+				break;
+			case 'Pause': {
+				currentTime += item.duration_ms / 1000;
+			}
+		}
+	}
+
+	return {
+		props: { ...metadata.props, sequence },
+		fps,
+		durationInFrames: Math.ceil(currentTime * fps)
+	};
+};
 
 export const IMessageCompSchema = z.object({
 	title: z.string(),
@@ -157,4 +212,23 @@ export const IMessageCompSchema = z.object({
 	)
 });
 
-export type TIMessageCompProps = z.infer<typeof IMessageCompSchema>;
+export type TIMessageCompProps = z.infer<typeof IMessageCompSchema> & { sequence: TSequence[] };
+
+interface TSequenceMessageContent {
+	type: 'Message';
+	message: string;
+	speaker: string;
+	isLeft: boolean;
+	src?: string;
+}
+
+interface TSequenceAudioContent {
+	type: 'Audio';
+	src: string;
+}
+
+interface TSequence {
+	startFrame: number;
+	durationInFrames?: number;
+	content: TSequenceMessageContent | TSequenceAudioContent;
+}

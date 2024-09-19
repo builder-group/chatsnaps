@@ -38,9 +38,21 @@ importers:
 
   packages/video:
     dependencies:
+      '@blgc/utils':
+        specifier: ^0.0.19
+        version: 0.0.19
       '@remotion/zod-types':
         specifier: 4.0.212
         version: 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@3.23.8)
+      elevenlabs-client:
+        specifier: ^0.0.6
+        version: 0.0.6
+      feature-fetch:
+        specifier: ^0.0.30
+        version: 0.0.30
+      md5:
+        specifier: ^2.3.0
+        version: 2.3.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -63,9 +75,15 @@ importers:
       '@remotion/eslint-config':
         specifier: 4.0.212
         version: 4.0.212(eslint@9.10.0(jiti@1.21.6))(typescript@5.6.2)
+      '@remotion/studio':
+        specifier: ^4.0.212
+        version: 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@remotion/tailwind':
         specifier: ^4.0.212
         version: 4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)(webpack@5.94.0(esbuild@0.18.6))
+      '@types/md5':
+        specifier: ^2.3.5
+        version: 2.3.5
       '@types/react':
         specifier: ^18.3.7
         version: 18.3.7
@@ -80,6 +98,14 @@ importers:
         version: 3.4.12
 
 packages:
+
+  '@0no-co/graphql.web@1.0.8':
+    resolution: {integrity: sha512-8BG6woLtDMvXB9Ajb/uE+Zr/U7y4qJ3upXi0JQHZmsKUJa7HjF/gFvmL2f3/mSmfZoQGRr9VoY97LCX2uaFMzA==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
 
   '@aashutoshrathi/word-wrap@1.2.6':
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
@@ -185,6 +211,12 @@ packages:
     peerDependencies:
       '@next/eslint-plugin-next': ^14.2.5
       eslint: ^8.57.0
+
+  '@blgc/types@0.0.7':
+    resolution: {integrity: sha512-lMngF7NR+q6eDUHIwZnkZL+2/o7iq7nTHiB4qqLkRaFO16TmOIQAB+9fCpQKNhzk92QOkXaCkfVVBUT/KMEPlQ==}
+
+  '@blgc/utils@0.0.19':
+    resolution: {integrity: sha512-6vwAi5TqnvT/heyEN1V5HX+QNlpP4Ful2Fn4YoqjENPRC3HLcd84+ZORTj+gOfnzQtO2Mdk3H/ovbHq+ElA+cg==}
 
   '@csstools/cascade-layer-name-parser@1.0.13':
     resolution: {integrity: sha512-MX0yLTwtZzr82sQ0zOjqimpZbzjMaK/h2pmlrLK7DCzlmiZLYFpoO94WmN1akRVo6ll/TdpHb53vihHLUMyvng==}
@@ -1041,6 +1073,9 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
+  '@types/md5@2.3.5':
+    resolution: {integrity: sha512-/i42wjYNgE6wf0j2bcTX6kuowmdL/6PE4IVitMpm2eYKBUuYCprdcWVK+xEF0gcV6ufMCRhtxmReGfc6hIK7Jw==}
+
   '@types/node@22.5.5':
     resolution: {integrity: sha512-Xjs4y5UPO/CLdzpgR6GirZJx36yScjh73+2NlLlkFRSoQN8B0DpfXPdZGnvVmLRLOsqDpOfTNv7D9trgGhmOIA==}
 
@@ -1534,6 +1569,9 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
 
+  charenc@0.0.2:
+    resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
+
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
@@ -1622,6 +1660,9 @@ packages:
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
+
+  crypt@0.0.2:
+    resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
 
   css-blank-pseudo@5.0.2:
     resolution: {integrity: sha512-aCU4AZ7uEcVSUzagTlA9pHciz7aWPKA/YzrEkpdSopJ2pvhIxiQ5sYeMz1/KByxlIo4XBdvMNJAVKMg/GRnhfw==}
@@ -1836,6 +1877,9 @@ packages:
 
   electron-to-chromium@1.5.24:
     resolution: {integrity: sha512-0x0wLCmpdKFCi9ulhvYZebgcPmHTkFVUfU2wzDykadkslKwT4oAmDTHEKLnlrDsMGZe4B+ksn8quZfZjYsBetA==}
+
+  elevenlabs-client@0.0.6:
+    resolution: {integrity: sha512-sT+7WbLesP5qNVOaXcF+flYJimA/NJ7TduZKxIgi59iY13lxz4PBK1CRrAaHnxcOleIu5xJf+aHrKtdb+tv+Qg==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -2218,6 +2262,9 @@ packages:
       picomatch:
         optional: true
 
+  feature-fetch@0.0.30:
+    resolution: {integrity: sha512-OiK/LvC8bHdKW0CCDlFFU80QMCMF+TMceOwHgR82KoR9Sy9WCwzjOZ8o6zkKlLReWcVXuVbHUtVwHL933QWodw==}
+
   figlet@1.7.0:
     resolution: {integrity: sha512-gO8l3wvqo0V7wEFLXPbkX83b7MVjRrk1oRLfYlZXol8nEpb/ON9pcKLI4qpBv5YtOTfrINtqb7b40iYY2FTWFg==}
     engines: {node: '>= 0.4.0'}
@@ -2536,6 +2583,9 @@ packages:
     resolution: {integrity: sha512-gDYaKHJmnj4aWxyj6YHyXVpdQawtVLHU5cb+eztPGczf6cjuTdwve5ZIEfgXqH4e57An1D1AKf8CZ3kYrQRqYA==}
     engines: {node: '>= 0.4'}
 
+  is-buffer@1.1.6:
+    resolution: {integrity: sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==}
+
   is-builtin-module@3.2.1:
     resolution: {integrity: sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==}
     engines: {node: '>=6'}
@@ -2834,6 +2884,9 @@ packages:
   maxmin@4.1.0:
     resolution: {integrity: sha512-p611b6DBuUsfm1chFgVHG+YXvYPYDD6OWInfZqk8/BAq5ayEbPJPcuYyrSs1tJIbqWGln4fnSN7sKFOJuRVH0w==}
     engines: {node: '>=12'}
+
+  md5@2.3.0:
+    resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
 
   mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
@@ -4354,6 +4407,8 @@ packages:
 
 snapshots:
 
+  '@0no-co/graphql.web@1.0.8': {}
+
   '@aashutoshrathi/word-wrap@1.2.6': {}
 
   '@alloc/quick-lru@5.2.0': {}
@@ -4531,6 +4586,10 @@ snapshots:
       - typescript
       - vite
       - vitest
+
+  '@blgc/types@0.0.7': {}
+
+  '@blgc/utils@0.0.19': {}
 
   '@csstools/cascade-layer-name-parser@1.0.13(@csstools/css-parser-algorithms@2.7.1(@csstools/css-tokenizer@2.4.1))(@csstools/css-tokenizer@2.4.1)':
     dependencies:
@@ -5339,6 +5398,8 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
+  '@types/md5@2.3.5': {}
+
   '@types/node@22.5.5':
     dependencies:
       undici-types: 6.19.8
@@ -5973,6 +6034,8 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
+  charenc@0.0.2: {}
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -6061,6 +6124,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  crypt@0.0.2: {}
 
   css-blank-pseudo@5.0.2(postcss@8.4.47):
     dependencies:
@@ -6307,6 +6372,13 @@ snapshots:
       jake: 10.9.2
 
   electron-to-chromium@1.5.24: {}
+
+  elevenlabs-client@0.0.6:
+    dependencies:
+      '@blgc/utils': 0.0.19
+      feature-fetch: 0.0.30
+    transitivePeerDependencies:
+      - graphql
 
   emoji-regex@8.0.0: {}
 
@@ -6929,6 +7001,14 @@ snapshots:
 
   fdir@6.1.1: {}
 
+  feature-fetch@0.0.30:
+    dependencies:
+      '@0no-co/graphql.web': 1.0.8
+      '@blgc/types': 0.0.7
+      '@blgc/utils': 0.0.19
+    transitivePeerDependencies:
+      - graphql
+
   figlet@1.7.0: {}
 
   figures@1.7.0:
@@ -7236,6 +7316,8 @@ snapshots:
       call-bind: 1.0.7
       has-tostringtag: 1.0.2
 
+  is-buffer@1.1.6: {}
+
   is-builtin-module@3.2.1:
     dependencies:
       builtin-modules: 3.3.0
@@ -7500,6 +7582,12 @@ snapshots:
       figures: 3.2.0
       gzip-size: 6.0.0
       pretty-bytes: 5.6.0
+
+  md5@2.3.0:
+    dependencies:
+      charenc: 0.0.2
+      crypt: 0.0.2
+      is-buffer: 1.1.6
 
   mdn-data@2.0.14: {}
 
