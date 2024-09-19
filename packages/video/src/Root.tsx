@@ -4,7 +4,7 @@ import { calculateMetadata, IMessageComp, IMessageCompSchema } from './compositi
 
 import './style.css';
 
-export const Studio: React.FC = () => {
+export const Root: React.FC = () => {
 	return (
 		<>
 			<Composition

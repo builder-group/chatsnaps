@@ -1,5 +1,5 @@
 import { registerRoot } from 'remotion';
 
-import { Studio } from './src/Studio.tsx';
+import { Root } from './src/Root.tsx';
 
-registerRoot(Studio);
+registerRoot(Root);

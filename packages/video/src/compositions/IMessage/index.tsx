@@ -1,11 +1,8 @@
-import { writeStaticFile } from '@remotion/studio';
-import md5 from 'md5';
 import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
 	CalculateMetadataFunction,
-	getStaticFiles,
 	interpolate,
 	Sequence,
 	spring,
@@ -14,9 +11,6 @@ import {
 	useVideoConfig
 } from 'remotion';
 import { z } from 'zod';
-
-import { elevenLabsClient } from '../../environment';
-import { streamToBuffer } from '../../lib';
 
 const MessageBubble: React.FC<
 	Omit<TSequenceMessageContent, 'type'> & { startFrame: number; frame: number; fps: number }
@@ -145,31 +139,31 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 						durationInFrames: fps * 1
 					});
 
-					const speakerVoice = isLeft ? 'Sarah' : 'Rachel';
+					// const speakerVoice = isLeft ? 'Sarah' : 'Rachel';
 
-					// Generate a unique hash for the message and voice
-					const hash = md5(`${item.message}-${speakerVoice}`);
-					const filePath = `.generated/elevenlabs/${hash}.mp3`;
+					// // Generate a unique hash for the message and voice
+					// const hash = md5(`${item.message}-${speakerVoice}`);
+					// const filePath = `.generated/elevenlabs/${hash}.mp3`;
 
-					const files = getStaticFiles();
-					const fileNamesSet = new Set(files.map((file) => file.name));
+					// const files = getStaticFiles();
+					// const fileNamesSet = new Set(files.map((file) => file.name));
 
-					// Generate voice
-					if (!fileNamesSet.has(filePath)) {
-						const audioStream = await elevenLabsClient.generateTextToSpeach({
-							voice: speakerVoice, // You might want to make this dynamic based on the speaker
-							text: item.message,
-							previousRequestIds: [], // TODO
-							nextRequestIds: [] // TODO
-						});
-						if (audioStream.isOk()) {
-							const buffer = await streamToBuffer(audioStream.value);
-							writeStaticFile({
-								filePath: filePath,
-								contents: buffer
-							});
-						}
-					}
+					// // Generate voice
+					// if (!fileNamesSet.has(filePath)) {
+					// 	const audioStream = await elevenLabsClient.generateTextToSpeach({
+					// 		voice: speakerVoice, // You might want to make this dynamic based on the speaker
+					// 		text: item.message,
+					// 		previousRequestIds: [], // TODO
+					// 		nextRequestIds: [] // TODO
+					// 	});
+					// 	if (audioStream.isOk()) {
+					// 		const buffer = await streamToBuffer(audioStream.value);
+					// 		writeStaticFile({
+					// 			filePath: filePath,
+					// 			contents: buffer
+					// 		});
+					// 	}
+					// }
 
 					// Push message
 					sequence.push({
@@ -177,10 +171,11 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 							type: 'Message',
 							message: item.message,
 							speaker: item.speaker,
-							isLeft,
-							src: filePath
+							isLeft
+							// src: filePath
 						},
-						startFrame
+						startFrame,
+						durationInFrames: fps * 3
 					});
 				}
 				break;

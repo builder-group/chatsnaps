@@ -4,7 +4,8 @@
 	"description": "ChatSnap Video",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && pnpm run bundle && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"bundle": "tsx bundle.js",
 		"css:build": "tailwindcss -i ./src/style.css -o ./dist/style.css",
 		"start:dev": "remotion studio ./studio.js",
 		"remotion:upgrade": "remotion upgrade",
@@ -37,13 +38,13 @@
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"remotion": "4.0.212",
+		"tsx": "^4.19.1",
 		"zod": "3.23.8"
 	},
 	"devDependencies": {
 		"@remotion/bundler": "^4.0.212",
 		"@remotion/cli": "4.0.212",
 		"@remotion/eslint-config": "4.0.212",
-		"@remotion/studio": "^4.0.212",
 		"@remotion/tailwind": "^4.0.212",
 		"@types/md5": "^2.3.5",
 		"@types/react": "^18.3.7",
