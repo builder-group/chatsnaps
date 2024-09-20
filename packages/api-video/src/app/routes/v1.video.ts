@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 
+import { s3Client } from '../../environment';
 import { router } from '../router';
 
 const compositionId = 'iMessage';
@@ -94,6 +95,10 @@ router.get('/v1/video', async (c) => {
 		codec: 'h264',
 		inputProps
 	});
+
+	if (result.buffer != null) {
+		await s3Client.uploadObject('test.mp4', result.buffer, 'test-bucket');
+	}
 
 	// TODO
 
