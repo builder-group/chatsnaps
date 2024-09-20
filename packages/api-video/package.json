@@ -35,7 +35,7 @@
 		"@remotion/bundler": "^4.0.212",
 		"@remotion/renderer": "^4.0.212",
 		"@repo/video": "workspace:*",
-		"elevenlabs-client": "^0.0.6",
+		"elevenlabs-client": "^0.0.8",
 		"feature-logger": "^0.0.23",
 		"hono": "^4.6.2",
 		"s3rver": "^3.7.1",

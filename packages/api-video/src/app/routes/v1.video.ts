@@ -85,6 +85,7 @@ async function mapSequence(
 
 	const firstMessage = sequence.find((item) => item.type === 'Message');
 	const firstSpeaker = firstMessage?.speaker;
+	const previousRequestIdsMap: Record<string, string[]> = {};
 
 	for (const item of sequence) {
 		switch (item.type) {
@@ -118,16 +119,25 @@ async function mapSequence(
 
 					// Generate voice
 					if (!isSpokenMessageCached) {
-						const audioStream = mapErr(
+						const audio = mapErr(
 							await elevenLabsClient.generateTextToSpeach({
 								voice: voiceId,
 								text: item.message,
-								previousRequestIds: [] // TODO:
+								// https://stackoverflow.com/questions/6473858/how-do-i-get-the-last-5-elements-excluding-the-first-element-from-an-array
+								previousRequestIds: (previousRequestIdsMap[voiceId] ?? []).slice(1).slice(-3)
 							}),
 							(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
 						).unwrap();
 
-						const arrayBuffer = await streamToBuffer(audioStream);
+						if (audio.requestId != null) {
+							if (Array.isArray(previousRequestIdsMap[voiceId])) {
+								previousRequestIdsMap[voiceId].push(audio.requestId);
+							} else {
+								previousRequestIdsMap[voiceId] = [audio.requestId];
+							}
+						}
+
+						const arrayBuffer = await streamToBuffer(audio.stream);
 						mapErr(
 							await s3Client.uploadObject(
 								spokenMessageFilename,

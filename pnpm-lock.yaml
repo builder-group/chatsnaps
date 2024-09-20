@@ -72,8 +72,8 @@ importers:
         specifier: workspace:*
         version: link:../video
       elevenlabs-client:
-        specifier: ^0.0.6
-        version: 0.0.6
+        specifier: ^0.0.8
+        version: 0.0.8
       feature-logger:
         specifier: ^0.0.23
         version: 0.0.23
@@ -2620,8 +2620,8 @@ packages:
   electron-to-chromium@1.5.24:
     resolution: {integrity: sha512-0x0wLCmpdKFCi9ulhvYZebgcPmHTkFVUfU2wzDykadkslKwT4oAmDTHEKLnlrDsMGZe4B+ksn8quZfZjYsBetA==}
 
-  elevenlabs-client@0.0.6:
-    resolution: {integrity: sha512-sT+7WbLesP5qNVOaXcF+flYJimA/NJ7TduZKxIgi59iY13lxz4PBK1CRrAaHnxcOleIu5xJf+aHrKtdb+tv+Qg==}
+  elevenlabs-client@0.0.8:
+    resolution: {integrity: sha512-/J9YynSXd6NYghnZQswO5Ksnv07/KYIxLtek/FxeVRogHOAE/VsmTc4Cubm2mCSB85ZjqrXEPcfmOlv7Nzu3fw==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -8650,7 +8650,7 @@ snapshots:
 
   electron-to-chromium@1.5.24: {}
 
-  elevenlabs-client@0.0.6:
+  elevenlabs-client@0.0.8:
     dependencies:
       '@blgc/utils': 0.0.19
       feature-fetch: 0.0.30

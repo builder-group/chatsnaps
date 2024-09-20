@@ -82,6 +82,6 @@ ChatHistoryComp.calculateMetadata = async (metadata) => {
 	return {
 		props: { ...metadata.props, sequence: orderedSequence },
 		fps,
-		durationInFrames: Math.ceil(lastFrame * fps)
+		durationInFrames: lastFrame
 	};
 };
