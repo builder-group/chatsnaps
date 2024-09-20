@@ -1,3 +1,4 @@
+import md5 from 'md5';
 import React from 'react';
 import {
 	AbsoluteFill,
@@ -139,11 +140,11 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 						durationInFrames: fps * 1
 					});
 
-					// const speakerVoice = isLeft ? 'Sarah' : 'Rachel';
+					const speakerVoice = isLeft ? 'Sarah' : 'Rachel';
 
 					// // Generate a unique hash for the message and voice
-					// const hash = md5(`${item.message}-${speakerVoice}`);
-					// const filePath = `.generated/elevenlabs/${hash}.mp3`;
+					const hash = md5(`${item.message}-${speakerVoice}`);
+					const filePath = `.generated/elevenlabs/${hash}.mp3`;
 
 					// const files = getStaticFiles();
 					// const fileNamesSet = new Set(files.map((file) => file.name));
@@ -171,8 +172,8 @@ export const calculateMetadata: CalculateMetadataFunction<TIMessageCompProps> = 
 							type: 'Message',
 							message: item.message,
 							speaker: item.speaker,
-							isLeft
-							// src: filePath
+							isLeft,
+							src: filePath
 						},
 						startFrame,
 						durationInFrames: fps * 3

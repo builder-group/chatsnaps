@@ -29,7 +29,9 @@
 	"dependencies": {
 		"@blgc/openapi-router": "^0.0.20",
 		"@blgc/utils": "^0.0.19",
-		"@repo/api-video": "workspace:*",
+		"@remotion/bundler": "^4.0.212",
+		"@remotion/renderer": "^4.0.212",
+		"@repo/video": "workspace:*",
 		"elevenlabs-client": "^0.0.6",
 		"feature-logger": "^0.0.23",
 		"hono": "^4.6.2"
