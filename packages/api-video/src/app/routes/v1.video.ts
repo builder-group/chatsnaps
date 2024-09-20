@@ -12,7 +12,7 @@ import {
 	s3Client,
 	s3Config
 } from '../../environment';
-import { sha256, streamToBuffer } from '../../lib';
+import { containsSpeakableChar, sha256, streamToBuffer } from '../../lib';
 import { router } from '../router';
 
 const SChatHistoryVideoDto = v.object({
@@ -86,6 +86,7 @@ async function mapSequence(
 	const firstMessage = sequence.find((item) => item.type === 'Message');
 	const firstSpeaker = firstMessage?.speaker;
 	const previousRequestIdsMap: Record<string, string[]> = {};
+	let creditsSpent = 0;
 
 	for (const item of sequence) {
 		switch (item.type) {
@@ -104,67 +105,70 @@ async function mapSequence(
 						durationInFrames: Number(fps)
 					});
 
-					const voiceId = isSender
-						? elevenLabsConfig.voices.Sarah.voiceId
-						: elevenLabsConfig.voices.Rachel.voiceId;
+					if (containsSpeakableChar(item.message)) {
+						const voiceId = isSender
+							? elevenLabsConfig.voices.Adam.voiceId
+							: elevenLabsConfig.voices.Alice.voiceId;
 
-					// Generate a unique hash for the message and voice ID
-					// TODO: Based on the scenario the tone might vary?
-					const spokenMessageFilename = `${sha256(`${voiceId}:${item.message}`)}.mp3`;
+						// Generate a unique hash for the message and voice ID
+						// TODO: Based on the scenario the tone might vary?
+						const spokenMessageFilename = `${sha256(`${voiceId}:${item.message}`)}.mp3`;
 
-					const isSpokenMessageCached =
-						unwrapOrNull(
-							await s3Client.doesObjectExist(spokenMessageFilename, s3Config.buckets.elevenlabs)
-						) ?? false;
+						const isSpokenMessageCached =
+							unwrapOrNull(
+								await s3Client.doesObjectExist(spokenMessageFilename, s3Config.buckets.elevenlabs)
+							) ?? false;
 
-					// Generate voice
-					if (!isSpokenMessageCached) {
-						const audio = mapErr(
-							await elevenLabsClient.generateTextToSpeach({
-								voice: voiceId,
-								text: item.message,
-								// https://stackoverflow.com/questions/6473858/how-do-i-get-the-last-5-elements-excluding-the-first-element-from-an-array
-								previousRequestIds: (previousRequestIdsMap[voiceId] ?? []).slice(1).slice(-3)
-							}),
-							(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
-						).unwrap();
+						// Generate voice
+						if (!isSpokenMessageCached) {
+							const audio = mapErr(
+								await elevenLabsClient.generateTextToSpeach({
+									voice: voiceId,
+									text: item.message
+									// previousRequestIds: (previousRequestIdsMap[voiceId] ?? []).slice(-3) // TODO: With prev requestIds they start whispering after around 20s
+								}),
+								(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
+							).unwrap();
 
-						if (audio.requestId != null) {
-							if (Array.isArray(previousRequestIdsMap[voiceId])) {
-								previousRequestIdsMap[voiceId].push(audio.requestId);
-							} else {
-								previousRequestIdsMap[voiceId] = [audio.requestId];
+							creditsSpent +=
+								typeof audio.characterCost === 'string' ? Number(audio.characterCost) : 0;
+							if (audio.requestId != null) {
+								if (Array.isArray(previousRequestIdsMap[voiceId])) {
+									previousRequestIdsMap[voiceId].push(audio.requestId);
+								} else {
+									previousRequestIdsMap[voiceId] = [audio.requestId];
+								}
 							}
+
+							const arrayBuffer = await streamToBuffer(audio.stream);
+							mapErr(
+								await s3Client.uploadObject(
+									spokenMessageFilename,
+									Buffer.from(arrayBuffer),
+									s3Config.buckets.elevenlabs
+								),
+								(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
+							).unwrap();
 						}
 
-						const arrayBuffer = await streamToBuffer(audio.stream);
-						mapErr(
-							await s3Client.uploadObject(
-								spokenMessageFilename,
-								Buffer.from(arrayBuffer),
-								s3Config.buckets.elevenlabs
-							),
+						const preSignedDonwloadUrlResult = await s3Client.getPreSignedDownloadUrl(
+							spokenMessageFilename,
+							900,
+							s3Config.buckets.elevenlabs
+						);
+						const spokenMessageSrc = mapErr(
+							preSignedDonwloadUrlResult,
 							(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
 						).unwrap();
+
+						// Push spoken message
+						finalSequence.push({
+							type: 'Audio',
+							src: spokenMessageSrc,
+							startFrame,
+							durationInFrames: 30 * 3 // TODO:
+						});
 					}
-
-					const preSignedDonwloadUrlResult = await s3Client.getPreSignedDownloadUrl(
-						spokenMessageFilename,
-						900,
-						s3Config.buckets.elevenlabs
-					);
-					const spokenMessageSrc = mapErr(
-						preSignedDonwloadUrlResult,
-						(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
-					).unwrap();
-
-					// Push spoken message
-					finalSequence.push({
-						type: 'Audio',
-						src: spokenMessageSrc,
-						startFrame,
-						durationInFrames: 30 * 3 // TODO:
-					});
 
 					// Push message
 					finalSequence.push({
@@ -181,6 +185,8 @@ async function mapSequence(
 			}
 		}
 	}
+
+	console.log({ creditsSpent });
 
 	return finalSequence;
 }
