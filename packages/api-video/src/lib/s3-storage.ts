@@ -139,7 +139,9 @@ export class S3Storage {
 		bucket?: string
 	): Promise<TResult<string | null, S3OperationError>> {
 		const bucketResult = this.getBucket(bucket);
-		if (bucketResult.isErr()) return bucketResult;
+		if (bucketResult.isErr()) {
+			return Err(bucketResult.error);
+		}
 		const bucketName = bucketResult.value;
 
 		try {
@@ -174,7 +176,9 @@ export class S3Storage {
 		bucket?: string
 	): Promise<TResult<string, S3OperationError>> {
 		const bucketResult = this.getBucket(bucket);
-		if (bucketResult.isErr()) return bucketResult;
+		if (bucketResult.isErr()) {
+			return Err(bucketResult.error);
+		}
 		const bucketName = bucketResult.value;
 
 		try {
@@ -208,7 +212,9 @@ export class S3Storage {
 		bucket?: string
 	): Promise<TResult<string, S3OperationError>> {
 		const bucketResult = this.getBucket(bucket);
-		if (bucketResult.isErr()) return bucketResult;
+		if (bucketResult.isErr()) {
+			return Err(bucketResult.error);
+		}
 		const bucketName = bucketResult.value;
 
 		try {
@@ -233,6 +239,73 @@ export class S3Storage {
 				})
 			);
 		}
+	}
+
+	public async getObjectUrl(
+		key: string,
+		bucket?: string
+	): Promise<TResult<string, S3OperationError>> {
+		const bucketResult = this.getBucket(bucket);
+		if (bucketResult.isErr()) {
+			return Err(bucketResult.error);
+		}
+		const bucketName = bucketResult.value;
+
+		try {
+			const endpoint = await this.resolveEndpoint();
+			const url = this.constructUrl(endpoint, bucketName, key);
+			return Ok(url);
+		} catch (error) {
+			return Err(
+				new S3OperationError({
+					message: 'Failed to construct object URL',
+					operation: 'GET_URL',
+					bucket: bucketName,
+					key,
+					originalError: error
+				})
+			);
+		}
+	}
+
+	private async resolveEndpoint(): Promise<TEndpoint> {
+		const endpoint = this.client.config.endpoint;
+		if (typeof endpoint === 'function') {
+			return await endpoint();
+		} else if (endpoint != null && typeof endpoint === 'object') {
+			return endpoint;
+		}
+
+		const region = this.client.config.region;
+		if (typeof region !== 'string') {
+			throw new Error('Region is not specified or is not a string in S3 client configuration');
+		}
+
+		return {
+			protocol: 'https:',
+			hostname: `s3.${region}.amazonaws.com`,
+			path: '/'
+		};
+	}
+
+	private constructUrl(endpoint: TEndpoint, bucket: string, key: string): string {
+		let { protocol, hostname } = endpoint;
+		const { port, path } = endpoint;
+		protocol = protocol.endsWith(':') ? protocol : `${protocol}:`;
+
+		let url = `${protocol}//${hostname}`;
+		if (port != null) {
+			url += `:${port.toString()}`;
+		}
+
+		if (this.client.config.forcePathStyle) {
+			url += `${path}${path.endsWith('/') ? '' : '/'}${bucket}/${encodeURIComponent(key)}`;
+		} else {
+			url += `${path}${path.endsWith('/') ? '' : '/'}${encodeURIComponent(key)}`;
+			hostname = `${bucket}.${hostname}`;
+		}
+
+		return url;
 	}
 }
 
@@ -262,4 +335,11 @@ export interface TS3OperationErrorConfig {
 	bucket: string;
 	key: string;
 	originalError?: unknown;
+}
+
+interface TEndpoint {
+	protocol: string;
+	hostname: string;
+	port?: number;
+	path: string;
 }

@@ -9,5 +9,5 @@ export const s3Client = new S3Storage({
 		secretAccessKey: s3Config.secretAccessKey
 	},
 	defaultBucket: 'test-bucket',
-	forcePathStyle: true // Required by S3rver
+	forcePathStyle: s3Config.endpoint.includes('localhost') // Required on localhost
 });

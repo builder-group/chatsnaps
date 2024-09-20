@@ -67,7 +67,7 @@ router.post('/v1/video/chatstory', vValidator('json', SChatHistoryVideoDto), asy
 	).unwrap();
 
 	const downloadUrl = mapErr(
-		await s3Client.getPreSignedDownloadUrl('test.mp4', 900, s3Config.buckets.video),
+		await s3Client.getObjectUrl('test.mp4', s3Config.buckets.video),
 		(e) => new AppError('#ERR_DOWNLOAD_URL', 500, { description: e.message })
 	).unwrap();
 
@@ -147,18 +147,23 @@ async function mapSequence(
 									Buffer.from(arrayBuffer),
 									s3Config.buckets.elevenlabs
 								),
-								(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
+								(e) =>
+									new AppError('#ERR_GENERATE_SPOKEN_MESSAGE_UPLOAD', 500, {
+										description: e.message
+									})
 							).unwrap();
 						}
 
-						const preSignedDonwloadUrlResult = await s3Client.getPreSignedDownloadUrl(
+						const preSignedDonwloadUrlResult = await s3Client.getObjectUrl(
 							spokenMessageFilename,
-							900,
 							s3Config.buckets.elevenlabs
 						);
 						const spokenMessageSrc = mapErr(
 							preSignedDonwloadUrlResult,
-							(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
+							(e) =>
+								new AppError('#ERR_GENERATE_SPOKEN_MESSAGE_DOWNLOAD', 500, {
+									description: e.message
+								})
 						).unwrap();
 
 						// Push spoken message
