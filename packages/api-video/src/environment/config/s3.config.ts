@@ -12,6 +12,7 @@ export const s3Config = {
 	),
 	region: 'us-east-1',
 	buckets: {
-		video: 'video'
+		video: 'video',
+		elevenlabs: 'elevenlabs'
 	}
 };

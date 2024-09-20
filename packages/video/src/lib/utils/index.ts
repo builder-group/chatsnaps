@@ -1,1 +1,1 @@
-export * from './stream-to-buffer';
+export * from './cn';

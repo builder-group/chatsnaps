@@ -1,1 +1,1 @@
-export * from './IMessage';
+export * from './ChatHistory';

@@ -43,6 +43,10 @@ async function setupS3rver() {
 				{
 					name: 'video',
 					configs: [fs.readFileSync(corsConfig), fs.readFileSync(websiteConfig)]
+				},
+				{
+					name: 'elevenlabs',
+					configs: [fs.readFileSync(corsConfig), fs.readFileSync(websiteConfig)]
 				}
 			]
 		});

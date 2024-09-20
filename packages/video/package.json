@@ -32,10 +32,12 @@
 	"dependencies": {
 		"@blgc/utils": "^0.0.19",
 		"@remotion/zod-types": "4.0.212",
+		"clsx": "^2.1.1",
 		"md5": "^2.3.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"remotion": "4.0.212",
+		"tailwind-merge": "^2.5.2",
 		"zod": "3.23.8"
 	},
 	"devDependencies": {
