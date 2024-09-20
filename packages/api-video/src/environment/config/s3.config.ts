@@ -10,5 +10,8 @@ export const s3Config = {
 		process.env.S3_SECRET_ACCESS_KEY,
 		'Environment variable "S3_SECRET_ACCESS_KEY" not set!'
 	),
-	region: 'us-east-1'
+	region: 'us-east-1',
+	buckets: {
+		video: 'video'
+	}
 };

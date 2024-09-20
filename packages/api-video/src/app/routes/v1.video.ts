@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { renderMedia, selectComposition } from '@remotion/renderer';
+import { AppError } from '@blgc/openapi-router';
 
-import { s3Client } from '../../environment';
+import { s3Client, s3Config } from '../../environment';
 import { router } from '../router';
 
 const compositionId = 'iMessage';
@@ -89,20 +90,34 @@ router.get('/v1/video', async (c) => {
 		inputProps
 	});
 
-	const result = await renderMedia({
+	const renderResult = await renderMedia({
 		composition,
 		serveUrl: bundleLocation,
 		codec: 'h264',
 		inputProps
 	});
-
-	if (result.buffer != null) {
-		await s3Client.uploadObject('test.mp4', result.buffer, 'test-bucket');
+	if (renderResult.buffer == null) {
+		throw new AppError('#ERR_RENDER', 500);
 	}
 
-	// TODO
+	const uploadResult = await s3Client.uploadObject(
+		'test.mp4',
+		renderResult.buffer,
+		s3Config.buckets.video
+	);
+	if (uploadResult.isErr()) {
+		throw new AppError('#ERR_UPLOAD_TO_S3', 500, { description: uploadResult.error.message });
+	}
+	const donwloadResult = await s3Client.getPreSignedDownloadUrl(
+		'test.mp4',
+		900,
+		s3Config.buckets.video
+	);
+	if (donwloadResult.isErr()) {
+		throw new AppError('#ERR_DOWNLOAD_URL', 500, { description: donwloadResult.error.message });
+	}
 
 	return c.json({
-		message: 'todo'
+		url: donwloadResult.value
 	});
 });

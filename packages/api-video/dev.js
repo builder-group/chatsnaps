@@ -41,7 +41,7 @@ async function setupS3rver() {
 			directory,
 			configureBuckets: [
 				{
-					name: 'test-bucket',
+					name: 'video',
 					configs: [fs.readFileSync(corsConfig), fs.readFileSync(websiteConfig)]
 				}
 			]

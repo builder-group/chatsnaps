@@ -17,7 +17,6 @@ export class S3Storage {
 
 	constructor(config: TS3StorageConfig) {
 		const { defaultBucket, ...s3ClientConfig } = config;
-		console.log({ s3ClientConfig });
 		this.client = new S3Client(s3ClientConfig);
 		this.defaultBucket = defaultBucket;
 	}
