@@ -11,6 +11,8 @@ export const Root: React.FC = () => {
 				id={ChatHistoryComp.id}
 				component={ChatHistoryComp}
 				calculateMetadata={ChatHistoryComp.calculateMetadata}
+				fps={30} // Set by calculateMetadata
+				durationInFrames={0} // Set by calculateMetadata
 				width={1080}
 				height={1920}
 				schema={ChatHistoryComp.schema}

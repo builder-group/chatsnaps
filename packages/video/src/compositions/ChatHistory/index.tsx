@@ -2,15 +2,19 @@ import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
+	interpolate,
 	Sequence,
+	spring,
 	staticFile,
 	useCurrentFrame,
 	useVideoConfig
 } from 'remotion';
 
+import { cn } from '../../lib';
 import { TRemotionFC } from '../../types';
-import { MessageBubble } from './MessageBubble';
-import { SChatHistoryCompProps, TChatHistoryCompProps } from './schema';
+import { SChatHistoryCompProps, TAudioItem, TChatHistoryCompProps, TMessageItem } from './schema';
+
+import './style.scss';
 
 export * from './schema';
 
@@ -18,48 +22,93 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const { sequence } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
-	const contentRef = React.useRef<HTMLDivElement>(null);
+	const contentRef = React.useRef<HTMLOListElement>(null);
 	const [contentHeight, setContentHeight] = React.useState(0);
 
 	React.useEffect(() => {
 		if (contentRef.current != null) {
-			setContentHeight(contentRef.current.scrollHeight);
+			setContentHeight(contentRef.current.clientHeight);
 		}
 	}, [frame]);
 
-	const scrollY = Math.max(0, contentHeight - height);
+	const { messages, audios } = React.useMemo(
+		() => ({
+			messages: sequence.filter(
+				(item) => item.type === 'Message' && item.startFrame <= frame
+			) as TMessageItem[],
+			audios: sequence.filter(
+				(item) => item.type === 'Audio' && item.startFrame <= frame
+			) as TAudioItem[]
+		}),
+		[sequence, frame]
+	);
+
+	const overflow = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className="bg-gray-100">
-			<div
-				className="flex flex-col"
+		<AbsoluteFill className="bg-white">
+			<ol
+				className={'list mt-4 text-4xl'}
 				ref={contentRef}
 				style={{
-					transform: `translateY(-${scrollY}px)`
+					transform: `translateY(-${overflow}px)`
 				}}
 			>
-				{sequence
-					.filter((item) => item.startFrame <= frame)
-					.map((item, index) => {
-						switch (item.type) {
-							case 'Message':
-								return (
-									<MessageBubble
-										key={`${item.type}-${index}`}
-										fps={fps}
-										frame={frame}
-										message={item}
-									/>
-								);
-							case 'Audio':
-								return (
-									<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
-										<Audio src={item.src.startsWith('http') ? item.src : staticFile(item.src)} />
-									</Sequence>
-								);
+				{messages.map(({ content, messageType, startFrame }, i) => {
+					const isLast = i === messages.length - 1;
+					const noTail = !isLast && messages[i + 1]?.messageType === messageType;
+
+					// Interpolate opacity and y position
+					const springAnimation = spring({
+						frame: frame - startFrame,
+						fps,
+						config: {
+							damping: 20,
+							stiffness: 200,
+							mass: 0.2
 						}
-					})}
-			</div>
+					});
+					const opacity = interpolate(springAnimation, [0, 1], [0, 1]);
+					const yPosition = interpolate(springAnimation, [0, 1], [300, 0]);
+
+					return (
+						<li
+							key={content}
+							className={cn('relative', messageType === 'sent' ? 'self-end' : 'self-start')}
+						>
+							<div
+								className={cn(
+									'shared absolute',
+									messageType === 'sent' ? 'sent' : 'received',
+									noTail && 'noTail'
+								)}
+								style={{
+									opacity,
+									transform: `translateY(${yPosition}px)`
+								}}
+							>
+								{content}
+							</div>
+							{/* Invisible static component to maintain consistent layout and thus not to disrupt the height calculations with e.g. spring animation */}
+							<div
+								className={cn(
+									'shared opacity-0',
+									messageType === 'sent' ? 'sent' : 'received',
+									noTail && 'noTail'
+								)}
+							>
+								{content}
+							</div>
+						</li>
+					);
+				})}
+			</ol>
+
+			{audios.map(({ src, startFrame, durationInFrames }) => (
+				<Sequence key={src} from={startFrame} durationInFrames={durationInFrames}>
+					<Audio src={src.startsWith('http') ? src : staticFile(src)} />
+				</Sequence>
+			))}
 		</AbsoluteFill>
 	);
 };

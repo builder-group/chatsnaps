@@ -28,3 +28,4 @@ export const SChatHistoryCompProps = z.object({
 export type TChatHistoryCompProps = z.infer<typeof SChatHistoryCompProps>;
 
 export type TMessageItem = z.infer<typeof SMessageItem>;
+export type TAudioItem = z.infer<typeof SAudioItem>;
