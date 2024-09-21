@@ -27,7 +27,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 
 	React.useEffect(() => {
 		if (contentRef.current != null) {
-			setContentHeight(contentRef.current.scrollHeight);
+			setContentHeight(contentRef.current.clientHeight);
 		}
 	}, [frame]);
 
@@ -74,17 +74,31 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 					return (
 						<li
 							key={content}
-							className={cn(
-								'shared',
-								messageType === 'sent' ? 'sent' : 'received',
-								noTail && 'noTail'
-							)}
-							style={{
-								opacity,
-								transform: `translateY(${yPosition}px)`
-							}}
+							className={cn('relative', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
-							{content}
+							<div
+								className={cn(
+									'shared absolute',
+									messageType === 'sent' ? 'sent' : 'received',
+									noTail && 'noTail'
+								)}
+								style={{
+									opacity,
+									transform: `translateY(${yPosition}px)`
+								}}
+							>
+								{content}
+							</div>
+							{/* Invisible static component to maintain consistent layout and thus not to disrupt the height calculations with e.g. spring animation */}
+							<div
+								className={cn(
+									'shared opacity-0',
+									messageType === 'sent' ? 'sent' : 'received',
+									noTail && 'noTail'
+								)}
+							>
+								{content}
+							</div>
 						</li>
 					);
 				})}
