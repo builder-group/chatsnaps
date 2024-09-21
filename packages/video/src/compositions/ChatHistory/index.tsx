@@ -8,9 +8,11 @@ import {
 	useVideoConfig
 } from 'remotion';
 
+import { cn } from '../../lib';
 import { TRemotionFC } from '../../types';
-import { MessageBubble } from './MessageBubble';
-import { SChatHistoryCompProps, TChatHistoryCompProps } from './schema';
+import { SChatHistoryCompProps, TAudioItem, TChatHistoryCompProps, TMessageItem } from './schema';
+
+import './style.scss';
 
 export * from './schema';
 
@@ -18,7 +20,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const { sequence } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
-	const contentRef = React.useRef<HTMLDivElement>(null);
+	const contentRef = React.useRef<HTMLOListElement>(null);
 	const [contentHeight, setContentHeight] = React.useState(0);
 
 	React.useEffect(() => {
@@ -27,39 +29,44 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 		}
 	}, [frame]);
 
-	const scrollY = Math.max(0, contentHeight - height);
+	const { messages, audios } = React.useMemo(
+		() => ({
+			messages: sequence.filter(
+				(item) => item.type === 'Message' && item.startFrame <= frame
+			) as TMessageItem[],
+			audios: sequence.filter(
+				(item) => item.type === 'Audio' && item.startFrame <= frame
+			) as TAudioItem[]
+		}),
+		[sequence, frame]
+	);
 
 	return (
-		<AbsoluteFill className="bg-gray-100">
-			<div
-				className="flex flex-col"
-				ref={contentRef}
-				style={{
-					transform: `translateY(-${scrollY}px)`
-				}}
-			>
-				{sequence
-					.filter((item) => item.startFrame <= frame)
-					.map((item, index) => {
-						switch (item.type) {
-							case 'Message':
-								return (
-									<MessageBubble
-										key={`${item.type}-${index}`}
-										fps={fps}
-										frame={frame}
-										message={item}
-									/>
-								);
-							case 'Audio':
-								return (
-									<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
-										<Audio src={item.src.startsWith('http') ? item.src : staticFile(item.src)} />
-									</Sequence>
-								);
-						}
-					})}
-			</div>
+		<AbsoluteFill className="bg-white">
+			<ol className={'list text-4xl'} ref={contentRef}>
+				{messages.map(({ content, messageType }, i) => {
+					const isLast = i === messages.length - 1;
+					const noTail = !isLast && messages[i + 1]?.messageType === messageType;
+					return (
+						<li
+							key={content}
+							className={cn(
+								'shared',
+								messageType === 'sent' ? 'sent' : 'received',
+								noTail && 'noTail'
+							)}
+						>
+							{content}
+						</li>
+					);
+				})}
+			</ol>
+
+			{audios.map(({ src, startFrame, durationInFrames }) => (
+				<Sequence from={startFrame} durationInFrames={durationInFrames}>
+					<Audio src={src.startsWith('http') ? src : staticFile(src)} />
+				</Sequence>
+			))}
 		</AbsoluteFill>
 	);
 };
