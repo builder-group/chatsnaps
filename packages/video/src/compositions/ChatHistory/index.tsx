@@ -2,7 +2,9 @@ import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
+	interpolate,
 	Sequence,
+	spring,
 	staticFile,
 	useCurrentFrame,
 	useVideoConfig
@@ -41,12 +43,34 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 		[sequence, frame]
 	);
 
+	const overflow = Math.max(0, contentHeight - height);
+
 	return (
 		<AbsoluteFill className="bg-white">
-			<ol className={'list text-4xl'} ref={contentRef}>
-				{messages.map(({ content, messageType }, i) => {
+			<ol
+				className={'list mt-4 text-4xl'}
+				ref={contentRef}
+				style={{
+					transform: `translateY(-${overflow}px)`
+				}}
+			>
+				{messages.map(({ content, messageType, startFrame }, i) => {
 					const isLast = i === messages.length - 1;
 					const noTail = !isLast && messages[i + 1]?.messageType === messageType;
+
+					// Interpolate opacity and y position
+					const springAnimation = spring({
+						frame: frame - startFrame,
+						fps,
+						config: {
+							damping: 20,
+							stiffness: 200,
+							mass: 0.2
+						}
+					});
+					const opacity = interpolate(springAnimation, [0, 1], [0, 1]);
+					const yPosition = interpolate(springAnimation, [0, 1], [300, 0]);
+
 					return (
 						<li
 							key={content}
@@ -55,6 +79,10 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 								messageType === 'sent' ? 'sent' : 'received',
 								noTail && 'noTail'
 							)}
+							style={{
+								opacity,
+								transform: `translateY(${yPosition}px)`
+							}}
 						>
 							{content}
 						</li>
@@ -63,7 +91,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 			</ol>
 
 			{audios.map(({ src, startFrame, durationInFrames }) => (
-				<Sequence from={startFrame} durationInFrames={durationInFrames}>
+				<Sequence key={src} from={startFrame} durationInFrames={durationInFrames}>
 					<Audio src={src.startsWith('http') ? src : staticFile(src)} />
 				</Sequence>
 			))}
