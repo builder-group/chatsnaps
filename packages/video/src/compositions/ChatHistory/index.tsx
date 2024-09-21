@@ -24,6 +24,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const { fps, height } = useVideoConfig();
 	const contentRef = React.useRef<HTMLOListElement>(null);
 	const [contentHeight, setContentHeight] = React.useState(0);
+	const headerHeight = 200;
 
 	React.useEffect(() => {
 		if (contentRef.current != null) {
@@ -47,11 +48,20 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 
 	return (
 		<AbsoluteFill className="bg-white">
+			<div
+				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-col items-center justify-end gap-1 border-b border-gray-200 bg-[#F1F1F2] bg-opacity-90 pb-4 backdrop-blur-lg backdrop-filter"
+				style={{ height: headerHeight }}
+			>
+				<div className="h-24 w-24 rounded-full bg-red-600" />
+				<p className="text-2xl">Some User</p>
+			</div>
+
 			<ol
-				className={'list mt-4 text-4xl'}
+				className={'list text-4xl'}
 				ref={contentRef}
 				style={{
-					transform: `translateY(-${overflow}px)`
+					transform: `translateY(-${overflow}px)`,
+					paddingTop: headerHeight + 16
 				}}
 			>
 				{messages.map(({ content, messageType, startFrame }, i) => {
