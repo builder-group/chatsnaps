@@ -16,19 +16,31 @@ import { containsSpeakableChar, sha256, streamToBuffer } from '../../lib';
 import { router } from '../router';
 
 const SChatHistoryVideoDto = v.object({
+	// Title of the chat history
 	title: v.string(),
-	script: v.array(
+	participants: v.array(
+		v.object({
+			// Id of the participant
+			id: v.number(),
+			// Display name of the participant
+			display_name: v.string(),
+			// Whether this participant is sending messages
+			is_sender: v.boolean()
+		})
+	),
+	events: v.array(
 		v.union([
 			v.object({
 				type: v.literal('Message'),
-				message: v.string(),
-				speaker: v.string()
-				// sender: v.string(),
-				// content: v.string()
-				// isSender: v.boolean()
+				// Content of the message
+				// TODO: Expand with images, gifs, ..
+				content: v.string(),
+				// Id of the participant who sent this message
+				participant_id: v.string()
 			}),
 			v.object({
 				type: v.literal('Pause'),
+				// Duration of the pause in milliseconds
 				duration_ms: v.number()
 			})
 		])

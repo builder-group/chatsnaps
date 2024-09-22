@@ -12,7 +12,12 @@ import {
 
 import { cn } from '../../lib';
 import { TRemotionFC } from '../../types';
-import { SChatHistoryCompProps, TAudioItem, TChatHistoryCompProps, TMessageItem } from './schema';
+import {
+	SChatHistoryCompProps,
+	TAudioSequenceItem,
+	TChatHistoryCompProps,
+	TMessageSequenceItem
+} from './schema';
 
 import './style.scss';
 
@@ -36,10 +41,10 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 		() => ({
 			messages: sequence.filter(
 				(item) => item.type === 'Message' && item.startFrame <= frame
-			) as TMessageItem[],
+			) as TMessageSequenceItem[],
 			audios: sequence.filter(
 				(item) => item.type === 'Audio' && item.startFrame <= frame
-			) as TAudioItem[]
+			) as TAudioSequenceItem[]
 		}),
 		[sequence, frame]
 	);
@@ -47,7 +52,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const overflow = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className="bg-white">
+		<AbsoluteFill className="chat-history bg-white">
 			<div
 				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-col items-center justify-end gap-1 border-b border-gray-200 bg-[#F1F1F2] bg-opacity-90 pb-4 backdrop-blur-lg backdrop-filter"
 				style={{ height: headerHeight }}
@@ -83,7 +88,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 
 					return (
 						<li
-							key={content}
+							key={JSON.stringify(content)}
 							className={cn('relative', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
 							<div
@@ -97,7 +102,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 									transform: `translateY(${yPosition}px)`
 								}}
 							>
-								{content}
+								{content.type === 'Text' ? content.text : ''}
 							</div>
 							{/* Invisible static component to maintain consistent layout and thus not to disrupt the height calculations with e.g. spring animation */}
 							<div
@@ -107,7 +112,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 									noTail && 'noTail'
 								)}
 							>
-								{content}
+								{content.type === 'Text' ? content.text : ''}
 							</div>
 						</li>
 					);
