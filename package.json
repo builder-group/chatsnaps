@@ -23,8 +23,8 @@
 	},
 	"homepage": "https://builder.group/?source=github",
 	"devDependencies": {
-		"@blgc/cli": "^0.0.17",
-		"@blgc/config": "^0.0.23",
+		"@blgc/cli": "^0.0.18",
+		"@blgc/config": "^0.0.24",
 		"@ianvs/prettier-plugin-sort-imports": "^4.3.1",
 		"eslint": "^8.57.0",
 		"prettier": "^3.3.3",
@@ -33,7 +33,7 @@
 		"tsx": "^4.19.1",
 		"turbo": "^2.1.2",
 		"typescript": "^5.6.2",
-		"vite": "^5.4.6",
+		"vite": "^5.4.7",
 		"vitest": "^2.1.1"
 	},
 	"packageManager": "pnpm@9.2.0",

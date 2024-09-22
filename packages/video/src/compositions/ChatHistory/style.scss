@@ -5,7 +5,7 @@ $base-width: 450px;
 $canvas-width: 1000px;
 
 /* Calculate the scale factor */
-$scale-factor: $canvas-width / $base-width;
+$scale-factor: calc($canvas-width / $base-width);
 
 /* Function to scale values */
 @function scale($value) {
