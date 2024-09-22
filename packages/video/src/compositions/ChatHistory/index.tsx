@@ -12,7 +12,12 @@ import {
 
 import { cn } from '../../lib';
 import { TRemotionFC } from '../../types';
-import { SChatHistoryCompProps, TAudioItem, TChatHistoryCompProps, TMessageItem } from './schema';
+import {
+	SChatHistoryCompProps,
+	TAudioSequenceItem,
+	TChatHistoryCompProps,
+	TMessageSequenceItem
+} from './schema';
 
 import './style.scss';
 
@@ -36,10 +41,10 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 		() => ({
 			messages: sequence.filter(
 				(item) => item.type === 'Message' && item.startFrame <= frame
-			) as TMessageItem[],
+			) as TMessageSequenceItem[],
 			audios: sequence.filter(
 				(item) => item.type === 'Audio' && item.startFrame <= frame
-			) as TAudioItem[]
+			) as TAudioSequenceItem[]
 		}),
 		[sequence, frame]
 	);
@@ -83,7 +88,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 
 					return (
 						<li
-							key={content}
+							key={JSON.stringify(content)}
 							className={cn('relative', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
 							<div
@@ -97,7 +102,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 									transform: `translateY(${yPosition}px)`
 								}}
 							>
-								{content}
+								{content.type === 'Text' ? content.text : ''}
 							</div>
 							{/* Invisible static component to maintain consistent layout and thus not to disrupt the height calculations with e.g. spring animation */}
 							<div
@@ -107,7 +112,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 									noTail && 'noTail'
 								)}
 							>
-								{content}
+								{content.type === 'Text' ? content.text : ''}
 							</div>
 						</li>
 					);

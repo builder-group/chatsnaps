@@ -1,13 +1,13 @@
-// Based on: https://samuelkraft.com/blog/ios-chat-bubbles-css
+/* Based on: https://samuelkraft.com/blog/ios-chat-bubbles-css */
 
-//  Define base dimensions
+/* Define base dimensions */
 $base-width: 450px;
 $canvas-width: 1000px;
 
-// Calculate the scale factor
-$scale-factor: $canvas-width / $base-width;
+/* Calculate the scale factor */
+$scale-factor: calc($canvas-width / $base-width);
 
-// Function to scale values
+/* Function to scale values */
 @function scale($value) {
 	@return $value * $scale-factor;
 }
