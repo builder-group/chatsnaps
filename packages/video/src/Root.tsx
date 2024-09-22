@@ -450,12 +450,6 @@ export const Root: React.FC = () => {
         "text": "..."
       },
       "startFrame": 456
-    },
-    {
-      "type": "Audio",
-      "src": "static/message.mp3",
-      "startFrame": 482,
-      "durationInFrames": 30
     }
   ]
         }`)}

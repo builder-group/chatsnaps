@@ -52,7 +52,7 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const overflow = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className="chat-history bg-white">
+		<AbsoluteFill className="bg-white">
 			<div
 				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-col items-center justify-end gap-1 border-b border-gray-200 bg-[#F1F1F2] bg-opacity-90 pb-4 backdrop-blur-lg backdrop-filter"
 				style={{ height: headerHeight }}

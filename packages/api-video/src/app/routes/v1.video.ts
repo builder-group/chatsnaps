@@ -36,7 +36,7 @@ const SChatHistoryVideoDto = v.object({
 				// TODO: Expand with images, gifs, ..
 				content: v.string(),
 				// Id of the participant who sent this message
-				participant_id: v.string()
+				participant_id: v.number()
 			}),
 			v.object({
 				type: v.literal('Pause'),
@@ -54,7 +54,7 @@ router.post('/v1/video/chatstory', vValidator('json', SChatHistoryVideoDto), asy
 
 	const videoProps: TChatHistoryCompProps = {
 		title: data.title,
-		sequence: await mapSequence(data.script)
+		sequence: await mapToSequence(data)
 	};
 
 	const composition = await selectComposition({
@@ -88,43 +88,46 @@ router.post('/v1/video/chatstory', vValidator('json', SChatHistoryVideoDto), asy
 	});
 });
 
-async function mapSequence(
-	sequence: TChatHistoryVideoDto['script']
+async function mapToSequence(
+	data: TChatHistoryVideoDto
 ): Promise<TChatHistoryCompProps['sequence']> {
-	const finalSequence: TChatHistoryCompProps['sequence'] = [];
+	const { events, participants } = data;
+	const sequence: TChatHistoryCompProps['sequence'] = [];
 	let currentTime = 0;
 	const fps = 30;
 
-	const firstMessage = sequence.find((item) => item.type === 'Message');
-	const firstSpeaker = firstMessage?.speaker;
 	const previousRequestIdsMap: Record<string, string[]> = {};
 	let creditsSpent = 0;
 
-	for (const item of sequence) {
+	for (const item of events) {
 		switch (item.type) {
 			case 'Message':
 				{
 					const startFrame = Math.floor(currentTime * fps);
 					currentTime += 0.5;
 
-					const isSender = !(item.speaker === firstSpeaker);
+					const participant = participants.find((p) => p.id === item.participant_id);
+					if (participant == null) {
+						continue;
+					}
 
 					// Push notification
-					finalSequence.push({
+					sequence.push({
 						type: 'Audio',
-						src: isSender ? 'static/send.mp3' : 'static/message.mp3',
+						src: participant.is_sender ? 'static/send.mp3' : 'static/message.mp3',
+						volume: 1,
 						startFrame,
 						durationInFrames: Number(fps)
 					});
 
-					if (containsSpeakableChar(item.message)) {
-						const voiceId = isSender
+					if (containsSpeakableChar(item.content)) {
+						const voiceId = participant.is_sender
 							? elevenLabsConfig.voices.Adam.voiceId
 							: elevenLabsConfig.voices.Alice.voiceId;
 
 						// Generate a unique hash for the message and voice ID
 						// TODO: Based on the scenario the tone might vary?
-						const spokenMessageFilename = `${sha256(`${voiceId}:${item.message}`)}.mp3`;
+						const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
 						const isSpokenMessageCached =
 							unwrapOrNull(
@@ -136,7 +139,7 @@ async function mapSequence(
 							const audio = mapErr(
 								await elevenLabsClient.generateTextToSpeach({
 									voice: voiceId,
-									text: item.message
+									text: item.content
 									// previousRequestIds: (previousRequestIdsMap[voiceId] ?? []).slice(-3) // TODO: With prev requestIds they start whispering after around 20s
 								}),
 								(e) => new AppError('#ERR_GENERATE_SPOKEN_MESSAGE', 500, { description: e.message })
@@ -179,20 +182,23 @@ async function mapSequence(
 						).unwrap();
 
 						// Push spoken message
-						finalSequence.push({
+						sequence.push({
 							type: 'Audio',
 							src: spokenMessageSrc,
+							volume: 1,
 							startFrame,
 							durationInFrames: 30 * 3 // TODO:
 						});
 					}
 
 					// Push message
-					finalSequence.push({
+					sequence.push({
 						type: 'Message',
-						content: item.message,
-						sender: item.speaker,
-						messageType: isSender ? 'sent' : 'received',
+						content: { type: 'Text', text: item.content },
+						participant: {
+							displayName: participant.display_name
+						},
+						messageType: participant.is_sender ? 'sent' : 'received',
 						startFrame
 					});
 				}
@@ -205,5 +211,5 @@ async function mapSequence(
 
 	console.log({ creditsSpent });
 
-	return finalSequence;
+	return sequence;
 }
