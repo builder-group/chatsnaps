@@ -25,7 +25,10 @@ const SChatHistoryVideoDto = v.object({
 			// Display name of the participant
 			display_name: v.string(),
 			// Whether this participant is sending messages
-			is_sender: v.boolean()
+			is_sender: v.boolean(),
+			speaker: v.optional(
+				v.picklist(Object.keys(elevenLabsConfig.voices) as (keyof typeof elevenLabsConfig.voices)[])
+			)
 		})
 	),
 	events: v.array(
@@ -55,12 +58,13 @@ router.post(
 	vValidator(
 		'query',
 		v.object({
-			voiceover: v.optional(v.boolean())
+			voiceover: v.optional(v.picklist(['true', 'false']))
 		})
 	),
 	async (c) => {
 		const data = c.req.valid('json');
-		const { voiceover = false } = c.req.valid('query');
+		const { voiceover: voiceoverString = 'false' } = c.req.valid('query');
+		const voiceover = voiceoverString === 'true';
 
 		const videoProps: TChatHistoryCompProps = {
 			title: data.title,
@@ -132,10 +136,8 @@ async function mapToSequence(
 						durationInFrames: Number(fps)
 					});
 
-					if (voiceover && containsSpeakableChar(item.content)) {
-						const voiceId = participant.is_sender
-							? elevenLabsConfig.voices.Adam.voiceId
-							: elevenLabsConfig.voices.Alice.voiceId;
+					if (voiceover && participant.speaker != null && containsSpeakableChar(item.content)) {
+						const voiceId = elevenLabsConfig.voices[participant.speaker].voiceId;
 
 						// Generate a unique hash for the message and voice ID
 						// TODO: Based on the scenario the tone might vary?
