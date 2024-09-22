@@ -49,47 +49,59 @@ const SChatHistoryVideoDto = v.object({
 
 type TChatHistoryVideoDto = v.InferInput<typeof SChatHistoryVideoDto>;
 
-router.post('/v1/video/chatstory', vValidator('json', SChatHistoryVideoDto), async (c) => {
-	const data = c.req.valid('json');
+router.post(
+	'/v1/video/chatstory',
+	vValidator('json', SChatHistoryVideoDto),
+	vValidator(
+		'query',
+		v.object({
+			voiceover: v.optional(v.boolean())
+		})
+	),
+	async (c) => {
+		const data = c.req.valid('json');
+		const { voiceover = false } = c.req.valid('query');
 
-	const videoProps: TChatHistoryCompProps = {
-		title: data.title,
-		sequence: await mapToSequence(data)
-	};
+		const videoProps: TChatHistoryCompProps = {
+			title: data.title,
+			sequence: await mapToSequence(data, voiceover)
+		};
 
-	const composition = await selectComposition({
-		serveUrl: remotionConfig.bundleLocation,
-		id: ChatHistoryComp.id, // TODO: If I reference id here do I load the entire ReactJs component into memory?
-		inputProps: videoProps
-	});
+		const composition = await selectComposition({
+			serveUrl: remotionConfig.bundleLocation,
+			id: ChatHistoryComp.id, // TODO: If I reference id here do I load the entire ReactJs component into memory?
+			inputProps: videoProps
+		});
 
-	const renderResult = await renderMedia({
-		composition,
-		serveUrl: remotionConfig.bundleLocation,
-		codec: 'h264',
-		inputProps: videoProps
-	});
-	if (renderResult.buffer == null) {
-		throw new AppError('#ERR_RENDER', 500);
+		const renderResult = await renderMedia({
+			composition,
+			serveUrl: remotionConfig.bundleLocation,
+			codec: 'h264',
+			inputProps: videoProps
+		});
+		if (renderResult.buffer == null) {
+			throw new AppError('#ERR_RENDER', 500);
+		}
+
+		mapErr(
+			await s3Client.uploadObject('test.mp4', renderResult.buffer, s3Config.buckets.video),
+			(e) => new AppError('#ERR_UPLOAD_TO_S3', 500, { description: e.message })
+		).unwrap();
+
+		const downloadUrl = mapErr(
+			await s3Client.getObjectUrl('test.mp4', s3Config.buckets.video),
+			(e) => new AppError('#ERR_DOWNLOAD_URL', 500, { description: e.message })
+		).unwrap();
+
+		return c.json({
+			url: downloadUrl
+		});
 	}
-
-	mapErr(
-		await s3Client.uploadObject('test.mp4', renderResult.buffer, s3Config.buckets.video),
-		(e) => new AppError('#ERR_UPLOAD_TO_S3', 500, { description: e.message })
-	).unwrap();
-
-	const downloadUrl = mapErr(
-		await s3Client.getObjectUrl('test.mp4', s3Config.buckets.video),
-		(e) => new AppError('#ERR_DOWNLOAD_URL', 500, { description: e.message })
-	).unwrap();
-
-	return c.json({
-		url: downloadUrl
-	});
-});
+);
 
 async function mapToSequence(
-	data: TChatHistoryVideoDto
+	data: TChatHistoryVideoDto,
+	voiceover: boolean
 ): Promise<TChatHistoryCompProps['sequence']> {
 	const { events, participants } = data;
 	const sequence: TChatHistoryCompProps['sequence'] = [];
@@ -120,7 +132,7 @@ async function mapToSequence(
 						durationInFrames: Number(fps)
 					});
 
-					if (containsSpeakableChar(item.content)) {
+					if (voiceover && containsSpeakableChar(item.content)) {
 						const voiceId = participant.is_sender
 							? elevenLabsConfig.voices.Adam.voiceId
 							: elevenLabsConfig.voices.Alice.voiceId;
