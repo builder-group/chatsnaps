@@ -22,7 +22,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 			/>
 			<Chat
 				sequence={sequence}
-				className="origin-top-left translate-x-16 translate-y-72 scale-75"
+				className="origin-top-left translate-x-16 translate-y-64 scale-75"
 			/>
 		</AbsoluteFill>
 	);
