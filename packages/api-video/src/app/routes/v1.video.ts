@@ -45,6 +45,11 @@ const SChatHistoryVideoDto = v.object({
 				type: v.literal('Pause'),
 				// Duration of the pause in milliseconds
 				duration_ms: v.number()
+			}),
+			v.object({
+				type: v.literal('Time'),
+				// Duration of the pause in milliseconds
+				passed_time_min: v.number()
 			})
 		])
 	)
@@ -58,18 +63,28 @@ router.post(
 	vValidator(
 		'query',
 		v.object({
-			voiceover: v.optional(v.picklist(['true', 'false']))
+			voiceover: v.optional(v.picklist(['true', 'false'])),
+			video: v.optional(v.picklist(['true', 'false']))
 		})
 	),
 	async (c) => {
 		const data = c.req.valid('json');
-		const { voiceover: voiceoverString = 'false' } = c.req.valid('query');
+		const { voiceover: voiceoverString = 'false', video: videoString = 'true' } =
+			c.req.valid('query');
 		const voiceover = voiceoverString === 'true';
+		const video = videoString === 'true';
 
 		const videoProps: TChatHistoryCompProps = {
 			title: data.title,
 			sequence: await mapToSequence(data, voiceover)
 		};
+
+		if (!video) {
+			return c.json({
+				url: null,
+				props: videoProps
+			});
+		}
 
 		const composition = await selectComposition({
 			serveUrl: remotionConfig.bundleLocation,
@@ -219,6 +234,11 @@ async function mapToSequence(
 				break;
 			case 'Pause': {
 				currentTime += item.duration_ms / 1000;
+				break;
+			}
+			case 'Time': {
+				// do nothing for now
+				break;
 			}
 		}
 	}
