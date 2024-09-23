@@ -20,7 +20,10 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 				width={width}
 				height={height}
 			/>
-			<Chat title={title} sequence={sequence} className="scale-75" />
+			<Chat
+				sequence={sequence}
+				className="origin-top-left translate-x-16 translate-y-72 scale-75"
+			/>
 		</AbsoluteFill>
 	);
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-	AbsoluteFill,
 	Audio,
 	Img,
 	interpolate,
@@ -20,7 +19,7 @@ import './style.scss';
 export * from './schema';
 
 export const Chat: React.FC<TProps> = (props) => {
-	const { title, sequence, className } = props;
+	const { sequence, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
 	const contentRef = React.useRef<HTMLOListElement>(null);
@@ -48,7 +47,7 @@ export const Chat: React.FC<TProps> = (props) => {
 	const overflow = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className={cn('overflow-hidden bg-black', className)}>
+		<div className={cn('overflow-hidden bg-black', className)}>
 			{/* <Img
 				src={staticFile('static/image/imessage.png')}
 				className="absolute left-0 right-0 top-[-130px] z-50 opacity-50"
@@ -137,10 +136,11 @@ export const Chat: React.FC<TProps> = (props) => {
 					<Audio src={src.startsWith('http') ? src : staticFile(src)} />
 				</Sequence>
 			))}
-		</AbsoluteFill>
+		</div>
 	);
 };
 
-interface TProps extends TChatStoryCompProps {
+interface TProps {
+	sequence: TChatStoryCompProps['sequence'];
 	className?: string;
 }
