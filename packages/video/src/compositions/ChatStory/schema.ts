@@ -41,13 +41,13 @@ const SAudioSequenceItem = SBaseSequenceItem.extend({
 	volume: z.number().min(0).max(1).optional().default(1)
 });
 
-export const SChatHistoryCompProps = z.object({
+export const SChatStoryCompProps = z.object({
 	// Title of the chat sequence
 	title: z.string(),
 	sequence: z.array(z.discriminatedUnion('type', [SMessageSequenceItem, SAudioSequenceItem]))
 });
 
-export type TChatHistoryCompProps = z.infer<typeof SChatHistoryCompProps>;
+export type TChatStoryCompProps = z.infer<typeof SChatStoryCompProps>;
 
 export type TMessageSequenceItem = z.infer<typeof SMessageSequenceItem>;
 export type TAudioSequenceItem = z.infer<typeof SAudioSequenceItem>;

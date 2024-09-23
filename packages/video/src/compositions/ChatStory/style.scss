@@ -13,9 +13,9 @@ $scale-factor: calc($canvas-width / $base-width);
 }
 
 .list {
-	--sentColor: #0b93f6;
-	--receiveColor: #e5e5ea;
-	--bg: #fff;
+	--sentColor: #0a84ff;
+	--receiveColor: #262629;
+	--bg: #000000;
 
 	display: flex;
 	flex-direction: column;
@@ -23,12 +23,6 @@ $scale-factor: calc($canvas-width / $base-width);
 	margin: 0 auto;
 	padding: 0;
 	list-style: none;
-}
-
-[data-theme='dark'] {
-	.list {
-		--bg: #161515;
-	}
 }
 
 .shared {
@@ -77,7 +71,7 @@ $scale-factor: calc($canvas-width / $base-width);
 
 .received {
 	align-self: flex-start;
-	color: black;
+	color: white;
 	background: var(--receiveColor);
 
 	&:before {

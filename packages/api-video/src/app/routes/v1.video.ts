@@ -1,6 +1,6 @@
 import { vValidator } from '@hono/valibot-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
-import { ChatHistoryComp, type TChatHistoryCompProps } from '@repo/video';
+import { ChatStoryComp, type TChatStoryCompProps } from '@repo/video';
 import * as v from 'valibot';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr, unwrapOrNull } from '@blgc/utils';
@@ -15,7 +15,7 @@ import {
 import { containsSpeakableChar, sha256, streamToBuffer } from '../../lib';
 import { router } from '../router';
 
-const SChatHistoryVideoDto = v.object({
+const SChatStoryVideoDto = v.object({
 	// Title of the chat history
 	title: v.string(),
 	participants: v.array(
@@ -55,11 +55,11 @@ const SChatHistoryVideoDto = v.object({
 	)
 });
 
-type TChatHistoryVideoDto = v.InferInput<typeof SChatHistoryVideoDto>;
+type TChatStoryVideoDto = v.InferInput<typeof SChatStoryVideoDto>;
 
 router.post(
 	'/v1/video/chatstory',
-	vValidator('json', SChatHistoryVideoDto),
+	vValidator('json', SChatStoryVideoDto),
 	vValidator(
 		'query',
 		v.object({
@@ -74,7 +74,7 @@ router.post(
 		const voiceover = voiceoverString === 'true';
 		const video = videoString === 'true';
 
-		const videoProps: TChatHistoryCompProps = {
+		const videoProps: TChatStoryCompProps = {
 			title: data.title,
 			sequence: await mapToSequence(data, voiceover)
 		};
@@ -88,7 +88,7 @@ router.post(
 
 		const composition = await selectComposition({
 			serveUrl: remotionConfig.bundleLocation,
-			id: ChatHistoryComp.id, // TODO: If I reference id here do I load the entire ReactJs component into memory?
+			id: ChatStoryComp.id, // TODO: If I reference id here do I load the entire ReactJs component into memory?
 			inputProps: videoProps
 		});
 
@@ -119,11 +119,11 @@ router.post(
 );
 
 async function mapToSequence(
-	data: TChatHistoryVideoDto,
+	data: TChatStoryVideoDto,
 	voiceover: boolean
-): Promise<TChatHistoryCompProps['sequence']> {
+): Promise<TChatStoryCompProps['sequence']> {
 	const { events, participants } = data;
-	const sequence: TChatHistoryCompProps['sequence'] = [];
+	const sequence: TChatStoryCompProps['sequence'] = [];
 	let currentTime = 0;
 	const fps = 30;
 
@@ -145,7 +145,9 @@ async function mapToSequence(
 					// Push notification
 					sequence.push({
 						type: 'Audio',
-						src: participant.is_sender ? 'static/send.mp3' : 'static/message.mp3',
+						src: participant.is_sender
+							? 'static/audio/sound/ios_sent.mp3'
+							: 'static/audio/sound/ios_received.mp3',
 						volume: 1,
 						startFrame,
 						durationInFrames: Number(fps)

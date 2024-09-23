@@ -2,6 +2,7 @@ import React from 'react';
 import {
 	AbsoluteFill,
 	Audio,
+	Img,
 	interpolate,
 	Sequence,
 	spring,
@@ -10,26 +11,21 @@ import {
 	useVideoConfig
 } from 'remotion';
 
+import { ChevronLeftIcon, ChevronRightIcon, VideoIcon } from '../../components';
 import { cn } from '../../lib';
-import { TRemotionFC } from '../../types';
-import {
-	SChatHistoryCompProps,
-	TAudioSequenceItem,
-	TChatHistoryCompProps,
-	TMessageSequenceItem
-} from './schema';
+import { TAudioSequenceItem, TChatStoryCompProps, TMessageSequenceItem } from './schema';
 
 import './style.scss';
 
 export * from './schema';
 
-export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
-	const { sequence } = props;
+export const Chat: React.FC<TProps> = (props) => {
+	const { title, sequence, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
 	const contentRef = React.useRef<HTMLOListElement>(null);
 	const [contentHeight, setContentHeight] = React.useState(0);
-	const headerHeight = 200;
+	const headerHeight = 240;
 
 	React.useEffect(() => {
 		if (contentRef.current != null) {
@@ -52,13 +48,30 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	const overflow = Math.max(0, contentHeight - height);
 
 	return (
-		<AbsoluteFill className="bg-white">
+		<AbsoluteFill className={cn('overflow-hidden bg-black', className)}>
+			{/* <Img
+				src={staticFile('static/image/imessage.png')}
+				className="absolute left-0 right-0 top-[-130px] z-50 opacity-50"
+			/> */}
 			<div
-				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-col items-center justify-end gap-1 border-b border-gray-200 bg-[#F1F1F2] bg-opacity-90 pb-4 backdrop-blur-lg backdrop-filter"
+				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-row items-center justify-between border-b border-gray-200 bg-[#1D1D1D] bg-opacity-90 px-5 pt-3 backdrop-blur-lg backdrop-filter"
 				style={{ height: headerHeight }}
 			>
-				<div className="h-24 w-24 rounded-full bg-red-600" />
-				<p className="text-2xl">Some User</p>
+				<ChevronLeftIcon className="mb-14 h-24 w-24 text-[#3478F6]" />
+				<div className="ml-11 flex flex-col gap-4">
+					<Img
+						className="h-[140px] w-[140px] rounded-full bg-white"
+						style={{
+							filter: 'drop-shadow(0px 12px 47px rgba(166,166,166,0.3))'
+						}}
+						src={staticFile('static/image/memoji/1.png')}
+					/>
+					<div className="flex flex-row items-center justify-center">
+						<p className="text-3xl tracking-[0.025em] text-white">Mom</p>
+						<ChevronRightIcon className="h-8 w-8 text-[#909093]" />
+					</div>
+				</div>
+				<VideoIcon className="mb-14 mr-10 h-24 w-24 stroke-1 text-[#3478F6]" />
 			</div>
 
 			<ol
@@ -128,24 +141,6 @@ export const ChatHistoryComp: TRemotionFC<TChatHistoryCompProps> = (props) => {
 	);
 };
 
-ChatHistoryComp.id = 'ChatHistory';
-ChatHistoryComp.schema = SChatHistoryCompProps;
-ChatHistoryComp.calculateMetadata = async (metadata) => {
-	const {
-		props: { sequence }
-	} = metadata;
-	const fps = 30;
-	const orderedSequence = sequence.sort((s) => s.startFrame);
-	const lastSequenceItem =
-		orderedSequence.length > 0 ? orderedSequence[orderedSequence.length - 1] : null;
-	const lastFrame =
-		lastSequenceItem != null
-			? lastSequenceItem.startFrame + (lastSequenceItem.durationInFrames ?? 0)
-			: 0;
-
-	return {
-		props: { ...metadata.props, sequence: orderedSequence },
-		fps,
-		durationInFrames: lastFrame
-	};
-};
+interface TProps extends TChatStoryCompProps {
+	className?: string;
+}

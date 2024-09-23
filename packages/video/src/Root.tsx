@@ -1,6 +1,6 @@
 import { Composition } from 'remotion';
 
-import { ChatHistoryComp } from './compositions';
+import { ChatStoryComp } from './compositions';
 
 import './style.css';
 
@@ -8,20 +8,20 @@ export const Root: React.FC = () => {
 	return (
 		<>
 			<Composition
-				id={ChatHistoryComp.id}
-				component={ChatHistoryComp}
-				calculateMetadata={ChatHistoryComp.calculateMetadata}
+				id={ChatStoryComp.id}
+				component={ChatStoryComp}
+				calculateMetadata={ChatStoryComp.calculateMetadata}
 				fps={30} // Set by calculateMetadata
 				durationInFrames={0} // Set by calculateMetadata
 				width={1080}
 				height={1920}
-				schema={ChatHistoryComp.schema}
+				schema={ChatStoryComp.schema}
 				defaultProps={JSON.parse(`{
   "title": "When Your Roommate 'Borrows' Your Stuff...",
   "sequence": [
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 0,
       "durationInFrames": 30
     },
@@ -45,7 +45,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 24,
       "durationInFrames": 30
     },
@@ -69,7 +69,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 54,
       "durationInFrames": 30
     },
@@ -93,7 +93,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 80,
       "durationInFrames": 30
     },
@@ -117,7 +117,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 102,
       "durationInFrames": 30
     },
@@ -141,7 +141,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 132,
       "durationInFrames": 30
     },
@@ -165,7 +165,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 156,
       "durationInFrames": 30
     },
@@ -189,7 +189,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 183,
       "durationInFrames": 30
     },
@@ -213,7 +213,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 216,
       "durationInFrames": 30
     },
@@ -237,7 +237,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 245,
       "durationInFrames": 30
     },
@@ -261,7 +261,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 270,
       "durationInFrames": 30
     },
@@ -285,7 +285,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 297,
       "durationInFrames": 30
     },
@@ -309,7 +309,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 318,
       "durationInFrames": 30
     },
@@ -333,7 +333,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 348,
       "durationInFrames": 30
     },
@@ -357,7 +357,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 381,
       "durationInFrames": 30
     },
@@ -381,7 +381,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 405,
       "durationInFrames": 30
     },
@@ -405,7 +405,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/send.mp3",
+      "src": "static/audio/sound/ios_sent.mp3",
       "startFrame": 426,
       "durationInFrames": 30
     },
@@ -429,7 +429,7 @@ export const Root: React.FC = () => {
     },
     {
       "type": "Audio",
-      "src": "static/message.mp3",
+      "src": "static/audio/sound/ios_received.mp3",
       "startFrame": 456,
       "durationInFrames": 30
     },
