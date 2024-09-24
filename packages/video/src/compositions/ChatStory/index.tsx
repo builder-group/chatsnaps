@@ -10,7 +10,7 @@ export * from './schema';
 
 export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 	const { title, sequence } = props;
-	const { width, height } = useVideoConfig();
+	const { width, height, durationInFrames, fps } = useVideoConfig();
 
 	return (
 		<AbsoluteFill className="bg-blue-500">
@@ -20,9 +20,17 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 				width={width}
 				height={height}
 			/>
+			{/* <OffthreadVideo
+				src={staticFile('static/video/.local/steep.mp4')}
+				className="absolute left-0 right-0 top-0"
+				muted
+				style={{ width, height, objectFit: 'cover' }}
+				startFrom={2 * fps}
+				endAt={durationInFrames}
+			/> */}
 			<Chat
 				sequence={sequence}
-				className="origin-top-left translate-x-16 translate-y-64 scale-75"
+				className="origin-top-left translate-x-16 translate-y-64 scale-75 rounded-3xl shadow-2xl"
 			/>
 		</AbsoluteFill>
 	);
