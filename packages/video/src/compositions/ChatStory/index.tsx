@@ -1,33 +1,22 @@
-import { AbsoluteFill, OffthreadVideo, staticFile, useVideoConfig } from 'remotion';
+import { AbsoluteFill } from 'remotion';
 
+import { Media } from '../../components';
 import { TRemotionFC } from '../../types';
-import { Chat } from './Chat';
+import { Messenger } from './Messenger';
+import { Overlay } from './Overlay';
 import { SChatStoryCompProps, TChatStoryCompProps } from './schema';
-
-import './style.scss';
 
 export * from './schema';
 
 export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
-	const { title, sequence } = props;
-	const { width, height, fps } = useVideoConfig();
+	const { title, sequence, messenger, background, overlay } = props;
 
 	return (
 		<AbsoluteFill className="bg-blue-500">
-			{/* <Img
-				src={staticFile('static/image/overlay/tiktok.png')}
-				className="absolute left-0 right-0 top-0 z-50"
-				width={width}
-				height={height}
-			/> */}
-			<OffthreadVideo
-				src={staticFile('static/video/.local/steep.mp4')}
-				className="absolute left-0 right-0 top-0"
-				muted
-				style={{ width, height, objectFit: 'cover' }}
-				startFrom={2 * fps}
-			/>
-			<Chat
+			<Overlay overlay={overlay} />
+			{background && <Media media={background} className="absolute left-0 top-0 z-0" />}
+			<Messenger
+				messenger={messenger}
 				sequence={sequence}
 				className="origin-top translate-y-64 scale-75 rounded-3xl shadow-2xl"
 			/>

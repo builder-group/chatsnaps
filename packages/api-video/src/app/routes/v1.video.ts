@@ -16,15 +16,11 @@ import { containsSpeakableChar, sha256, streamToBuffer } from '../../lib';
 import { router } from '../router';
 
 const SChatStoryVideoDto = v.object({
-	// Title of the chat history
 	title: v.string(),
 	participants: v.array(
 		v.object({
-			// Id of the participant
 			id: v.number(),
-			// Display name of the participant
 			display_name: v.string(),
-			// Whether this participant is sending messages
 			is_sender: v.boolean(),
 			speaker: v.optional(
 				v.picklist(Object.keys(elevenLabsConfig.voices) as (keyof typeof elevenLabsConfig.voices)[])
@@ -35,20 +31,16 @@ const SChatStoryVideoDto = v.object({
 		v.union([
 			v.object({
 				type: v.literal('Message'),
-				// Content of the message
 				// TODO: Expand with images, gifs, ..
 				content: v.string(),
-				// Id of the participant who sent this message
 				participant_id: v.number()
 			}),
 			v.object({
 				type: v.literal('Pause'),
-				// Duration of the pause in milliseconds
 				duration_ms: v.number()
 			}),
 			v.object({
 				type: v.literal('Time'),
-				// Duration of the pause in milliseconds
 				passed_time_min: v.number()
 			})
 		])
@@ -76,7 +68,14 @@ router.post(
 
 		const videoProps: TChatStoryCompProps = {
 			title: data.title,
-			sequence: await mapToSequence(data, voiceover)
+			sequence: await mapToSequence(data, voiceover),
+			messenger: {
+				type: 'IMessenge',
+				contact: {
+					profilePicture: { type: 'Image', src: 'static/image/memoji/1.png' },
+					name: 'Mom'
+				}
+			}
 		};
 
 		if (!video) {

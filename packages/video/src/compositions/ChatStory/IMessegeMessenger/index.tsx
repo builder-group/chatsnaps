@@ -1,7 +1,6 @@
 import React from 'react';
 import {
 	Audio,
-	Img,
 	interpolate,
 	Sequence,
 	spring,
@@ -10,16 +9,19 @@ import {
 	useVideoConfig
 } from 'remotion';
 
-import { ChevronLeftIcon, ChevronRightIcon, VideoIcon } from '../../components';
-import { cn } from '../../lib';
-import { TAudioSequenceItem, TChatStoryCompProps, TMessageSequenceItem } from './schema';
+import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '../../../components';
+import { cn } from '../../../lib';
+import {
+	TAudioSequenceItem,
+	TIMessegeMessenger,
+	TMessageSequenceItem,
+	TSequenceItem
+} from '../schema';
 
 import './style.scss';
 
-export * from './schema';
-
-export const Chat: React.FC<TProps> = (props) => {
-	const { sequence, className } = props;
+export const IMessegeMessenger: React.FC<TProps> = (props) => {
+	const { sequence, contact, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
 	const maxHeight = React.useMemo(() => height / 2.5, [height]);
@@ -59,15 +61,15 @@ export const Chat: React.FC<TProps> = (props) => {
 			>
 				<ChevronLeftIcon className="mb-14 h-24 w-24 text-[#3478F6]" />
 				<div className="ml-11 flex flex-col gap-4">
-					<Img
+					<Media
+						media={contact.profilePicture}
 						className="h-[140px] w-[140px] rounded-full bg-white"
 						style={{
 							filter: 'drop-shadow(0px 12px 47px rgba(166,166,166,0.3))'
 						}}
-						src={staticFile('static/image/memoji/1.png')}
 					/>
 					<div className="flex flex-row items-center justify-center">
-						<p className="text-3xl tracking-[0.025em] text-white">Mom</p>
+						<p className="text-3xl tracking-[0.025em] text-white">{contact.name}</p>
 						<ChevronRightIcon className="h-8 w-8 text-[#909093]" />
 					</div>
 				</div>
@@ -145,7 +147,7 @@ export const Chat: React.FC<TProps> = (props) => {
 	);
 };
 
-interface TProps {
-	sequence: TChatStoryCompProps['sequence'];
+interface TProps extends Omit<TIMessegeMessenger, 'type'> {
+	sequence: TSequenceItem[];
 	className?: string;
 }
