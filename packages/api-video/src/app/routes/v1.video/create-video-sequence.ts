@@ -83,6 +83,7 @@ class VideoSequenceCreator {
 
 		this.addNotificationSound(participant, startFrame);
 
+		let voiceDurationMs = 0;
 		if (
 			this.config.voiceover &&
 			participant.voice != null &&
@@ -90,12 +91,13 @@ class VideoSequenceCreator {
 		) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
 			if (voiceResult.isErr()) {
-				return voiceResult;
+				return Err(voiceResult.error);
 			}
+			voiceDurationMs = voiceResult.value;
 		}
 
 		this.addMessageToSequence(item, participant, startFrame);
-		this.currentTimeMs += this.config.messageDelayMs;
+		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs / 1000);
 		return Ok(undefined);
 	}
 
@@ -116,7 +118,7 @@ class VideoSequenceCreator {
 		item: Extract<TChatStoryVideoEvent, { type: 'Message' }>,
 		voice: NonNullable<TChatStoryVideoParticipant['voice']>,
 		startFrame: number
-	): Promise<TResult<void, AppError>> {
+	): Promise<TResult<number, AppError>> {
 		const voiceId = elevenLabsConfig.voices[voice].voiceId;
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
@@ -137,8 +139,14 @@ class VideoSequenceCreator {
 			return Err(spokenMessageUrl.error);
 		}
 
-		await this.addVoiceoverToSequence(spokenMessageUrl.value, startFrame);
-		return Ok(undefined);
+		const durationMs = unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0;
+		this.addVoiceoverToSequence(
+			spokenMessageUrl.value,
+			startFrame,
+			(durationMs / 1000) * this.config.fps || this.config.fps * 3
+		);
+
+		return Ok(durationMs);
 	}
 
 	private async checkSpokenMessageCache(filename: string): Promise<boolean> {
@@ -201,16 +209,13 @@ class VideoSequenceCreator {
 		return Ok(urlResult.value);
 	}
 
-	private async addVoiceoverToSequence(src: string, startFrame: number): Promise<void> {
-		const durationMs = unwrapOrNull(await estimateMp3Duration(src));
-		const defaultDurationInFrames = this.config.fps * 3;
+	private addVoiceoverToSequence(src: string, startFrame: number, durationInFrames: number): void {
 		this.sequence.push({
 			type: 'Audio',
 			src,
 			volume: 1,
 			startFrame,
-			durationInFrames:
-				durationMs != null ? (durationMs / 1000) * this.config.fps : defaultDurationInFrames
+			durationInFrames
 		});
 	}
 
