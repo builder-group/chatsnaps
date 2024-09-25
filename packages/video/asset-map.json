@@ -1,0 +1,34 @@
+{
+  "static/audio/sound/ios_received.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/ios_received.mp3",
+    "durationMs": 6384
+  },
+  "static/audio/sound/ios_sent.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/ios_sent.mp3",
+    "durationMs": 504
+  },
+  "static/image/imessage.png": {
+    "type": "PNG",
+    "path": "static/image/imessage.png"
+  },
+  "static/image/memoji/1.png": {
+    "type": "PNG",
+    "path": "static/image/memoji/1.png"
+  },
+  "static/image/overlay/tiktok.png": {
+    "type": "PNG",
+    "path": "static/image/overlay/tiktok.png"
+  },
+  "static/video/.local/fpv.mp4": {
+    "type": "MP4",
+    "path": "static/video/.local/fpv.mp4",
+    "durationMs": 658567
+  },
+  "static/video/.local/steep.mp4": {
+    "type": "MP4",
+    "path": "static/video/.local/steep.mp4",
+    "durationMs": 1049415
+  }
+}

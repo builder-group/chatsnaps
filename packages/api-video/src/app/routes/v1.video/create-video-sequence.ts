@@ -1,4 +1,5 @@
 import { type TChatStoryCompProps } from '@repo/video';
+import assetMap from '@repo/video/asset-map.json';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
@@ -99,14 +100,15 @@ class VideoSequenceCreator {
 	}
 
 	private addNotificationSound(participant: TChatStoryVideoParticipant, startFrame: number): void {
+		const audio = participant.isSelf
+			? assetMap['static/audio/sound/ios_sent.mp3']
+			: assetMap['static/audio/sound/ios_received.mp3'];
 		this.sequence.push({
 			type: 'Audio',
-			src: participant.isSelf
-				? 'static/audio/sound/ios_sent.mp3'
-				: 'static/audio/sound/ios_received.mp3',
+			src: audio.path,
 			volume: 1,
 			startFrame,
-			durationInFrames: this.config.fps * 2 // TODO: Calculate actual duration
+			durationInFrames: Math.floor((audio.durationMs / 1000) * this.config.fps)
 		});
 	}
 

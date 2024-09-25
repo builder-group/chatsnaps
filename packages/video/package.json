@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "shx rm -rf dist && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle && pnpm run remotion:build",
 		"css:build": "tailwindcss -i ./src/style.css -o ./dist/style.css",
+		"remotion:generate-asset-map": "tsx ./remotion.generate-asset-map.js",
 		"start:dev": "remotion studio ./remotion.root.js",
 		"remotion:build": "tsx remotion.build.js",
 		"remotion:upgrade": "remotion upgrade",
@@ -62,6 +63,7 @@
 	},
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"asset-map.json"
 	]
 }
