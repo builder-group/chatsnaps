@@ -5,7 +5,6 @@ import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr } from '@blgc/utils';
 import { remotionConfig, s3Client, s3Config } from '@/environment';
-import { estimateMp3Duration } from '@/lib';
 
 import { router } from '../../router';
 import { createVideoSequence } from './create-video-sequence';
@@ -27,16 +26,6 @@ router.post(
 			c.req.valid('query');
 		const voiceover = voiceoverString === 'true';
 		const renderVideo = renderVideoString === 'true';
-
-		const filePath = (
-			await s3Client.getObjectUrl(
-				'0c495caba2cc3a2a3b1fcb313c848eb5a646d4c116fa79cdcea28b3a90d29fe4.mp3',
-				'elevenlabs'
-			)
-		).unwrap();
-		const duration = await estimateMp3Duration(filePath);
-
-		console.log({ duration, filePath });
 
 		const sequence = (
 			await createVideoSequence(data, { voiceover, fps: 30, messageDelayMs: 500 })

@@ -1,9 +1,9 @@
 import { type TChatStoryCompProps } from '@repo/video';
 import assetMap from '@repo/video/asset-map.json';
 import { AppError } from '@blgc/openapi-router';
-import { Err, Ok, unwrapOr, type TResult } from '@blgc/utils';
+import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
-import { sha256, streamToBuffer } from '@/lib';
+import { estimateMp3Duration, sha256, streamToBuffer } from '@/lib';
 
 import {
 	type TChatStoryVideoDto,
@@ -137,7 +137,7 @@ class VideoSequenceCreator {
 			return Err(spokenMessageUrl.error);
 		}
 
-		this.addVoiceoverToSequence(spokenMessageUrl.value, startFrame);
+		await this.addVoiceoverToSequence(spokenMessageUrl.value, startFrame);
 		return Ok(undefined);
 	}
 
@@ -201,13 +201,16 @@ class VideoSequenceCreator {
 		return Ok(urlResult.value);
 	}
 
-	private addVoiceoverToSequence(src: string, startFrame: number): void {
+	private async addVoiceoverToSequence(src: string, startFrame: number): Promise<void> {
+		const durationMs = unwrapOrNull(await estimateMp3Duration(src));
+		const defaultDurationInFrames = this.config.fps * 3;
 		this.sequence.push({
 			type: 'Audio',
 			src,
 			volume: 1,
 			startFrame,
-			durationInFrames: this.config.fps * 3 // TODO: Calculate actual duration
+			durationInFrames:
+				durationMs != null ? (durationMs / 1000) * this.config.fps : defaultDurationInFrames
 		});
 	}
 

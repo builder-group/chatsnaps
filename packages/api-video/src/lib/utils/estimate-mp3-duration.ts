@@ -1,18 +1,10 @@
-/* eslint-disable no-bitwise -- Required here */
-// Based on: https://github.com/FactorialComplexity/mp3-duration-estimate
+/* eslint-disable no-bitwise -- Used to extract relevant data */
 
+// Inspired by: https://github.com/FactorialComplexity/mp3-duration-estimate
+
+import { FetchError } from 'feature-fetch';
+import { Err, Ok, type TResult } from '@blgc/utils';
 import { fetchClient } from '@/environment/clients/fetch.client';
-
-interface TID3V2Header {
-	size: number;
-	headerSize: number;
-}
-
-interface TMP3FrameHeader {
-	bitrate: number;
-	samplingRate: number;
-	stereo: boolean;
-}
 
 const BITRATES = [
 	[
@@ -58,94 +50,132 @@ const SAMPLING_RATES = [
 
 async function readID3V2Header(
 	url: string
-): Promise<{ header?: TID3V2Header; totalContentSize?: number }> {
-	const result = (
-		await fetchClient.get(url, {
-			headers: { Range: 'bytes=0-9' },
-			parseAs: 'arrayBuffer'
-		})
-	).unwrap();
+): Promise<TResult<{ header?: TID3V2Header; totalContentSize?: number }, FetchError>> {
+	const result = await fetchClient.get(url, {
+		headers: { Range: 'bytes=0-9' },
+		parseAs: 'arrayBuffer'
+	});
 
-	const buffer = result.data;
-	const data = new Uint8Array(buffer);
+	if (result.isErr()) {
+		return Err(
+			new FetchError('#ERR_FETCH_ID3V2', {
+				description: `Failed to fetch ID3V2 header: ${result.error.message}`,
+				throwable: result.error.throwable
+			})
+		);
+	}
+
+	const data = new Uint8Array(result.value.data);
+	const response = result.value.response;
 
 	if (data[0] === 0x49 && data[1] === 0x44 && data[2] === 0x33) {
-		return {
+		return Ok({
 			header: {
 				headerSize: 10,
 				size: readSynchsafeInteger(data.slice(6, 10))
 			},
-			totalContentSize: parseInt(
-				result.response.headers.get('Content-Range')?.split('/')[1] ?? '0',
-				10
-			)
-		};
+			totalContentSize: parseInt(response.headers.get('Content-Range')?.split('/')[1] ?? '0', 10)
+		});
 	}
 
-	return {
-		totalContentSize: parseInt(
-			result.response.headers.get('Content-Range')?.split('/')[1] ?? '0',
-			10
-		)
-	};
+	return Ok({
+		totalContentSize: parseInt(response.headers.get('Content-Range')?.split('/')[1] ?? '0', 10)
+	});
 }
 
 function readSynchsafeInteger(data: Uint8Array): number {
 	return data.reduce((acc, byte) => (acc << 7) | (byte & 0x7f), 0);
 }
 
-function parseMP3FrameHeader(header: Uint8Array): TMP3FrameHeader {
+function parseMP3FrameHeader(header: Uint8Array): TResult<TMP3FrameHeader, FetchError> {
+	if (header.length < 4) {
+		return Err(
+			new FetchError('#ERR_INSUFFICIENT_DATA', {
+				description: 'Insufficient data for MP3 frame header'
+			})
+		);
+	}
+
+	// @ts-expect-error -- Header length is checked above
 	const firstUI16BE = (header[0] << 8) | header[1];
 	const syncWord = firstUI16BE & 0xffe0;
 
 	if (syncWord !== 0xffe0) {
-		throw new Error('Malformed MP3 file - frame not found');
+		return Err(
+			new FetchError('#ERR_MALFORMED_MP3', { description: 'Malformed MP3 file - frame not found' })
+		);
 	}
 
 	const mpegVersionBits = (firstUI16BE >> 3) & 0x3;
 	const layerBits = (firstUI16BE >> 1) & 0x3;
+	// @ts-expect-error -- Header length is checked above
 	const bitrateBits = (header[2] & 0xf0) >> 4;
+	// @ts-expect-error -- Header length is checked above
 	const samplingRateBits = (header[2] & 0x0c) >> 2;
+	// @ts-expect-error -- Header length is checked above
 	const channelModeBits = header[3] >> 6;
 
-	return {
-		bitrate: BITRATES[mpegVersionBits][layerBits][bitrateBits],
+	const bitrate = BITRATES[mpegVersionBits]?.[layerBits]?.[bitrateBits];
+	const samplingRate = SAMPLING_RATES[mpegVersionBits]?.[samplingRateBits];
+
+	if (bitrate == null || samplingRate == null) {
+		return Err(
+			new FetchError('#ERR_INVALID_BITRATE_OR_SAMPLING_RATE', {
+				description: 'Invalid bitrate or sampling rate'
+			})
+		);
+	}
+
+	return Ok({
+		bitrate,
 		stereo: channelModeBits !== 3,
-		samplingRate: SAMPLING_RATES[mpegVersionBits][samplingRateBits]
-	};
+		samplingRate
+	});
 }
 
-export async function estimateMp3Duration(url: string): Promise<number | null> {
-	try {
-		const { header, totalContentSize } = await readID3V2Header(url);
-
-		if (!totalContentSize) {
-			return null;
-		}
-
-		const firstFrameOffset = header ? header.size + header.headerSize : 0;
-		const totalAudioDataSize = totalContentSize - firstFrameOffset;
-
-		const frameHeaderBuffer = (
-			await fetchClient.get(url, {
-				headers: {
-					Range: `bytes=${firstFrameOffset.toString()}-${(firstFrameOffset + 3).toString()}`
-				},
-				parseAs: 'arrayBuffer'
-			})
-		).unwrap().data;
-
-		const mp3FrameHeader = parseMP3FrameHeader(new Uint8Array(frameHeaderBuffer));
-
-		const durationMs = Math.floor(
-			(totalAudioDataSize / ((mp3FrameHeader.bitrate / 8) * 1000)) *
-				(mp3FrameHeader.stereo ? 1 : 2) *
-				1000
-		);
-
-		return durationMs;
-	} catch (error) {
-		console.error('Error estimating MP3 duration:', error);
-		return null;
+export async function estimateMp3Duration(url: string): Promise<TResult<number, FetchError>> {
+	const headerResult = await readID3V2Header(url);
+	if (headerResult.isErr()) {
+		return Err(headerResult.error);
 	}
+
+	const { header, totalContentSize } = headerResult.value;
+	if (totalContentSize == null) {
+		return Err(
+			new FetchError('#ERR_MISSING_CONTENT_SIZE', { description: 'Missing content size' })
+		);
+	}
+
+	const firstFrameOffset = header ? header.size + header.headerSize : 0;
+	const totalAudioDataSize = totalContentSize - firstFrameOffset;
+
+	const frameHeaderResult = await fetchClient.get(url, {
+		headers: {
+			Range: `bytes=${firstFrameOffset.toString()}-${(firstFrameOffset + 3).toString()}`
+		},
+		parseAs: 'arrayBuffer'
+	});
+	if (frameHeaderResult.isErr()) {
+		return Err(frameHeaderResult.error);
+	}
+
+	const mp3FrameHeaderResult = parseMP3FrameHeader(new Uint8Array(frameHeaderResult.value.data));
+	if (mp3FrameHeaderResult.isErr()) {
+		return Err(mp3FrameHeaderResult.error);
+	}
+
+	const mp3FrameHeader = mp3FrameHeaderResult.value;
+
+	return Ok(Math.floor((totalAudioDataSize / ((mp3FrameHeader.bitrate / 8) * 1000)) * 1000));
+}
+
+interface TID3V2Header {
+	size: number;
+	headerSize: number;
+}
+
+interface TMP3FrameHeader {
+	bitrate: number;
+	samplingRate: number;
+	stereo: boolean;
 }
