@@ -2,7 +2,7 @@
 	"chatstory": {
 		"title": "When Your Roommate 'Borrows' Your Stuff...",
 		"messenger": {
-			"type": "IMessenge",
+			"type": "IMessage",
 			"contact": {
 				"profilePicture": { "type": "Image", "src": "static/image/memoji/1.png" },
 				"name": "Mom"

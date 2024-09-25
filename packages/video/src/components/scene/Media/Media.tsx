@@ -3,8 +3,6 @@ import { Audio, Img, OffthreadVideo } from 'remotion';
 import { getAbsoluteSrc } from './get-absolute-src';
 import { TMedia } from './schema';
 
-export * from './schema';
-
 export const Media: React.FC<TProps> = (props) => {
 	const { media, style, ...elementProps } = props;
 

@@ -1,6 +1,6 @@
 import React from 'react';
+import { Media } from '@/components';
 
-import { Media } from '../../components';
 import { TChatStoryCompProps } from './schema';
 
 export const Overlay: React.FC<TProps> = (props) => {

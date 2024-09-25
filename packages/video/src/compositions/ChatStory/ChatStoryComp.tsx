@@ -1,12 +1,10 @@
 import { AbsoluteFill } from 'remotion';
+import { Media } from '@/components';
+import { TRemotionFC } from '@/types';
 
-import { Media } from '../../components';
-import { TRemotionFC } from '../../types';
 import { Messenger } from './Messenger';
 import { Overlay } from './Overlay';
 import { SChatStoryCompProps, TChatStoryCompProps } from './schema';
-
-export * from './schema';
 
 export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 	const { title, sequence, messenger, background, overlay } = props;

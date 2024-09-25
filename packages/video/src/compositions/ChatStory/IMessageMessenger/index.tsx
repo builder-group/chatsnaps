@@ -8,19 +8,19 @@ import {
 	useCurrentFrame,
 	useVideoConfig
 } from 'remotion';
+import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '@/components';
+import { cn } from '@/lib';
 
-import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '../../../components';
-import { cn } from '../../../lib';
 import {
 	TAudioSequenceItem,
-	TIMessegeMessenger,
+	TIMessageMessenger,
 	TMessageSequenceItem,
 	TSequenceItem
 } from '../schema';
 
 import './style.scss';
 
-export const IMessegeMessenger: React.FC<TProps> = (props) => {
+export const IMessageMessenger: React.FC<TProps> = (props) => {
 	const { sequence, contact, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
@@ -119,7 +119,7 @@ export const IMessegeMessenger: React.FC<TProps> = (props) => {
 							>
 								{content.type === 'Text' ? content.text : ''}
 							</div>
-							{/* Invisible static component to maintain consistent layout and thus not to disrupt the height calculations with e.g. spring animation */}
+							{/* Invisible static component to maintain consistent layout and thus to not influence the height calculations with e.g. spring animation */}
 							<div
 								className={cn(
 									'shared opacity-0',
@@ -147,7 +147,7 @@ export const IMessegeMessenger: React.FC<TProps> = (props) => {
 	);
 };
 
-interface TProps extends Omit<TIMessegeMessenger, 'type'> {
+interface TProps extends Omit<TIMessageMessenger, 'type'> {
 	sequence: TSequenceItem[];
 	className?: string;
 }

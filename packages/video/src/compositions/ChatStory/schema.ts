@@ -1,13 +1,14 @@
 import { z } from 'zod';
+import { SImageMedia, SVisualMedia } from '@/components';
 
-import { SImageMedia, SVisualMedia } from '../../components';
+export { SImageMedia, SVisualMedia } from '@/components';
 
 const SBaseSequenceItem = z.object({
 	startFrame: z.number(),
 	durationInFrames: z.number().optional()
 });
 
-const SMessageSequenceItem = SBaseSequenceItem.extend({
+export const SMessageSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('Message'),
 	messageType: z.enum(['sent', 'received']),
 	participant: z.object({
@@ -24,30 +25,33 @@ const SMessageSequenceItem = SBaseSequenceItem.extend({
 });
 export type TMessageSequenceItem = z.infer<typeof SMessageSequenceItem>;
 
-const SAudioSequenceItem = SBaseSequenceItem.extend({
+export const SAudioSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('Audio'),
 	src: z.string(),
 	volume: z.number().min(0).max(1).optional().default(1)
 });
 export type TAudioSequenceItem = z.infer<typeof SAudioSequenceItem>;
 
-const SSequenceItem = z.discriminatedUnion('type', [SMessageSequenceItem, SAudioSequenceItem]);
+export const SSequenceItem = z.discriminatedUnion('type', [
+	SMessageSequenceItem,
+	SAudioSequenceItem
+]);
 export type TSequenceItem = z.infer<typeof SSequenceItem>;
 
-const SIMessegeMessenger = z.object({
-	type: z.literal('IMessenge'),
+export const SIMessageMessenger = z.object({
+	type: z.literal('IMessage'),
 	contact: z.object({
 		profilePicture: SVisualMedia,
 		name: z.string()
 	})
 });
-export type TIMessegeMessenger = z.infer<typeof SIMessegeMessenger>;
+export type TIMessageMessenger = z.infer<typeof SIMessageMessenger>;
 
-const SWhatsAppMessenger = z.object({
+export const SWhatsAppMessenger = z.object({
 	type: z.literal('WhatsApp')
 });
 
-const SMessenger = z.discriminatedUnion('type', [SIMessegeMessenger, SWhatsAppMessenger]);
+export const SMessenger = z.discriminatedUnion('type', [SIMessageMessenger, SWhatsAppMessenger]);
 export type TMessenger = z.infer<typeof SMessenger>;
 
 export const SChatStoryCompProps = z.object({

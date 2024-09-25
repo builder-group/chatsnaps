@@ -22,7 +22,7 @@ const SChatStoryVideoDto = v.object({
 			id: v.number(),
 			display_name: v.string(),
 			is_sender: v.boolean(),
-			speaker: v.optional(
+			voice: v.optional(
 				v.picklist(Object.keys(elevenLabsConfig.voices) as (keyof typeof elevenLabsConfig.voices)[])
 			)
 		})
@@ -42,6 +42,20 @@ const SChatStoryVideoDto = v.object({
 			v.object({
 				type: v.literal('Time'),
 				passed_time_min: v.number()
+			})
+		])
+	),
+	messenger: v.optional(
+		v.union([
+			v.object({
+				type: v.literal('IMessage'),
+				contact: v.object({
+					profile_picture_src: v.string(),
+					name: v.string()
+				})
+			}),
+			v.object({
+				type: v.literal('WhatsApp')
 			})
 		])
 	)
@@ -70,7 +84,7 @@ router.post(
 			title: data.title,
 			sequence: await mapToSequence(data, voiceover),
 			messenger: {
-				type: 'IMessenge',
+				type: 'IMessage',
 				contact: {
 					profilePicture: { type: 'Image', src: 'static/image/memoji/1.png' },
 					name: 'Mom'
@@ -152,8 +166,8 @@ async function mapToSequence(
 						durationInFrames: Number(fps)
 					});
 
-					if (voiceover && participant.speaker != null && containsSpeakableChar(item.content)) {
-						const voiceId = elevenLabsConfig.voices[participant.speaker].voiceId;
+					if (voiceover && participant.voice != null && containsSpeakableChar(item.content)) {
+						const voiceId = elevenLabsConfig.voices[participant.voice].voiceId;
 
 						// Generate a unique hash for the message and voice ID
 						// TODO: Based on the scenario the tone might vary?
