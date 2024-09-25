@@ -31,7 +31,6 @@
 	"homepage": "",
 	"dependencies": {
 		"@blgc/utils": "^0.0.19",
-		"@remotion/media-parser": "^4.0.212",
 		"@remotion/zod-types": "4.0.212",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.445.0",
