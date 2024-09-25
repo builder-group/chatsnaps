@@ -1,84 +1,72 @@
-import { vValidator } from '@hono/valibot-validator';
+import { zValidator } from '@hono/zod-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
-import { ChatStoryComp, type TChatStoryCompProps } from '@repo/video';
-import * as v from 'valibot';
+import { ChatStoryComp, SChatStoryCompProps, type TChatStoryCompProps } from '@repo/video';
+import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr, unwrapOrNull } from '@blgc/utils';
-
 import {
 	elevenLabsClient,
 	elevenLabsConfig,
 	remotionConfig,
 	s3Client,
 	s3Config
-} from '../../environment';
-import { containsSpeakableChar, sha256, streamToBuffer } from '../../lib';
-import { router } from '../router';
+} from '@/environment';
+import { containsSpeakableChar, sha256, streamToBuffer } from '@/lib';
 
-const SChatStoryVideoDto = v.object({
-	title: v.string(),
-	participants: v.array(
-		v.object({
-			id: v.number(),
-			display_name: v.string(),
-			is_sender: v.boolean(),
-			voice: v.optional(
-				v.picklist(Object.keys(elevenLabsConfig.voices) as (keyof typeof elevenLabsConfig.voices)[])
+import { router } from '../../router';
+
+const SChatStoryVideoDto = z.object({
+	title: z.string(),
+	participants: z.array(
+		z.object({
+			id: z.number(),
+			displayName: z.string(),
+			isSelf: z.boolean(),
+			voice: z.optional(
+				z.enum(Object.keys(elevenLabsConfig.voices) as [keyof typeof elevenLabsConfig.voices])
 			)
 		})
 	),
-	events: v.array(
-		v.union([
-			v.object({
-				type: v.literal('Message'),
-				// TODO: Expand with images, gifs, ..
-				content: v.string(),
-				participant_id: v.number()
+	events: z.array(
+		z.union([
+			z.object({
+				type: z.literal('Message'),
+				content: z.string(),
+				participantId: z.number()
 			}),
-			v.object({
-				type: v.literal('Pause'),
-				duration_ms: v.number()
+			z.object({
+				type: z.literal('Pause'),
+				durationMs: z.number()
 			}),
-			v.object({
-				type: v.literal('Time'),
-				passed_time_min: v.number()
+			z.object({
+				type: z.literal('Time'),
+				passedTimeMin: z.number()
 			})
 		])
 	),
-	messenger: v.optional(
-		v.union([
-			v.object({
-				type: v.literal('IMessage'),
-				contact: v.object({
-					profile_picture_src: v.string(),
-					name: v.string()
-				})
-			}),
-			v.object({
-				type: v.literal('WhatsApp')
-			})
-		])
-	)
+	messenger: SChatStoryCompProps.shape.messenger.optional(),
+	background: SChatStoryCompProps.shape.background,
+	overlay: SChatStoryCompProps.shape.overlay
 });
 
-type TChatStoryVideoDto = v.InferInput<typeof SChatStoryVideoDto>;
+type TChatStoryVideoDto = z.infer<typeof SChatStoryVideoDto>;
 
 router.post(
 	'/v1/video/chatstory',
-	vValidator('json', SChatStoryVideoDto),
-	vValidator(
+	zValidator('json', SChatStoryVideoDto),
+	zValidator(
 		'query',
-		v.object({
-			voiceover: v.optional(v.picklist(['true', 'false'])),
-			video: v.optional(v.picklist(['true', 'false']))
+		z.object({
+			voiceover: z.enum(['true', 'false']).optional(),
+			renderVideo: z.enum(['true', 'false']).optional()
 		})
 	),
 	async (c) => {
 		const data = c.req.valid('json');
-		const { voiceover: voiceoverString = 'false', video: videoString = 'true' } =
+		const { voiceover: voiceoverString = 'false', renderVideo: renderVideoString = 'true' } =
 			c.req.valid('query');
 		const voiceover = voiceoverString === 'true';
-		const video = videoString === 'true';
+		const renderVideo = renderVideoString === 'true';
 
 		const videoProps: TChatStoryCompProps = {
 			title: data.title,
@@ -92,7 +80,7 @@ router.post(
 			}
 		};
 
-		if (!video) {
+		if (!renderVideo) {
 			return c.json({
 				url: null,
 				props: videoProps
@@ -150,7 +138,7 @@ async function mapToSequence(
 					const startFrame = Math.floor(currentTime * fps);
 					currentTime += 0.5;
 
-					const participant = participants.find((p) => p.id === item.participant_id);
+					const participant = participants.find((p) => p.id === item.participantId);
 					if (participant == null) {
 						continue;
 					}
@@ -158,7 +146,7 @@ async function mapToSequence(
 					// Push notification
 					sequence.push({
 						type: 'Audio',
-						src: participant.is_sender
+						src: participant.isSelf
 							? 'static/audio/sound/ios_sent.mp3'
 							: 'static/audio/sound/ios_received.mp3',
 						volume: 1,
@@ -240,15 +228,15 @@ async function mapToSequence(
 						type: 'Message',
 						content: { type: 'Text', text: item.content },
 						participant: {
-							displayName: participant.display_name
+							displayName: participant.displayName
 						},
-						messageType: participant.is_sender ? 'sent' : 'received',
+						messageType: participant.isSelf ? 'sent' : 'received',
 						startFrame
 					});
 				}
 				break;
 			case 'Pause': {
-				currentTime += item.duration_ms / 1000;
+				currentTime += item.durationMs / 1000;
 				break;
 			}
 			case 'Time': {

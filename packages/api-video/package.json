@@ -32,7 +32,7 @@
 		"@aws-sdk/s3-request-presigner": "^3.654.0",
 		"@blgc/openapi-router": "^0.0.20",
 		"@blgc/utils": "^0.0.19",
-		"@hono/valibot-validator": "^0.3.0",
+		"@hono/zod-validator": "^0.2.2",
 		"@remotion/bundler": "^4.0.212",
 		"@remotion/media-parser": "^4.0.212",
 		"@remotion/renderer": "^4.0.212",
@@ -41,7 +41,7 @@
 		"feature-logger": "^0.0.23",
 		"hono": "^4.6.2",
 		"s3rver": "^3.7.1",
-		"valibot": "^0.42.0"
+		"zod": "3.23.8"
 	},
 	"devDependencies": {
 		"@blgc/config": "^0.0.24",
