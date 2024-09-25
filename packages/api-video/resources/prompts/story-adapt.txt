@@ -33,6 +33,7 @@ Follow these guidelines to adapt the story into a viral chat format:
 4. Rapid Pacing & Clipped Dialogue:
    - Use 1-4 word messages and keep the conversation fast-paced
    - Split thoughts across multiple rapid-fire texts for impact
+   - Add dynamic pauses (100ms-800ms) between messages, varying based on context to match flow
    - Eliminate filler and ensure every message adds drama, humor, or suspense
    - Integrate appropriate internet slang, emojis, or memes
    - Use ellipsis (...) to create suspense between messages
@@ -77,33 +78,33 @@ Output your adapted viral chat story using the following JSON format:
     "participants": [
         {
             "id": 1,
-            "display_name": "Character1",
-            "is_sender": false
+            "displayName": "Character1",
+            "isSelf": false
         },
         {
             "id": 2,
-            "display_name": "Character2",
-            "is_sender": true
+            "displayName": "Character2",
+            "isSelf": true
         }
     ],
     "events": [
         {
             "type": "Message",
             "content": "First shocking message that hooks",
-            "participant_id": 1
+            "participantId": 1
         },
         {
             "type": "Pause",
-            "duration_ms": 300
+            "durationMs": 300
         },
         {
             "type": "Message",
             "content": "Escalating response to build tension",
-            "participant_id": 2
+            "participantId": 2
         },
         {
-		        "type": "Time",
-		        "passed_time_min": 30
+            "type": "Time",
+            "passedTimeMin": 30
         }
     ]
 }
@@ -117,6 +118,7 @@ Before submitting your adaptation, review this Final Viral Checklist:
 - Are there mini-hooks or surprises every 2-3 messages to keep viewers engaged?
 - Does the story deliver constant surprises and twists?
 - Is the pacing rapid, with no unnecessary filler?
+- Are varying pauses (100ms-800ms) between messages included and fitting the flow?
 - Are the characters distinct and memorable?
 - Is the resolution unexpected and viral-worthy?
 - Are there at least three quotable, meme-able lines?
