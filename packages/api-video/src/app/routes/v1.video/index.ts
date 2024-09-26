@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { ChatStoryComp, type TChatStoryCompProps } from '@repo/video';
+import assetMap from '@repo/video/asset-map.json';
 import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr } from '@blgc/utils';
@@ -38,11 +39,17 @@ router.post(
 			messenger: data.messenger ?? {
 				type: 'IMessage',
 				contact: {
-					profilePicture: { type: 'Image', src: 'static/image/memoji/1.png' },
+					profilePicture: { type: 'Image', src: assetMap['static/image/memoji/1.png'].path },
 					name: 'Mom'
 				}
 			},
-			background: data.background,
+			background: data.background ?? {
+				type: 'Video',
+				src: assetMap['static/video/.local/minecraft.mp4'].path,
+				objectFit: 'cover',
+				width: 1080,
+				height: 1920
+			},
 			overlay: data.overlay
 		};
 

@@ -3,7 +3,7 @@ import assetMap from '@repo/video/asset-map.json';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
-import { estimateMp3Duration, sha256, streamToBuffer } from '@/lib';
+import { estimateMp3Duration, sha256, streamToBuffer, toSeconds } from '@/lib';
 
 import {
 	type TChatStoryVideoDto,
@@ -24,26 +24,32 @@ class VideoSequenceCreator {
 	private currentTimeMs = 0;
 	private creditsSpent = 0;
 
-	private audioManager: AudioManager;
-
 	private data: TChatStoryVideoDto;
 	private config: TVideoSequenceCreatorConfig;
 
+	private voiceContextMap: Record<
+		string,
+		{
+			previousText?: string;
+			previousRequestIds: string[];
+		}
+	> = {};
+
 	constructor(data: TChatStoryVideoDto, options: Partial<TVideoSequenceCreatorConfig> = {}) {
-		this.audioManager = new AudioManager();
 		this.data = data;
 		this.config = {
 			fps: options.fps ?? 30,
-			messageDelayMs: options.messageDelayMs ?? 500,
-			voiceover: options.voiceover ?? false
+			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
+			voiceover: options.voiceover ?? false,
+			useCached: false
 		};
 	}
 
 	public async createSequence(): Promise<
 		TResult<{ sequence: TChatStoryCompProps['sequence']; creditsSpent: number }, AppError>
 	> {
-		for (const item of this.data.events) {
-			const result = await this.processEvent(item);
+		for (const [index, item] of this.data.events.entries()) {
+			const result = await this.processEvent({ ...item, index });
 			if (result.isErr()) {
 				return Err(result.error);
 			}
@@ -52,7 +58,7 @@ class VideoSequenceCreator {
 		return Ok({ sequence: this.sequence, creditsSpent: this.creditsSpent });
 	}
 
-	private async processEvent(item: TChatStoryVideoEvent): Promise<TResult<void, AppError>> {
+	private async processEvent(item: TExtendedChatStoryVideoEvent): Promise<TResult<void, AppError>> {
 		switch (item.type) {
 			case 'Message':
 				return this.processMessageEvent(item);
@@ -65,16 +71,16 @@ class VideoSequenceCreator {
 	}
 
 	private processPauseEvent(
-		item: Extract<TChatStoryVideoEvent, { type: 'Pause' }>
+		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Pause' }>
 	): TResult<void, AppError> {
 		this.currentTimeMs += item.durationMs;
 		return Ok(undefined);
 	}
 
 	private async processMessageEvent(
-		item: Extract<TChatStoryVideoEvent, { type: 'Message' }>
+		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>
 	): Promise<TResult<void, AppError>> {
-		const startFrame = Math.floor((this.currentTimeMs / 1000) * this.config.fps);
+		const startFrame = toSeconds(this.currentTimeMs) * this.config.fps;
 		const participant = this.data.participants.find((p) => p.id === item.participantId);
 		if (participant == null) {
 			console.warn(`No participant for message '${item.content}' found!`);
@@ -84,11 +90,7 @@ class VideoSequenceCreator {
 		this.addNotificationSound(participant, startFrame);
 
 		let voiceDurationMs = 0;
-		if (
-			this.config.voiceover &&
-			participant.voice != null &&
-			this.containsSpeakableChar(item.content)
-		) {
+		if (this.config.voiceover && participant.voice != null && this.canBeSpoken(item.content)) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
 			if (voiceResult.isErr()) {
 				return Err(voiceResult.error);
@@ -97,7 +99,7 @@ class VideoSequenceCreator {
 		}
 
 		this.addMessageToSequence(item, participant, startFrame);
-		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs / 1000);
+		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs - 200);
 		return Ok(undefined);
 	}
 
@@ -110,19 +112,20 @@ class VideoSequenceCreator {
 			src: audio.path,
 			volume: 1,
 			startFrame,
-			durationInFrames: Math.floor((audio.durationMs / 1000) * this.config.fps)
+			durationInFrames: toSeconds(audio.durationMs) * this.config.fps
 		});
 	}
 
 	private async processVoiceover(
-		item: Extract<TChatStoryVideoEvent, { type: 'Message' }>,
+		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
 		voice: NonNullable<TChatStoryVideoParticipant['voice']>,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
 		const voiceId = elevenLabsConfig.voices[voice].voiceId;
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
-		const isSpokenMessageCached = await this.checkSpokenMessageCache(spokenMessageFilename);
+		const isSpokenMessageCached =
+			this.config.useCached && (await this.checkSpokenMessageCache(spokenMessageFilename));
 		if (!isSpokenMessageCached) {
 			const generateResult = await this.generateAndUploadVoiceover(
 				item,
@@ -143,7 +146,7 @@ class VideoSequenceCreator {
 		this.addVoiceoverToSequence(
 			spokenMessageUrl.value,
 			startFrame,
-			(durationMs / 1000) * this.config.fps || this.config.fps * 3
+			toSeconds(durationMs) * this.config.fps || this.config.fps * 3
 		);
 
 		return Ok(durationMs);
@@ -155,14 +158,27 @@ class VideoSequenceCreator {
 	}
 
 	private async generateAndUploadVoiceover(
-		item: Extract<TChatStoryVideoEvent, { type: 'Message' }>,
+		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
 		voiceId: string,
 		filename: string
 	): Promise<TResult<void, AppError>> {
+		const { previousText, previousRequestIds } = this.getVoiceContext(voiceId);
+		const maybeNextText = this.getNextMessageEventFromParticipant(
+			item.index + 1,
+			item.participantId
+		)?.content;
+		const nextText = maybeNextText != null ? this.enhanceSpeechText(maybeNextText) : undefined;
+		const currentText = this.enhanceSpeechText(item.content);
+
+		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
-			text: item.content,
-			previousRequestIds: this.audioManager.getPreviousRequestIds(voiceId)
+			text: currentText,
+			modelId: elevenLabsConfig.models.eleven_turbo_v2.id,
+			// languageCode: 'EN',
+			previousRequestIds,
+			nextText,
+			previousText
 		});
 
 		if (audioResult.isErr()) {
@@ -175,9 +191,7 @@ class VideoSequenceCreator {
 
 		const audio = audioResult.value;
 		this.updateCreditsSpent(audio.characterCost ?? 0);
-		if (audio.requestId) {
-			this.audioManager.addRequestId(voiceId, audio.requestId);
-		}
+		this.updateVoiceContext(voiceId, currentText, audio.requestId);
 
 		const arrayBuffer = await streamToBuffer(audio.stream);
 		const uploadResult = await s3Client.uploadObject(
@@ -220,7 +234,7 @@ class VideoSequenceCreator {
 	}
 
 	private addMessageToSequence(
-		item: Extract<TChatStoryVideoEvent, { type: 'Message' }>,
+		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
 		participant: TChatStoryVideoParticipant,
 		startFrame: number
 	): void {
@@ -235,37 +249,82 @@ class VideoSequenceCreator {
 		});
 	}
 
+	private getNextMessageEventFromParticipant(
+		startIndex: number,
+		participantId: number
+	): Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }> | null {
+		for (let i = startIndex; i < this.data.events.length; i++) {
+			const event = this.data.events[i];
+			if (event?.type === 'Message' && event.participantId === participantId) {
+				return { ...event, index: i };
+			}
+		}
+		return null;
+	}
+
 	private updateCreditsSpent(characterCost: string | number): void {
 		const cost = typeof characterCost === 'string' ? Number(characterCost) : characterCost;
 		this.creditsSpent += cost;
 	}
 
-	private containsSpeakableChar(text: string): boolean {
+	public updateVoiceContext(voiceId: string, text: string, requestId?: string): void {
+		if (this.voiceContextMap[voiceId] == null) {
+			this.voiceContextMap[voiceId] = {
+				previousText: undefined,
+				previousRequestIds: []
+			};
+		}
+
+		const context = this.voiceContextMap[voiceId];
+		context.previousText = text;
+
+		if (requestId != null) {
+			context.previousRequestIds.push(requestId);
+			context.previousRequestIds = context.previousRequestIds.slice(
+				-elevenLabsConfig.maxPreviousRequestIds
+			);
+		}
+	}
+
+	public getVoiceContext(voiceId: string): {
+		previousText?: string;
+		previousRequestIds: string[];
+	} {
+		return (
+			this.voiceContextMap[voiceId] ?? {
+				previousText: undefined,
+				previousRequestIds: []
+			}
+		);
+	}
+
+	// https://elevenlabs.io/docs/speech-synthesis/prompting
+	private enhanceSpeechText(content: string): string {
+		let modifiedContent = content;
+
+		// Add exclamation mark for uppercase words
+		if (/^[^a-z]*$/.test(modifiedContent)) {
+			modifiedContent = `"${modifiedContent}"!`;
+		}
+
+		// Add pauses after questions
+		if (modifiedContent.endsWith('?')) {
+			modifiedContent = `${modifiedContent} ...`;
+		}
+
+		return modifiedContent;
+	}
+
+	private canBeSpoken(text: string): boolean {
 		return /[a-zA-Z0-9]/.test(text);
 	}
 }
+
+type TExtendedChatStoryVideoEvent = TChatStoryVideoEvent & { index: number };
 
 interface TVideoSequenceCreatorConfig {
 	fps: number;
 	messageDelayMs: number;
 	voiceover: boolean;
-}
-
-class AudioManager {
-	private previousRequestIdsMap: Record<string, string[]> = {};
-	private static MAX_PREVIOUS_REQUEST_IDS = 3;
-
-	public addRequestId(voiceId: string, requestId: string): void {
-		if (this.previousRequestIdsMap[voiceId] == null) {
-			this.previousRequestIdsMap[voiceId] = [];
-		}
-		this.previousRequestIdsMap[voiceId].push(requestId);
-		this.previousRequestIdsMap[voiceId] = this.previousRequestIdsMap[voiceId].slice(
-			-AudioManager.MAX_PREVIOUS_REQUEST_IDS
-		);
-	}
-
-	public getPreviousRequestIds(voiceId: string): string[] {
-		return this.previousRequestIdsMap[voiceId] ?? [];
-	}
+	useCached: boolean;
 }

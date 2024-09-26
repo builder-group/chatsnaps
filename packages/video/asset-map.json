@@ -24,7 +24,12 @@
   "static/video/.local/fpv.mp4": {
     "type": "MP4",
     "path": "static/video/.local/fpv.mp4",
-    "durationMs": 658567
+    "durationMs": 658566
+  },
+  "static/video/.local/minecraft.mp4": {
+    "type": "MP4",
+    "path": "static/video/.local/minecraft.mp4",
+    "durationMs": 39333
   },
   "static/video/.local/steep.mp4": {
     "type": "MP4",

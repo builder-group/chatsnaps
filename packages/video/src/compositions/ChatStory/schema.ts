@@ -58,7 +58,10 @@ export const SChatStoryCompProps = z.object({
 	title: z.string(),
 	sequence: z.array(SSequenceItem),
 	messenger: SMessenger,
-	background: SVisualMedia.optional(),
-	overlay: z.union([SVisualMedia, z.literal('tiktok')]).optional()
+	background: SVisualMedia.optional().nullable(),
+	overlay: z
+		.union([SVisualMedia, z.literal('tiktok')])
+		.optional()
+		.nullable()
 });
 export type TChatStoryCompProps = z.infer<typeof SChatStoryCompProps>;

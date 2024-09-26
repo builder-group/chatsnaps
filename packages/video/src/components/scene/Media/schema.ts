@@ -13,13 +13,14 @@ export const SImageMedia = SBaseVisualMedia.extend({
 
 export const SVideoMedia = SBaseVisualMedia.extend({
 	type: z.literal('Video'),
-	startFrom: z.number().optional().default(0)
+	startFrom: z.number().optional(),
+	playbackRate: z.number().optional()
 });
 
 export const SAudioMedia = z.object({
 	type: z.literal('Audio'),
 	src: z.string(),
-	startFrom: z.number().optional().default(0)
+	startFrom: z.number().optional()
 });
 
 const SMedia = z.discriminatedUnion('type', [SImageMedia, SVideoMedia, SAudioMedia]);
