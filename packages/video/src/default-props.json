@@ -16,7 +16,7 @@
 			"width": 1080,
 			"height": 1920
 		},
-		"overlay": "tiktok",
+		"overlay": null,
 		"sequence": [
 			{
 				"type": "Audio",

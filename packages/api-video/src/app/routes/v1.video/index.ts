@@ -28,14 +28,14 @@ router.post(
 		const voiceover = voiceoverString === 'true';
 		const renderVideo = renderVideoString === 'true';
 
-		const sequence = (
+		const { sequence, creditsSpent } = (
 			await createVideoSequence(data, { voiceover, fps: 30, messageDelayMs: 500 })
 		).unwrap();
-		console.log(`Total credits spent: ${sequence.creditsSpent.toString()}`);
+		console.log(`Total credits spent: ${creditsSpent.toString()}`);
 
 		const videoProps: TChatStoryCompProps = {
 			title: data.title,
-			sequence: sequence.sequence,
+			sequence,
 			messenger: data.messenger ?? {
 				type: 'IMessage',
 				contact: {
@@ -56,7 +56,8 @@ router.post(
 		if (!renderVideo) {
 			return c.json({
 				url: null,
-				props: videoProps
+				props: videoProps,
+				creditsSpent
 			});
 		}
 
@@ -88,7 +89,8 @@ router.post(
 
 		return c.json({
 			url: downloadUrl,
-			props: null
+			props: null,
+			creditsSpent
 		});
 	}
 );

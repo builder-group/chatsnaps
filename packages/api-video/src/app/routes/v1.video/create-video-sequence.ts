@@ -4,6 +4,7 @@ import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
 import { estimateMp3Duration, sha256, streamToBuffer } from '@/lib';
+import { logger } from '@/logger';
 
 import {
 	type TChatStoryVideoDto,
@@ -83,7 +84,7 @@ class VideoSequenceCreator {
 		const startFrame = Math.floor((this.currentTimeMs / 1000) * this.config.fps);
 		const participant = this.data.participants.find((p) => p.id === item.participantId);
 		if (participant == null) {
-			console.warn(`No participant for message '${item.content}' found!`);
+			logger.warn(`No participant for message '${item.content}' found!`);
 			return Ok(undefined);
 		}
 
@@ -163,23 +164,26 @@ class VideoSequenceCreator {
 		filename: string
 	): Promise<TResult<void, AppError>> {
 		const { previousText, previousRequestIds } = this.getVoiceContext(voiceId);
-		const maybeNextText = this.getNextMessageEventFromParticipant(
-			item.index + 1,
-			item.participantId
-		)?.content;
-		const nextText = maybeNextText != null ? this.enhanceSpeechText(maybeNextText) : undefined;
+		// const maybeNextText = this.getNextMessageEventFromParticipant(
+		// 	item.index + 1,
+		// 	item.participantId
+		// )?.content;
+		// const nextText = maybeNextText != null ? this.enhanceSpeechText(maybeNextText) : undefined;
 		const currentText = this.enhanceSpeechText(item.content);
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
 			text: currentText,
-			modelId: elevenLabsConfig.models.eleven_turbo_v2.id,
+			// modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: 50% cheaper and faster. Compare with 'eleven_multilingual_v2'.
+			modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
 			// languageCode: 'EN',
 			previousRequestIds,
-			nextText,
+			// nextText, // TODO: All models I've tried have issues with the 'nextText' property and include like a cut off beginning of the next text's content
 			previousText
 		});
+
+		logger.info('Generated Voiceover: ', { text: currentText, voiceId: voiceId.slice(0, 4) });
 
 		if (audioResult.isErr()) {
 			return Err(
@@ -229,7 +233,7 @@ class VideoSequenceCreator {
 			src,
 			volume: 1,
 			startFrame,
-			durationInFrames
+			durationInFrames: durationInFrames + this.config.fps
 		});
 	}
 
@@ -303,9 +307,17 @@ class VideoSequenceCreator {
 	private enhanceSpeechText(content: string): string {
 		let modifiedContent = content;
 
+		// Remove emojis
+		modifiedContent = modifiedContent
+			.replace(
+				/(?<temp1>[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+				''
+			)
+			.trim();
+
 		// Add emphasis to uppercase words
 		if (/^[^a-z]*$/.test(modifiedContent)) {
-			modifiedContent = `${modifiedContent}!!`;
+			modifiedContent = `${modifiedContent}!`;
 		}
 
 		// Convert common abbreviations and short forms
