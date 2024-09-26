@@ -31,6 +31,11 @@
     "path": "static/video/.local/minecraft.mp4",
     "durationMs": 39333
   },
+  "static/video/.local/minecraft_2.mp4": {
+    "type": "MP4",
+    "path": "static/video/.local/minecraft_2.mp4",
+    "durationMs": 67666
+  },
   "static/video/.local/steep.mp4": {
     "type": "MP4",
     "path": "static/video/.local/steep.mp4",

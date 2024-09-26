@@ -14,6 +14,7 @@ export const SImageMedia = SBaseVisualMedia.extend({
 export const SVideoMedia = SBaseVisualMedia.extend({
 	type: z.literal('Video'),
 	startFrom: z.number().optional(),
+	endAt: z.number().optional(),
 	playbackRate: z.number().optional()
 });
 

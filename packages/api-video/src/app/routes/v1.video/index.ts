@@ -45,7 +45,7 @@ router.post(
 			},
 			background: data.background ?? {
 				type: 'Video',
-				src: assetMap['static/video/.local/minecraft.mp4'].path,
+				src: assetMap['static/video/.local/minecraft_2.mp4'].path,
 				objectFit: 'cover',
 				width: 1080,
 				height: 1920

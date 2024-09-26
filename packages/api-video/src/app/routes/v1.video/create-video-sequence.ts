@@ -3,7 +3,7 @@ import assetMap from '@repo/video/asset-map.json';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
-import { estimateMp3Duration, sha256, streamToBuffer, toSeconds } from '@/lib';
+import { estimateMp3Duration, sha256, streamToBuffer } from '@/lib';
 
 import {
 	type TChatStoryVideoDto,
@@ -41,7 +41,7 @@ class VideoSequenceCreator {
 			fps: options.fps ?? 30,
 			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
 			voiceover: options.voiceover ?? false,
-			useCached: false
+			useCached: true
 		};
 	}
 
@@ -80,7 +80,7 @@ class VideoSequenceCreator {
 	private async processMessageEvent(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>
 	): Promise<TResult<void, AppError>> {
-		const startFrame = toSeconds(this.currentTimeMs) * this.config.fps;
+		const startFrame = Math.floor((this.currentTimeMs / 1000) * this.config.fps);
 		const participant = this.data.participants.find((p) => p.id === item.participantId);
 		if (participant == null) {
 			console.warn(`No participant for message '${item.content}' found!`);
@@ -99,7 +99,7 @@ class VideoSequenceCreator {
 		}
 
 		this.addMessageToSequence(item, participant, startFrame);
-		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs - 200);
+		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs);
 		return Ok(undefined);
 	}
 
@@ -112,7 +112,7 @@ class VideoSequenceCreator {
 			src: audio.path,
 			volume: 1,
 			startFrame,
-			durationInFrames: toSeconds(audio.durationMs) * this.config.fps
+			durationInFrames: Math.floor((audio.durationMs / 1000) * this.config.fps)
 		});
 	}
 
@@ -146,7 +146,7 @@ class VideoSequenceCreator {
 		this.addVoiceoverToSequence(
 			spokenMessageUrl.value,
 			startFrame,
-			toSeconds(durationMs) * this.config.fps || this.config.fps * 3
+			Math.floor((durationMs / 1000) * this.config.fps) || this.config.fps * 3
 		);
 
 		return Ok(durationMs);
@@ -298,18 +298,46 @@ class VideoSequenceCreator {
 		);
 	}
 
+	// TODO: Improve
 	// https://elevenlabs.io/docs/speech-synthesis/prompting
 	private enhanceSpeechText(content: string): string {
 		let modifiedContent = content;
 
-		// Add exclamation mark for uppercase words
+		// Add emphasis to uppercase words
 		if (/^[^a-z]*$/.test(modifiedContent)) {
-			modifiedContent = `"${modifiedContent}"!`;
+			modifiedContent = `${modifiedContent}!!`;
 		}
 
-		// Add pauses after questions
-		if (modifiedContent.endsWith('?')) {
-			modifiedContent = `${modifiedContent} ...`;
+		// Convert common abbreviations and short forms
+		const abbreviations: Record<string, string> = {
+			'OMG': 'Oh my God',
+			'AF': 'as fuck',
+			'WTF': 'What the fuck',
+			'LOL': 'laughing out loud',
+			'ROFL': 'rolling on the floor laughing',
+			'ASAP': 'as soon as possible',
+			'TBH': 'to be honest',
+			'IDK': "I don't know",
+			'IMO': 'in my opinion',
+			'IMHO': 'in my humble opinion',
+			'FYI': 'for your information',
+			'TL;DR': "too long; didn't read",
+			'AKA': 'also known as',
+			'e.g.': 'for example',
+			'i.e.': 'that is',
+			'etc.': 'et cetera',
+			'mins': 'minutes'
+		};
+
+		// Replace abbreviations with their full forms
+		for (const [abbr, fullForm] of Object.entries(abbreviations)) {
+			const regex = new RegExp(`\\b${abbr}\\b`, 'gi');
+			modifiedContent = modifiedContent.replace(regex, fullForm);
+		}
+
+		// Add pauses after punctuation
+		if (modifiedContent.endsWith('?') || modifiedContent.endsWith('!')) {
+			modifiedContent = `"${modifiedContent}" ...`;
 		}
 
 		return modifiedContent;

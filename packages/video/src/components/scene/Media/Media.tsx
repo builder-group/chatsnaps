@@ -31,6 +31,7 @@ export const Media: React.FC<TProps> = (props) => {
 						...style
 					}}
 					startFrom={media.startFrom}
+					endAt={media.endAt}
 					playbackRate={media.playbackRate}
 					{...elementProps}
 				/>
