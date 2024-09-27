@@ -42,6 +42,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 								key={`${item.startFrame}-${item.media.src}`}
 								from={item.startFrame}
 								durationInFrames={item.durationInFrames}
+								className="mt-64"
 							>
 								<TikTokFollowComp media={item.media} />
 							</Sequence>

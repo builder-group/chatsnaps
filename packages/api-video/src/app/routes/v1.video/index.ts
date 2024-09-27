@@ -11,6 +11,10 @@ import { router } from '../../router';
 import { createVideoSequence } from './create-video-sequence';
 import { SChatStoryVideoDto } from './schema';
 
+router.post('/v1/video/chatstory/prompt', async (c) => {
+	// TODO
+});
+
 router.post(
 	'/v1/video/chatstory',
 	zValidator('json', SChatStoryVideoDto),

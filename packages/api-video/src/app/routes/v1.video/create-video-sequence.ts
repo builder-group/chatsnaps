@@ -1,5 +1,6 @@
 import { type TChatStoryCompProps } from '@repo/video';
 import assetMap from '@repo/video/asset-map.json';
+import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
@@ -119,10 +120,17 @@ class VideoSequenceCreator {
 
 	private async processVoiceover(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
-		voice: NonNullable<TChatStoryVideoParticipant['voice']>,
+		voice: string,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
-		const voiceId = elevenLabsConfig.voices[voice].voiceId;
+		const voiceId = isVoiceId(voice)
+			? voice
+			: unwrapOrNull(await elevenLabsClient.getVoices())?.voices.find((v) => v.name === voice)
+					?.voice_id;
+		if (voiceId == null) {
+			throw new AppError(`#ERR_INVALID_VOICE`, 400);
+		}
+
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
 		const isSpokenMessageCached =

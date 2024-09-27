@@ -1,6 +1,5 @@
 import { SChatStoryCompProps } from '@repo/video';
 import * as z from 'zod';
-import { elevenLabsConfig } from '@/environment';
 
 const SChatStoryVideoEvent = z.union([
 	z.object({
@@ -23,9 +22,7 @@ const SChatStoryVideoParticipant = z.object({
 	id: z.number(),
 	displayName: z.string(),
 	isSelf: z.boolean(),
-	voice: z.optional(
-		z.enum(Object.keys(elevenLabsConfig.voices) as [keyof typeof elevenLabsConfig.voices])
-	)
+	voice: z.string().optional()
 });
 export type TChatStoryVideoParticipant = z.infer<typeof SChatStoryVideoParticipant>;
 
