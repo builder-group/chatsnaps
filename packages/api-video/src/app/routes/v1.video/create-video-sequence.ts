@@ -42,7 +42,7 @@ class VideoSequenceCreator {
 			fps: options.fps ?? 30,
 			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
 			voiceover: options.voiceover ?? false,
-			useCached: false
+			useCached: true
 		};
 	}
 

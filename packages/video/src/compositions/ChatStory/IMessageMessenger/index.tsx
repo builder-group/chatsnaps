@@ -77,7 +77,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 			</div>
 
 			<ol
-				className={'list text-4xl'}
+				className={'list text-5xl'}
 				ref={contentRef}
 				style={{
 					transform: `translateY(-${overflow}px)`,
