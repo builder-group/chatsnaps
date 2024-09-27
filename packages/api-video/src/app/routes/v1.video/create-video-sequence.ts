@@ -31,7 +31,7 @@ class VideoSequenceCreator {
 	private voiceContextMap: Record<
 		string,
 		{
-			previousText?: string;
+			previousContent: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][];
 			previousRequestIds: string[];
 		}
 	> = {};
@@ -42,7 +42,7 @@ class VideoSequenceCreator {
 			fps: options.fps ?? 30,
 			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
 			voiceover: options.voiceover ?? false,
-			useCached: true
+			useCached: false
 		};
 	}
 
@@ -158,32 +158,52 @@ class VideoSequenceCreator {
 		return unwrapOr(result, false);
 	}
 
+	// ElevenLabs
+	// Pause: <break time="1.5s" />
+	// SSML: <phoneme alphabet="cmu-arpabet" ph="AE K CH UW AH L IY">actually</phoneme>
+
+	// Good Voices
+	// Elli - Kid
+	// Grace - Mom
+
 	private async generateAndUploadVoiceover(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
 		voiceId: string,
 		filename: string
 	): Promise<TResult<void, AppError>> {
-		const { previousText, previousRequestIds } = this.getVoiceContext(voiceId);
-		// const maybeNextText = this.getNextMessageEventFromParticipant(
-		// 	item.index + 1,
-		// 	item.participantId
-		// )?.content;
-		// const nextText = maybeNextText != null ? this.enhanceSpeechText(maybeNextText) : undefined;
+		const { previousContent, previousRequestIds } = this.getVoiceContext(voiceId);
+		const previousText = previousContent
+			.map((c) => this.enhanceSpeechText(c))
+			.join(' ... ')
+			.trim();
+		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
+		const nextText = nextContent
+			.map((c) => this.enhanceSpeechText(c))
+			.join(' ... ')
+			.trim();
 		const currentText = this.enhanceSpeechText(item.content);
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
 			text: currentText,
-			// modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: 50% cheaper and faster. Compare with 'eleven_multilingual_v2'.
-			modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
-			// languageCode: 'EN',
+			modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: 50% cheaper and faster. Compare with 'eleven_multilingual_v2'.
+			// modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
 			previousRequestIds,
-			// nextText, // TODO: All models I've tried have issues with the 'nextText' property and include like a cut off beginning of the next text's content
-			previousText
+			// nextText: nextText.length > 0 ? nextText : undefined, // TODO: All models I've tried have issues with the 'nextText' property and include like a cut off beginning of the next text's content
+			previousText: previousText.length > 0 ? previousText : undefined,
+			voiceSettings: {
+				stability: 0.4,
+				similarityBoost: 0.8,
+				style: 0
+			}
 		});
 
-		logger.info('Generated Voiceover: ', { text: currentText, voiceId: voiceId.slice(0, 4) });
+		logger.info(`Voiceover for ${voiceId.slice(0, 4)}`, {
+			text: currentText,
+			nextText,
+			previousText
+		});
 
 		if (audioResult.isErr()) {
 			return Err(
@@ -253,17 +273,18 @@ class VideoSequenceCreator {
 		});
 	}
 
-	private getNextMessageEventFromParticipant(
+	private getFutureContentForParticipant(
 		startIndex: number,
 		participantId: number
-	): Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }> | null {
+	): Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][] {
+		const content: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][] = [];
 		for (let i = startIndex; i < this.data.events.length; i++) {
 			const event = this.data.events[i];
 			if (event?.type === 'Message' && event.participantId === participantId) {
-				return { ...event, index: i };
+				content.push(event.content);
 			}
 		}
-		return null;
+		return content;
 	}
 
 	private updateCreditsSpent(characterCost: string | number): void {
@@ -271,16 +292,20 @@ class VideoSequenceCreator {
 		this.creditsSpent += cost;
 	}
 
-	public updateVoiceContext(voiceId: string, text: string, requestId?: string): void {
+	private updateVoiceContext(
+		voiceId: string,
+		content: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'],
+		requestId?: string
+	): void {
 		if (this.voiceContextMap[voiceId] == null) {
 			this.voiceContextMap[voiceId] = {
-				previousText: undefined,
+				previousContent: [],
 				previousRequestIds: []
 			};
 		}
 
 		const context = this.voiceContextMap[voiceId];
-		context.previousText = text;
+		context.previousContent.push(content);
 
 		if (requestId != null) {
 			context.previousRequestIds.push(requestId);
@@ -290,13 +315,13 @@ class VideoSequenceCreator {
 		}
 	}
 
-	public getVoiceContext(voiceId: string): {
-		previousText?: string;
+	private getVoiceContext(voiceId: string): {
+		previousContent: string[];
 		previousRequestIds: string[];
 	} {
 		return (
 			this.voiceContextMap[voiceId] ?? {
-				previousText: undefined,
+				previousContent: [],
 				previousRequestIds: []
 			}
 		);
@@ -349,7 +374,7 @@ class VideoSequenceCreator {
 
 		// Add pauses after punctuation
 		if (modifiedContent.endsWith('?') || modifiedContent.endsWith('!')) {
-			modifiedContent = `"${modifiedContent}" ...`;
+			modifiedContent = `"${modifiedContent}"`;
 		}
 
 		return modifiedContent;
