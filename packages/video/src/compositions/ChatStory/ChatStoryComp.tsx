@@ -7,7 +7,7 @@ import { Overlay } from './Overlay';
 import { SChatStoryCompProps, TChatStoryCompProps } from './schema';
 
 export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
-	const { title, sequence, messenger, background, overlay } = props;
+	const { sequence, messenger, background, overlay } = props;
 
 	return (
 		<AbsoluteFill className="bg-blue-500">

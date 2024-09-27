@@ -56,7 +56,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 				className="absolute left-0 right-0 top-[-130px] z-50 opacity-50"
 			/> */}
 			<div
-				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-row items-center justify-between border-b border-gray-200 bg-[#1D1D1D] bg-opacity-90 px-5 pt-3 backdrop-blur-lg backdrop-filter"
+				className="absolute left-0 right-0 top-0 z-10 flex flex-none flex-row items-center justify-between border-b border-gray-400 bg-[#1D1D1D] bg-opacity-90 px-5 pt-3 backdrop-blur-lg backdrop-filter"
 				style={{ height: headerHeight }}
 			>
 				<ChevronLeftIcon className="mb-14 h-24 w-24 text-[#3478F6]" />

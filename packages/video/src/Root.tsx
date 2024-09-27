@@ -1,6 +1,7 @@
 import { Composition } from 'remotion';
 
 import { ChatStoryComp } from './compositions';
+import { TikTokFollowComp } from './compositions/TikTokFollow';
 import defaultProps from './default-props.json';
 
 import './style.css';
@@ -18,6 +19,22 @@ export const Root: React.FC = () => {
 				height={1920}
 				schema={ChatStoryComp.schema}
 				defaultProps={defaultProps.chatstory as any}
+			/>
+			<Composition
+				id={TikTokFollowComp.id}
+				component={TikTokFollowComp}
+				durationInFrames={120}
+				fps={30}
+				width={1080}
+				height={1920}
+				defaultProps={{
+					initialScale: 0.8,
+					media: {
+						type: 'Image',
+						src: 'https://avatars.githubusercontent.com/u/57860196?v=4&size=64'
+					},
+					className: 'bg-green-500'
+				}}
 			/>
 		</>
 	);

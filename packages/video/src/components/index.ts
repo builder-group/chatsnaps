@@ -1,2 +1,2 @@
 export * from './icon';
-export * from './scene';
+export * from './remotion';
