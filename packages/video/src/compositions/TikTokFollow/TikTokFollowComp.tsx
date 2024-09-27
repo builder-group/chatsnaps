@@ -20,15 +20,9 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 		}
 	});
 
-	const exit = spring({
-		fps,
-		frame,
-		config: {
-			damping: 15,
-			stiffness: 200
-		},
-		durationInFrames: 20,
-		delay: durationInFrames - 20
+	const exit = interpolate(frame, [durationInFrames - 10, durationInFrames], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp'
 	});
 
 	const scale = enter - exit;
@@ -48,7 +42,7 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 	const buttonRotation = interpolate(buttonAnimation, [0, 1], [0, 180]);
 	const isInitialState = buttonAnimation < 0.8;
 
-	const color = interpolateColors(frame, [0, 20], ['#ffffff', '#ef4444']);
+	const color = interpolateColors(frame, [0, 50], ['#ffffff', '#ef4444']);
 
 	return (
 		<div className={cn('flex h-full w-full items-center justify-center', className)}>
@@ -60,7 +54,7 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 			>
 				<Media media={media} className="h-64 w-64 rounded-full border-4 border-white shadow-lg" />
 				<div
-					className="absolute -bottom-4 -right-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full shadow-md"
+					className="absolute -bottom-4 -right-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-md"
 					style={{
 						transform: `scale(${buttonScale}) rotate(${buttonRotation}deg)`,
 						backgroundColor: color
@@ -70,7 +64,7 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 						className="absolute inset-0 flex items-center justify-center"
 						style={{ opacity: isInitialState ? 1 : 0, color: 'rgb(239, 68, 68)' }}
 					>
-						<XIcon className="h-8 w-8 stroke-[4px]" />
+						<XIcon className="h-10 w-10 stroke-[4px]" />
 					</div>
 					<div
 						className="absolute inset-0 flex items-center justify-center"
@@ -80,7 +74,7 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 							transform: 'rotate(-180deg)'
 						}}
 					>
-						<CheckIcon className="h-8 w-8 stroke-[4px]" />
+						<CheckIcon className="h-10 w-10 stroke-[4px]" />
 					</div>
 				</div>
 			</div>
