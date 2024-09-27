@@ -3,6 +3,15 @@
 		"title": "Grandma's DEMONIC Possession?! 😱👵🏼👹",
 		"sequence": [
 			{
+				"type": "TikTokFollow",
+				"media": {
+					"type": "Image",
+					"src": "https://avatars.githubusercontent.com/u/57860196?v=4&size=64"
+				},
+				"startFrame": 0,
+				"durationInFrames": 120
+			},
+			{
 				"type": "Audio",
 				"src": "static/audio/sound/ios_sent.mp3",
 				"volume": 1,

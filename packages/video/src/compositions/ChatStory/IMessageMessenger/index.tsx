@@ -1,27 +1,14 @@
 import React from 'react';
-import {
-	Audio,
-	interpolate,
-	Sequence,
-	spring,
-	staticFile,
-	useCurrentFrame,
-	useVideoConfig
-} from 'remotion';
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '@/components';
 import { cn } from '@/lib';
 
-import {
-	TAudioSequenceItem,
-	TIMessageMessenger,
-	TMessageSequenceItem,
-	TSequenceItem
-} from '../schema';
+import { TIMessageMessenger, TMessageSequenceItem } from '../schema';
 
 import './style.scss';
 
 export const IMessageMessenger: React.FC<TProps> = (props) => {
-	const { sequence, contact, className } = props;
+	const { messages, contact, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, height } = useVideoConfig();
 	const maxHeight = React.useMemo(() => height / 2.5, [height]);
@@ -34,18 +21,6 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 			setContentHeight(contentRef.current.clientHeight);
 		}
 	}, [frame]);
-
-	const { messages, audios } = React.useMemo(
-		() => ({
-			messages: sequence.filter(
-				(item) => item.type === 'Message' && item.startFrame <= frame
-			) as TMessageSequenceItem[],
-			audios: sequence.filter(
-				(item) => item.type === 'Audio' && item.startFrame <= frame
-			) as TAudioSequenceItem[]
-		}),
-		[sequence, frame]
-	);
 
 	const overflow = Math.max(0, contentHeight - maxHeight);
 
@@ -133,21 +108,11 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					);
 				})}
 			</ol>
-
-			{audios.map(({ src, startFrame, durationInFrames }) => (
-				<Sequence
-					key={`${startFrame}-${src}`}
-					from={startFrame}
-					durationInFrames={durationInFrames}
-				>
-					<Audio src={src.startsWith('http') ? src : staticFile(src)} />
-				</Sequence>
-			))}
 		</div>
 	);
 };
 
 interface TProps extends Omit<TIMessageMessenger, 'type'> {
-	sequence: TSequenceItem[];
+	messages: TMessageSequenceItem[];
 	className?: string;
 }

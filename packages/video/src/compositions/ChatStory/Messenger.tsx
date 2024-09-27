@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { IMessageMessenger } from './IMessageMessenger';
-import { TMessenger, TSequenceItem } from './schema';
+import { TMessageSequenceItem, TMessenger } from './schema';
 
 export const Messenger: React.FC<TProps> = (props) => {
-	const { messenger, sequence, ...elementProps } = props;
+	const { messenger, messages, ...elementProps } = props;
 	switch (messenger.type) {
 		case 'IMessage':
-			return <IMessageMessenger sequence={sequence} {...messenger} {...elementProps} />;
+			return <IMessageMessenger messages={messages} {...messenger} {...elementProps} />;
 		default:
 			return null;
 	}
@@ -15,6 +15,6 @@ export const Messenger: React.FC<TProps> = (props) => {
 
 interface TProps {
 	messenger: TMessenger;
-	sequence: TSequenceItem[];
+	messages: TMessageSequenceItem[];
 	className?: string;
 }

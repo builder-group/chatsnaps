@@ -1,13 +1,15 @@
-import { AbsoluteFill } from 'remotion';
+import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from 'remotion';
 import { Media } from '@/components';
 import { TRemotionFC } from '@/types';
 
+import { TikTokFollowComp } from '../TikTokFollow';
 import { Messenger } from './Messenger';
 import { Overlay } from './Overlay';
-import { SChatStoryCompProps, TChatStoryCompProps } from './schema';
+import { SChatStoryCompProps, TChatStoryCompProps, TMessageSequenceItem } from './schema';
 
 export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 	const { sequence, messenger, background, overlay } = props;
+	const frame = useCurrentFrame();
 
 	return (
 		<AbsoluteFill className="bg-blue-500">
@@ -15,9 +17,39 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 			{background && <Media media={background} className="absolute left-0 top-0 z-0" />}
 			<Messenger
 				messenger={messenger}
-				sequence={sequence}
+				messages={
+					sequence.filter(
+						(item) => item.type === 'Message' && item.startFrame <= frame
+					) as TMessageSequenceItem[]
+				}
 				className="origin-top translate-y-64 scale-75 rounded-3xl shadow-2xl"
 			/>
+			{sequence.map((item) => {
+				switch (item.type) {
+					case 'Audio':
+						return (
+							<Sequence
+								key={`${item.startFrame}-${item.src}`}
+								from={item.startFrame}
+								durationInFrames={item.durationInFrames}
+							>
+								<Audio src={item.src.startsWith('http') ? item.src : staticFile(item.src)} />
+							</Sequence>
+						);
+					case 'TikTokFollow':
+						return (
+							<Sequence
+								key={`${item.startFrame}-${item.media.src}`}
+								from={item.startFrame}
+								durationInFrames={item.durationInFrames}
+							>
+								<TikTokFollowComp media={item.media} />
+							</Sequence>
+						);
+					default:
+						return null;
+				}
+			})}
 		</AbsoluteFill>
 	);
 };

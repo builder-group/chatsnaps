@@ -28,7 +28,6 @@ export const Root: React.FC = () => {
 				width={1080}
 				height={1920}
 				defaultProps={{
-					initialScale: 0.8,
 					media: {
 						type: 'Image',
 						src: 'https://avatars.githubusercontent.com/u/57860196?v=4&size=64'
