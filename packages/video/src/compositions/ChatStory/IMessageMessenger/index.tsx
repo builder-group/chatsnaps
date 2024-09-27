@@ -35,7 +35,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 				style={{ height: headerHeight }}
 			>
 				<ChevronLeftIcon className="mb-14 h-24 w-24 text-[#3478F6]" />
-				<div className="ml-11 flex flex-col gap-4">
+				<div className="ml-11 flex flex-col items-center gap-4">
 					<Media
 						media={contact.profilePicture}
 						className="h-[140px] w-[140px] rounded-full bg-white"
