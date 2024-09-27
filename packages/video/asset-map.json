@@ -21,24 +21,19 @@
     "type": "PNG",
     "path": "static/image/overlay/tiktok.png"
   },
-  "static/video/.local/fpv.mp4": {
+  "static/video/.local/minecraft_1.mp4": {
     "type": "MP4",
-    "path": "static/video/.local/fpv.mp4",
-    "durationMs": 658566
-  },
-  "static/video/.local/minecraft.mp4": {
-    "type": "MP4",
-    "path": "static/video/.local/minecraft.mp4",
-    "durationMs": 39333
-  },
-  "static/video/.local/minecraft_2.mp4": {
-    "type": "MP4",
-    "path": "static/video/.local/minecraft_2.mp4",
+    "path": "static/video/.local/minecraft_1.mp4",
     "durationMs": 67666
   },
-  "static/video/.local/steep.mp4": {
+  "static/video/.local/steep_1.mp4": {
     "type": "MP4",
-    "path": "static/video/.local/steep.mp4",
-    "durationMs": 1049415
+    "path": "static/video/.local/steep_1.mp4",
+    "durationMs": 165466
+  },
+  "static/video/.local/steep_2.mp4": {
+    "type": "MP4",
+    "path": "static/video/.local/steep_2.mp4",
+    "durationMs": 85033
   }
 }

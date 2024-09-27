@@ -16,7 +16,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 			<Messenger
 				messenger={messenger}
 				sequence={sequence}
-				className="origin-top translate-y-64 scale-[80%] rounded-3xl shadow-2xl"
+				className="origin-top translate-y-64 scale-75 rounded-3xl shadow-2xl"
 			/>
 		</AbsoluteFill>
 	);

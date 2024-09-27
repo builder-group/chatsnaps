@@ -2069,7 +2069,7 @@
 		},
 		"background": {
 			"type": "Video",
-			"src": "static/video/.local/minecraft_2.mp4",
+			"src": "static/video/.local/steep_1.mp4",
 			"objectFit": "cover",
 			"width": 1080,
 			"height": 1920
