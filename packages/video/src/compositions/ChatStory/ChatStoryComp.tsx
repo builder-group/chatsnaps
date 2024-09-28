@@ -60,7 +60,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 									className="mt-64"
 								>
 									<TikTokLikeComp className="scale-150" />
-									<Audio src={staticFile(assetMap['static/audio/sound/like_2.mp3'].path)} />
+									<Audio src={staticFile(assetMap['static/audio/sound/like_1.mp3'].path)} />
 								</Sequence>
 							</>
 						);
