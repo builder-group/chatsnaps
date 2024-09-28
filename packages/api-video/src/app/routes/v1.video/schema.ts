@@ -5,6 +5,7 @@ const SChatStoryVideoEvent = z.union([
 	z.object({
 		type: z.literal('Message'),
 		content: z.string(),
+		spokenContent: z.string().optional(),
 		participantId: z.number()
 	}),
 	z.object({

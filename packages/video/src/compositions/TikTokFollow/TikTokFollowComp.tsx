@@ -20,12 +20,34 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 		}
 	});
 
-	const exit = interpolate(frame, [durationInFrames - 10, durationInFrames], [0, 1], {
-		extrapolateLeft: 'clamp',
-		extrapolateRight: 'clamp'
+	const exitDuration = 20;
+	const exitStart = durationInFrames - exitDuration;
+	const exit = spring({
+		fps,
+		frame: frame - exitStart,
+		config: {
+			damping: 10,
+			stiffness: 100,
+			mass: 1
+		},
+		durationInFrames: exitDuration
 	});
 
-	const scale = enter - exit;
+	// Pulsing effect
+	const pulseFrequency = 2;
+	const pulseAmplitude = 0.05;
+	const pulse = Math.sin(frame * (Math.PI / fps) * pulseFrequency) * pulseAmplitude;
+
+	const scale =
+		enter *
+		(1 +
+			interpolate(exit, [0, 0.5, 1], [0, 0.2, -1], {
+				extrapolateLeft: 'clamp',
+				extrapolateRight: 'clamp'
+			}));
+
+	// Apply pulsing to the scale
+	const finalScale = scale * (1 + pulse);
 
 	const buttonAnimation = spring({
 		fps,
@@ -42,14 +64,18 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 	const buttonRotation = interpolate(buttonAnimation, [0, 1], [0, 180]);
 	const isInitialState = buttonAnimation < 0.8;
 
-	const color = interpolateColors(frame, [0, 50], ['#ffffff', '#ef4444']);
+	const color = interpolateColors(frame, [0, 30], ['#ffffff', '#ef4444']);
 
 	return (
 		<div className={cn('flex h-full w-full items-center justify-center', className)}>
 			<div
 				className="relative"
 				style={{
-					transform: `scale(${scale})`
+					transform: `scale(${finalScale})`,
+					opacity: interpolate(frame, [exitStart, durationInFrames], [1, 0], {
+						extrapolateLeft: 'clamp',
+						extrapolateRight: 'clamp'
+					})
 				}}
 			>
 				<Media media={media} className="h-64 w-64 rounded-full border-4 border-white shadow-lg" />

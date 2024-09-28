@@ -36,5 +36,20 @@ export const elevenLabsConfig = {
 			id: 'eleven_monolingual_v1',
 			name: 'Eleven English v1'
 		}
+	},
+	voices: {
+		'Amrut Deshmukh - Booklet Guy': {
+			id: 'vO7hjeAjmsdlGgUdvPpe',
+			description:
+				'Indian Guy but compared to e.g. Adam quite silent and also has problems with " ... "'
+		},
+		'Yash A Malhotra - Warm & Friendly': {
+			id: 'sXXU5CoXEMsIqocfPUh2',
+			description: 'Loud and clear Indian Guy'
+		},
+		'Elli (Legacy)': {
+			id: 'MF3mGyEYCl7XYWbV9V6O',
+			description: 'Emotional female voice (kid)'
+		}
 	}
 };

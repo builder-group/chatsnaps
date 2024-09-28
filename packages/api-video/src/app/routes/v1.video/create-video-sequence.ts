@@ -50,6 +50,25 @@ class VideoSequenceCreator {
 	public async createSequence(): Promise<
 		TResult<{ sequence: TChatStoryCompProps['sequence']; creditsSpent: number }, AppError>
 	> {
+		// Resolve voices
+		for (const participant of this.data.participants) {
+			if (participant.voice != null) {
+				const voiceId = isVoiceId(participant.voice)
+					? participant.voice
+					: unwrapOrNull(await elevenLabsClient.getVoices())?.voices.find(
+							(v) => v.name === participant.voice
+						)?.voice_id;
+				if (voiceId != null) {
+					participant.voice = voiceId;
+				} else {
+					throw new AppError(`#ERR_INVALID_VOICE`, 400, {
+						description: `Faild to resolve voice with the id or name: ${participant.voice}`
+					});
+				}
+			}
+		}
+
+		// Transform message events to video sequence
 		for (const [index, item] of this.data.events.entries()) {
 			const result = await this.processEvent({ ...item, index });
 			if (result.isErr()) {
@@ -120,17 +139,9 @@ class VideoSequenceCreator {
 
 	private async processVoiceover(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
-		voice: string,
+		voiceId: string,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
-		const voiceId = isVoiceId(voice)
-			? voice
-			: unwrapOrNull(await elevenLabsClient.getVoices())?.voices.find((v) => v.name === voice)
-					?.voice_id;
-		if (voiceId == null) {
-			throw new AppError(`#ERR_INVALID_VOICE`, 400);
-		}
-
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
 		const isSpokenMessageCached =
@@ -166,14 +177,6 @@ class VideoSequenceCreator {
 		return unwrapOr(result, false);
 	}
 
-	// ElevenLabs
-	// Pause: <break time="1.5s" />
-	// SSML: <phoneme alphabet="cmu-arpabet" ph="AE K CH UW AH L IY">actually</phoneme>
-
-	// Good Voices
-	// Elli - Kid
-	// Grace - Mom
-
 	private async generateAndUploadVoiceover(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
 		voiceId: string,
@@ -182,14 +185,14 @@ class VideoSequenceCreator {
 		const { previousContent, previousRequestIds } = this.getVoiceContext(voiceId);
 		const previousText = previousContent
 			.map((c) => this.enhanceSpeechText(c))
-			.join(' ... ')
+			.join(' - ')
 			.trim();
 		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
 		const nextText = nextContent
 			.map((c) => this.enhanceSpeechText(c))
-			.join(' ... ')
+			.join(' - ')
 			.trim();
-		const currentText = this.enhanceSpeechText(item.content);
+		const currentText = this.enhanceSpeechText(item.spokenContent ?? item.content);
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
