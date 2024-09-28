@@ -1,7 +1,6 @@
 import { Composition } from 'remotion';
 
-import { ChatStoryComp } from './compositions';
-import { TikTokFollowComp } from './compositions/TikTokFollow';
+import { ChatStoryComp, TikTokFollowComp, TikTokLikeComp } from './compositions';
 import defaultProps from './default-props.json';
 
 import './style.css';
@@ -32,6 +31,17 @@ export const Root: React.FC = () => {
 						type: 'Image',
 						src: 'https://avatars.githubusercontent.com/u/57860196?v=4&size=64'
 					},
+					className: 'bg-green-500'
+				}}
+			/>
+			<Composition
+				id={TikTokLikeComp.id}
+				component={TikTokLikeComp}
+				durationInFrames={120}
+				fps={30}
+				width={1080}
+				height={1920}
+				defaultProps={{
 					className: 'bg-green-500'
 				}}
 			/>

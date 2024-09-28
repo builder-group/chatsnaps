@@ -15,8 +15,8 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 		frame,
 		config: {
 			damping: 12,
-			stiffness: 200,
-			mass: 0.8
+			stiffness: 100,
+			mass: 1
 		}
 	});
 
