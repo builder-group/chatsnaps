@@ -1,8 +1,28 @@
 {
+  "static/audio/sound/boom.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/boom.mp3",
+    "durationMs": 1306
+  },
+  "static/audio/sound/discord.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/discord.mp3",
+    "durationMs": 504
+  },
+  "static/audio/sound/error.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/error.mp3",
+    "durationMs": 1018
+  },
   "static/audio/sound/follow_1.mp3": {
     "type": "MP3",
     "path": "static/audio/sound/follow_1.mp3",
     "durationMs": 2089
+  },
+  "static/audio/sound/get-out.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/get-out.mp3",
+    "durationMs": 863
   },
   "static/audio/sound/huh.mp3": {
     "type": "MP3",
@@ -19,15 +39,25 @@
     "path": "static/audio/sound/ios_sent.mp3",
     "durationMs": 504
   },
+  "static/audio/sound/knock.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/knock.mp3",
+    "durationMs": 9168
+  },
   "static/audio/sound/like_1.mp3": {
     "type": "MP3",
     "path": "static/audio/sound/like_1.mp3",
     "durationMs": 2089
   },
-  "static/audio/sound/like_2.mp3": {
+  "static/audio/sound/punch.mp3": {
     "type": "MP3",
-    "path": "static/audio/sound/like_2.mp3",
-    "durationMs": 2089
+    "path": "static/audio/sound/punch.mp3",
+    "durationMs": 1567
+  },
+  "static/audio/sound/wow.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/wow.mp3",
+    "durationMs": 4205
   },
   "static/image/imessage.png": {
     "type": "PNG",

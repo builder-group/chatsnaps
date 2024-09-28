@@ -8,12 +8,12 @@
 					"type": "Image",
 					"src": "https://avatars.githubusercontent.com/u/57860196?v=4&size=64"
 				},
-				"startFrame": 0,
+				"startFrame": 60,
 				"durationInFrames": 120
 			},
 			{
 				"type": "TikTokLike",
-				"startFrame": 150,
+				"startFrame": 180,
 				"durationInFrames": 120
 			},
 			{
