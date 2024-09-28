@@ -12,6 +12,11 @@
 				"durationInFrames": 120
 			},
 			{
+				"type": "TikTokLike",
+				"startFrame": 150,
+				"durationInFrames": 120
+			},
+			{
 				"type": "Audio",
 				"src": "static/audio/sound/ios_sent.mp3",
 				"volume": 1,

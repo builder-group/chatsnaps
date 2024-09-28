@@ -111,10 +111,9 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 					}}
 				>
 					<HeartIcon
-						size={100}
 						stroke={colorTransition}
 						fill={colorTransition}
-						className="transition-colors duration-300 ease-out"
+						className="h-32 w-32 drop-shadow-lg transition-colors duration-300 ease-out"
 					/>
 				</div>
 			</div>

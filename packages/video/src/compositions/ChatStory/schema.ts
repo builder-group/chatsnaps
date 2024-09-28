@@ -32,15 +32,20 @@ export const SAudioSequenceItem = SBaseSequenceItem.extend({
 });
 export type TAudioSequenceItem = z.infer<typeof SAudioSequenceItem>;
 
-export const SFollowTikTokSequenceItem = SBaseSequenceItem.extend({
+export const STikTokFollowSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('TikTokFollow'),
 	media: SVisualMedia
+});
+
+export const STikTokLikeSequenceItem = SBaseSequenceItem.extend({
+	type: z.literal('TikTokLike')
 });
 
 export const SSequenceItem = z.discriminatedUnion('type', [
 	SMessageSequenceItem,
 	SAudioSequenceItem,
-	SFollowTikTokSequenceItem
+	STikTokFollowSequenceItem,
+	STikTokLikeSequenceItem
 ]);
 export type TSequenceItem = z.infer<typeof SSequenceItem>;
 

@@ -2,7 +2,9 @@ import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from 'remo
 import { Media } from '@/components';
 import { TRemotionFC } from '@/types';
 
+import assetMap from '../../../asset-map.json';
 import { TikTokFollowComp } from '../TikTokFollow';
+import { TikTokLikeComp } from '../TikTokLike';
 import { Messenger } from './Messenger';
 import { Overlay } from './Overlay';
 import { SChatStoryCompProps, TChatStoryCompProps, TMessageSequenceItem } from './schema';
@@ -44,8 +46,23 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 								durationInFrames={item.durationInFrames}
 								className="mt-64"
 							>
-								<TikTokFollowComp media={item.media} />
+								<TikTokFollowComp media={item.media} className="scale-100" />
+								<Audio src={staticFile(assetMap['static/audio/sound/follow_1.mp3'].path)} />
 							</Sequence>
+						);
+					case 'TikTokLike':
+						return (
+							<>
+								<Sequence
+									key={`${item.startFrame}`}
+									from={item.startFrame}
+									durationInFrames={item.durationInFrames}
+									className="mt-64"
+								>
+									<TikTokLikeComp className="scale-150" />
+									<Audio src={staticFile(assetMap['static/audio/sound/like_2.mp3'].path)} />
+								</Sequence>
+							</>
 						);
 					default:
 						return null;

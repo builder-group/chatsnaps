@@ -94,7 +94,7 @@ class VideoSequenceCreator {
 	private processPauseEvent(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Pause' }>
 	): TResult<void, AppError> {
-		this.currentTimeMs += item.durationMs;
+		this.currentTimeMs += item.durationMs / 2;
 		return Ok(undefined);
 	}
 

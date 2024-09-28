@@ -1,4 +1,14 @@
 {
+  "static/audio/sound/follow_1.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/follow_1.mp3",
+    "durationMs": 2089
+  },
+  "static/audio/sound/huh.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/huh.mp3",
+    "durationMs": 624
+  },
   "static/audio/sound/ios_received.mp3": {
     "type": "MP3",
     "path": "static/audio/sound/ios_received.mp3",
@@ -8,6 +18,16 @@
     "type": "MP3",
     "path": "static/audio/sound/ios_sent.mp3",
     "durationMs": 504
+  },
+  "static/audio/sound/like_1.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/like_1.mp3",
+    "durationMs": 2089
+  },
+  "static/audio/sound/like_2.mp3": {
+    "type": "MP3",
+    "path": "static/audio/sound/like_2.mp3",
+    "durationMs": 2089
   },
   "static/image/imessage.png": {
     "type": "PNG",

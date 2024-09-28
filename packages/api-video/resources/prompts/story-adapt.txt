@@ -35,7 +35,7 @@ Follow these guidelines to adapt the story into a viral chat format:
 4. Rapid Pacing & Clipped Dialogue:
    - Use 1-4 word messages and keep the conversation fast-paced
    - Split thoughts across multiple rapid-fire texts for impact
-   - Add dynamic pauses (100ms-400ms) between messages, varying based on context to match flow
+   - Add a very short dynamic pause (100ms-300ms) behind each message to maintain flow while keeping it fast-paced
    - Eliminate filler and ensure every message adds drama, humor, or suspense
    - Integrate appropriate internet slang, emojis, or memes
    - Use ellipsis (...) to create suspense between messages
@@ -120,7 +120,7 @@ Before submitting your adaptation, review this Final Viral Checklist:
 - Are there mini-hooks or surprises every 2-3 messages to keep viewers engaged?
 - Does the story deliver constant surprises and twists?
 - Is the pacing rapid, with no unnecessary filler?
-- Are varying pauses (100ms-400ms) between messages included and fitting the flow?
+- Are short, dynamic pauses (100ms-300ms) behind each message included, fitting to the flow?
 - Are the characters distinct and memorable?
 - Is the resolution unexpected and viral-worthy?
 - Are there at least three quotable, meme-able lines?

@@ -111,6 +111,9 @@ importers:
       '@blgc/utils':
         specifier: ^0.0.20
         version: 0.0.20
+      '@radix-ui/react-icons':
+        specifier: ^1.3.0
+        version: 1.3.0(react@18.3.1)
       '@remotion/zod-types':
         specifier: 4.0.212
         version: 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@3.23.8)
@@ -147,13 +150,13 @@ importers:
         version: 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@remotion/enable-scss':
         specifier: ^4.0.212
-        version: 4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0))
+        version: 4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6))
       '@remotion/eslint-config':
         specifier: 4.0.212
         version: 4.0.212(eslint@9.11.0(jiti@1.21.6))(typescript@5.6.2)
       '@remotion/tailwind':
         specifier: ^4.0.212
-        version: 4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)(webpack@5.94.0(esbuild@0.24.0))
+        version: 4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)(webpack@5.94.0(esbuild@0.18.6))
       '@types/md5':
         specifier: ^2.3.5
         version: 2.3.5
@@ -168,7 +171,7 @@ importers:
         version: 10.4.20(postcss@8.4.47)
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(webpack@5.94.0(esbuild@0.24.0))
+        version: 7.1.2(webpack@5.94.0(esbuild@0.18.6))
       postcss:
         specifier: ^8.4.47
         version: 8.4.47
@@ -180,7 +183,7 @@ importers:
         version: 1.79.3
       sass-loader:
         specifier: ^16.0.2
-        version: 16.0.2(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0))
+        version: 16.0.2(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6))
       tailwindcss:
         specifier: ^3.4.12
         version: 3.4.12
@@ -1398,6 +1401,11 @@ packages:
   '@pkgr/core@0.1.1':
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
+
+  '@radix-ui/react-icons@1.3.0':
+    resolution: {integrity: sha512-jQxj/0LKgp+j9BiTXz3O3sgs26RNet2iLWmsPyRz2SIcR4q/4SbazXfnYwbAr+vLYKSfc7qxzyGQA1HLlYiuNw==}
+    peerDependencies:
+      react: ^16.x || ^17.x || ^18.x
 
   '@remotion/bundler@4.0.212':
     resolution: {integrity: sha512-yj/LcuLAUPuJ2UoMFTmC26Kt6uJQG7qVUILr5rKqk4qt1B83xMfrU0RkaAnOl+KhmgynZWxreV55leToDOrq1g==}
@@ -7220,18 +7228,22 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
+  '@radix-ui/react-icons@1.3.0(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+
   '@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@remotion/studio': 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@remotion/studio-shared': 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.24.0))
+      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.18.6))
       esbuild: 0.18.6
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-refresh: 0.9.0
       remotion: 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       source-map: 0.7.3
-      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.24.0))
+      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.18.6))
       webpack: 5.94.0(esbuild@0.24.0)
     transitivePeerDependencies:
       - '@swc/core'
@@ -7285,12 +7297,12 @@ snapshots:
   '@remotion/compositor-win32-x64-msvc@4.0.212':
     optional: true
 
-  '@remotion/enable-scss@4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0))':
+  '@remotion/enable-scss@4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6))':
     dependencies:
       '@remotion/bundler': 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.24.0))
-      sass-loader: 14.2.1(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0))
-      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.24.0))
+      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.18.6))
+      sass-loader: 14.2.1(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6))
+      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.18.6))
     transitivePeerDependencies:
       - '@rspack/core'
       - node-sass
@@ -7403,15 +7415,15 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@remotion/tailwind@4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)(webpack@5.94.0(esbuild@0.24.0))':
+  '@remotion/tailwind@4.0.212(@remotion/bundler@4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.6.2)(webpack@5.94.0(esbuild@0.18.6))':
     dependencies:
       '@remotion/bundler': 4.0.212(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       autoprefixer: 10.4.20(postcss@8.4.47)
-      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.24.0))
+      css-loader: 5.2.7(webpack@5.94.0(esbuild@0.18.6))
       postcss: 8.4.47
-      postcss-loader: 7.3.4(postcss@8.4.47)(typescript@5.6.2)(webpack@5.94.0(esbuild@0.24.0))
+      postcss-loader: 7.3.4(postcss@8.4.47)(typescript@5.6.2)(webpack@5.94.0(esbuild@0.18.6))
       postcss-preset-env: 8.5.1(postcss@8.4.47)
-      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.24.0))
+      style-loader: 2.0.0(webpack@5.94.0(esbuild@0.18.6))
       tailwindcss: 3.4.12
     transitivePeerDependencies:
       - ts-node
@@ -8849,7 +8861,7 @@ snapshots:
       postcss-selector-parser: 6.1.2
       postcss-value-parser: 4.2.0
 
-  css-loader@5.2.7(webpack@5.94.0(esbuild@0.24.0)):
+  css-loader@5.2.7(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.47)
       loader-utils: 2.0.4
@@ -8863,7 +8875,7 @@ snapshots:
       semver: 7.6.3
       webpack: 5.94.0(esbuild@0.24.0)
 
-  css-loader@7.1.2(webpack@5.94.0(esbuild@0.24.0)):
+  css-loader@7.1.2(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.47)
       postcss: 8.4.47
@@ -11172,7 +11184,7 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.47
 
-  postcss-loader@7.3.4(postcss@8.4.47)(typescript@5.6.2)(webpack@5.94.0(esbuild@0.24.0)):
+  postcss-loader@7.3.4(postcss@8.4.47)(typescript@5.6.2)(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       cosmiconfig: 8.3.6(typescript@5.6.2)
       jiti: 1.21.6
@@ -11741,14 +11753,14 @@ snapshots:
 
   safe-stable-stringify@2.5.0: {}
 
-  sass-loader@14.2.1(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0)):
+  sass-loader@14.2.1(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
       sass: 1.79.3
       webpack: 5.94.0(esbuild@0.24.0)
 
-  sass-loader@16.0.2(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0)):
+  sass-loader@16.0.2(sass@1.79.3)(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
@@ -12019,7 +12031,7 @@ snapshots:
 
   style-inject@0.3.0: {}
 
-  style-loader@2.0.0(webpack@5.94.0(esbuild@0.24.0)):
+  style-loader@2.0.0(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
@@ -12108,7 +12120,7 @@ snapshots:
 
   tapable@2.2.1: {}
 
-  terser-webpack-plugin@5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.24.0)):
+  terser-webpack-plugin@5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.18.6)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
@@ -12437,7 +12449,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.24.0))
+      terser-webpack-plugin: 5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.18.6))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
