@@ -1,9 +1,9 @@
-import { assetMap, type TChatStoryCompProps } from '@repo/video';
+import { getStaticAsset, type TChatStoryCompProps } from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
-import { estimateMp3Duration, sha256, streamToBuffer } from '@/lib';
+import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
 import { logger } from '@/logger';
 
 import {
@@ -100,7 +100,7 @@ class ChatHistorySequenceCreator {
 	private async processMessageEvent(
 		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>
 	): Promise<TResult<void, AppError>> {
-		const startFrame = Math.floor((this.currentTimeMs / 1000) * this.config.fps);
+		const startFrame = msToFrames(this.currentTimeMs, this.config.fps);
 		const participant = this.data.participants.find((p) => p.id === item.participantId);
 		if (participant == null) {
 			logger.warn(`No participant for message '${item.content}' found!`);
@@ -125,14 +125,14 @@ class ChatHistorySequenceCreator {
 
 	private addNotificationSound(participant: TChatStoryVideoParticipant, startFrame: number): void {
 		const audio = participant.isSelf
-			? assetMap['static/audio/sound/ios_sent.mp3']
-			: assetMap['static/audio/sound/ios_received.mp3'];
+			? getStaticAsset('static/audio/sound/ios_sent.mp3')
+			: getStaticAsset('static/audio/sound/ios_received.mp3');
 		this.sequence.push({
 			type: 'Audio',
 			src: audio.path,
 			volume: 1,
 			startFrame,
-			durationInFrames: Math.floor((audio.durationMs / 1000) * this.config.fps)
+			durationInFrames: msToFrames(audio.durationMs, this.config.fps)
 		});
 	}
 
@@ -165,7 +165,7 @@ class ChatHistorySequenceCreator {
 		this.addVoiceoverToSequence(
 			spokenMessageUrl.value,
 			startFrame,
-			Math.floor((durationMs / 1000) * this.config.fps) || this.config.fps * 3
+			msToFrames(durationMs, this.config.fps) || this.config.fps * 3
 		);
 
 		return Ok(durationMs);

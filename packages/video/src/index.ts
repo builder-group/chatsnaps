@@ -1,5 +1,5 @@
-import assetMap from './asset-map.json';
+import { getStaticAsset } from './lib';
 
 export * from './compositions';
 
-export { assetMap };
+export { getStaticAsset };

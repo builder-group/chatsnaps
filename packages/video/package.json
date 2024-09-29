@@ -4,7 +4,7 @@
 	"description": "ChatSnap Video",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle && pnpm run remotion:build",
+		"build": "shx rm -rf dist && pnpm remotion:generate-asset-map && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle && pnpm run remotion:build",
 		"css:build": "tailwindcss -i ./src/style.css -o ./dist/style.css",
 		"remotion:generate-asset-map": "tsx ./remotion.generate-asset-map.js",
 		"start:dev": "remotion studio ./remotion.root.js",

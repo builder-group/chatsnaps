@@ -1,6 +1,6 @@
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from 'remotion';
-import assetMap from '@/asset-map.json';
 import { Media } from '@/components';
+import { getStaticAsset } from '@/lib';
 import { TRemotionFC } from '@/types';
 
 import { TikTokFollowComp } from '../TikTokFollow';
@@ -47,7 +47,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 								className="mt-64"
 							>
 								<TikTokFollowComp media={item.media} className="scale-100" />
-								<Audio src={staticFile(assetMap['static/audio/sound/follow_1.mp3'].path)} />
+								<Audio src={staticFile(getStaticAsset('static/audio/sound/follow_1.mp3').path)} />
 							</Sequence>
 						);
 					case 'TikTokLike':
@@ -60,7 +60,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 									className="mt-64"
 								>
 									<TikTokLikeComp className="scale-150" />
-									<Audio src={staticFile(assetMap['static/audio/sound/like_1.mp3'].path)} />
+									<Audio src={staticFile(getStaticAsset('static/audio/sound/like_1.mp3').path)} />
 								</Sequence>
 							</>
 						);

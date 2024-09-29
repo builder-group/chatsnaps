@@ -4,22 +4,19 @@ import {
 	type TTikTokLikeSequenceItem
 } from '@repo/video';
 
+import { calculateTotalDurationFrames } from './calculate-total-duration-frames';
+
 export function addCTAAnimations(
 	sequence: TChatStoryCompProps['sequence'],
 	ctas: TCTAItem[],
 	options: TAddCTAAnimationsOptions = {}
-): TChatStoryCompProps['sequence'] {
+): void {
 	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even' } = options;
-	const totalDurationFrames = sequence.reduce(
-		(max, item) => Math.max(max, item.startFrame + (item.durationInFrames ?? 0)),
-		0
-	);
+	const totalDurationFrames = calculateTotalDurationFrames(sequence);
 	const minSpacingFrames = minSpacingSeconds * fps;
 
 	const regularCTAs = ctas.filter((cta) => !cta.atEnd);
 	const endCTAs = ctas.filter((cta) => cta.atEnd);
-
-	const ctaItems: TChatStoryCompProps['sequence'] = [];
 
 	// Calculate total duration of end CTAs and adjust available duration for regular CTAs
 	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + getDurationInFrames(cta, fps), 0);
@@ -28,21 +25,18 @@ export function addCTAAnimations(
 	// Place CTAs
 	placeRegularCTAs(
 		regularCTAs,
-		ctaItems,
+		sequence,
 		availableDurationForRegularCTAs,
 		fps,
 		minSpacingFrames,
 		spreadType
 	);
-	placeEndCTAs(endCTAs, ctaItems, totalDurationFrames, fps);
-
-	const newSequence = [...sequence, ...ctaItems];
-	return newSequence.sort((a, b) => a.startFrame - b.startFrame);
+	placeEndCTAs(endCTAs, sequence, totalDurationFrames, fps);
 }
 
 function placeEndCTAs(
 	ctas: TCTAItem[],
-	ctaItems: TChatStoryCompProps['sequence'],
+	sequence: TChatStoryCompProps['sequence'],
 	totalDurationFrames: number,
 	fps: number
 ): void {
@@ -51,7 +45,7 @@ function placeEndCTAs(
 		// Reverse to place from end to start
 		const durationInFrames = getDurationInFrames(cta, fps);
 		endPosition -= durationInFrames;
-		ctaItems.push({
+		sequence.push({
 			...cta,
 			durationInFrames,
 			startFrame: endPosition
@@ -61,7 +55,7 @@ function placeEndCTAs(
 
 function placeRegularCTAs(
 	ctas: TCTAItem[],
-	ctaItems: TChatStoryCompProps['sequence'],
+	sequence: TChatStoryCompProps['sequence'],
 	availableDuration: number,
 	fps: number,
 	minSpacingFrames: number,
@@ -79,7 +73,7 @@ function placeRegularCTAs(
 				const durationInFrames = getDurationInFrames(cta, fps);
 				const startFrame = Math.round(currentPosition);
 
-				ctaItems.push({
+				sequence.push({
 					...cta,
 					durationInFrames,
 					startFrame
@@ -111,7 +105,7 @@ function placeRegularCTAs(
 
 				const startFrame = Math.floor(Math.random() * (maxStart - minStart + 1) + minStart);
 
-				ctaItems.push({
+				sequence.push({
 					...cta,
 					durationInFrames,
 					startFrame

@@ -1,13 +1,15 @@
 import { zValidator } from '@hono/zod-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
-import { assetMap, ChatStoryComp, type TChatStoryCompProps } from '@repo/video';
+import { ChatStoryComp, getStaticAsset, type TChatStoryCompProps } from '@repo/video';
 import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr } from '@blgc/utils';
 import { remotionConfig, s3Client, s3Config } from '@/environment';
+import { selectRandomVideo } from '@/lib';
 
 import { router } from '../../router';
 import { addCTAAnimations } from './add-cta-animations';
+import { calculateTotalDurationFrames } from './calculate-total-duration-frames';
 import { createChatHistorySequence } from './create-chat-history-sequence';
 import { SChatStoryVideoDto } from './schema';
 
@@ -35,11 +37,8 @@ router.post(
 		const { sequence, creditsSpent } = (
 			await createChatHistorySequence(data, { voiceover, fps: 30, messageDelayMs: 500 })
 		).unwrap();
-		console.log(`Total credits spent: ${creditsSpent.toString()}`);
-
-		const finalSequence = addCTAAnimations(
+		addCTAAnimations(
 			sequence,
-
 			[
 				{ type: 'TikTokLike' },
 				{
@@ -62,24 +61,57 @@ router.post(
 			{ fps: 30 }
 		);
 
+		let background = data.background;
+		if (background == null) {
+			const backgroundVideo = selectRandomVideo(
+				[
+					{
+						path: getStaticAsset('static/video/.local/steep_1.mp4').path,
+						durationMs: getStaticAsset('static/video/.local/steep_1.mp4').durationMs
+					},
+					{
+						path: getStaticAsset('static/video/.local/steep_2.mp4').path,
+						durationMs: getStaticAsset('static/video/.local/steep_2.mp4').durationMs
+					},
+					{
+						path: getStaticAsset('static/video/.local/steep_3.mp4').path,
+						durationMs: getStaticAsset('static/video/.local/steep_3.mp4').durationMs
+					}
+				],
+				{
+					totalDurationInFrames: calculateTotalDurationFrames(sequence),
+					endBufferMs: 2000,
+					startBufferMs: 2000
+				}
+			);
+			if (backgroundVideo == null) {
+				throw new AppError('#ERR_BACKGROUND_VIDEO', 400);
+			}
+
+			background = {
+				type: 'Video',
+				src: backgroundVideo.src,
+				startFrom: backgroundVideo.startFrom,
+				objectFit: 'cover',
+				width: 1080,
+				height: 1920
+			};
+		}
+
+		console.log(`Total credits spent: ${creditsSpent.toString()}`);
+
 		const videoProps: TChatStoryCompProps = {
 			title: data.title,
 			messenger: data.messenger ?? {
 				type: 'IMessage',
 				contact: {
-					profilePicture: { type: 'Image', src: assetMap['static/image/memoji/1.png'].path },
+					profilePicture: { type: 'Image', src: getStaticAsset('static/image/memoji/1.png').path },
 					name: 'Mom'
 				}
 			},
-			background: data.background ?? {
-				type: 'Video',
-				src: assetMap['static/video/.local/steep_1.mp4'].path,
-				objectFit: 'cover',
-				width: 1080,
-				height: 1920
-			},
+			background,
 			overlay: data.overlay,
-			sequence: finalSequence
+			sequence: sequence.sort((a, b) => a.startFrame - b.startFrame)
 		};
 
 		if (!renderVideo) {
