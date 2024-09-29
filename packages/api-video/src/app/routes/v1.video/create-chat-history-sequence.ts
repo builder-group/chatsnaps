@@ -197,11 +197,11 @@ class ChatHistorySequenceCreator {
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
 			text: currentText,
-			modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: 50% cheaper and faster. Compare with 'eleven_multilingual_v2'.
+			modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: Using turbo for speed/cost. Compare quality with 'eleven_multilingual_v2'.
 			// modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
-			previousRequestIds,
-			// nextText: nextText.length > 0 ? nextText : undefined, // TODO: All models I've tried have issues with the 'nextText' property and include like a cut off beginning of the next text's content
+			// nextText: nextText.length > 0 ? nextText : undefined, // TODO: Disabled. Can cause audio overlap and partial inclusion of a cut off start from the next text with some voices (see 'out/voice-lab').
 			previousText: previousText.length > 0 ? previousText : undefined,
+			// previousRequestIds, // TODO: Disabled. Can cause cumulative voice quality degradation over multiple requests with some voices (see 'out/tiktok/8.cracked-elli').
 			voiceSettings: {
 				stability: 0.4,
 				similarityBoost: 0.8,
@@ -212,7 +212,8 @@ class ChatHistorySequenceCreator {
 		logger.info(`Voiceover for ${voiceId.slice(0, 4)}`, {
 			text: currentText,
 			nextText,
-			previousText
+			previousText,
+			previousRequestIds
 		});
 
 		if (audioResult.isErr()) {
@@ -360,8 +361,8 @@ class ChatHistorySequenceCreator {
 			'OMG': 'Oh my God',
 			'AF': 'as fuck',
 			'WTF': 'What the fuck',
-			'LOL': 'laughing out loud',
-			'ROFL': 'rolling on the floor laughing',
+			// 'LOL': 'laughing out loud',
+			// 'ROFL': 'rolling on the floor laughing',
 			'ASAP': 'as soon as possible',
 			'TBH': 'to be honest',
 			'IDK': "I don't know",

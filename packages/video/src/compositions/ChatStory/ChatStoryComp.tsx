@@ -79,17 +79,14 @@ ChatStoryComp.calculateMetadata = async (metadata) => {
 		props: { sequence }
 	} = metadata;
 	const fps = 30;
-	const orderedSequence = sequence.sort((s) => s.startFrame);
-	const lastSequenceItem =
-		orderedSequence.length > 0 ? orderedSequence[orderedSequence.length - 1] : null;
-	const lastFrame =
-		lastSequenceItem != null
-			? lastSequenceItem.startFrame + (lastSequenceItem.durationInFrames ?? 0)
-			: 0;
+	const totalDurationFrames = sequence.reduce(
+		(max, item) => Math.max(max, item.startFrame + (item.durationInFrames ?? 0)),
+		0
+	);
 
 	return {
-		props: { ...metadata.props, sequence: orderedSequence },
+		props: { ...metadata.props, sequence },
 		fps,
-		durationInFrames: lastFrame
+		durationInFrames: totalDurationFrames
 	};
 };
