@@ -1,8 +1,8 @@
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from 'remotion';
+import assetMap from '@/asset-map.json';
 import { Media } from '@/components';
 import { TRemotionFC } from '@/types';
 
-import assetMap from '../../../asset-map.json';
 import { TikTokFollowComp } from '../TikTokFollow';
 import { TikTokLikeComp } from '../TikTokLike';
 import { Messenger } from './Messenger';

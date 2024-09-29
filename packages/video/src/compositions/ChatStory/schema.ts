@@ -36,10 +36,12 @@ export const STikTokFollowSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('TikTokFollow'),
 	media: SVisualMedia
 });
+export type TTikTokFollowSequenceItem = z.infer<typeof STikTokFollowSequenceItem>;
 
 export const STikTokLikeSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('TikTokLike')
 });
+export type TTikTokLikeSequenceItem = z.infer<typeof STikTokLikeSequenceItem>;
 
 export const SSequenceItem = z.discriminatedUnion('type', [
 	SMessageSequenceItem,

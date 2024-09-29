@@ -1,5 +1,4 @@
-import { type TChatStoryCompProps } from '@repo/video';
-import assetMap from '@repo/video/asset-map.json';
+import { assetMap, type TChatStoryCompProps } from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
@@ -13,15 +12,15 @@ import {
 	type TChatStoryVideoParticipant
 } from './schema';
 
-export function createVideoSequence(
+export function createChatHistorySequence(
 	data: TChatStoryVideoDto,
 	options: Partial<TVideoSequenceCreatorConfig> = {}
 ): Promise<TResult<{ sequence: TChatStoryCompProps['sequence']; creditsSpent: number }, AppError>> {
-	const creator = new VideoSequenceCreator(data, options);
+	const creator = new ChatHistorySequenceCreator(data, options);
 	return creator.createSequence();
 }
 
-class VideoSequenceCreator {
+class ChatHistorySequenceCreator {
 	private sequence: TChatStoryCompProps['sequence'] = [];
 	private currentTimeMs = 0;
 	private creditsSpent = 0;

@@ -6,7 +6,7 @@ import { promisify } from 'node:util';
 const execPromise = promisify(exec);
 
 const config = {
-	outputPath: './asset-map.json',
+	outputPath: './src/asset-map.json',
 	publicDir: './public',
 	blacklist: [/\.DS_Store/, /thumbs\.db/i],
 	supportedMediaExtensions: ['.mp3', '.mp4', '.wav', '.ogg', '.webm']
