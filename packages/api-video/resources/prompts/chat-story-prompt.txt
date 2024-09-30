@@ -12,65 +12,54 @@ You will be provided with two key pieces of information:
 {{ORIGINAL_STORY}}
 </original_story>
 
-Follow these guidelines to adapt the story into a viral chat format:
+Your task is to creatively adapt the story for maximum virality by following these enhanced guidelines:
 
 1. Viral-First Adaptation:
    - Identify the central conflict or key moment from the original story
-   - Take creative liberty to adjust, dramatize, or completely change elements for maximum virality
+   - Use creative liberty to amplify, dramatize or change elements for maximum virality
    - Amplify emotional beats, conflicts, and surprises
-   - Consider adding a shocking twist or revelation that wasn't in the original story
 
-2. Powerful Hook:
-   - Start with a shocking statement, dramatic action, or intriguing question within the first 1-2 messages
-   - Introduce the conflict immediately to hook viewers
-   - Make the hook relatable or extreme to compel viewers to keep watching
-   - Use emojis or all-caps for emphasis in the opening messages
+2. Powerful Hook (First 1-2 Messages):
+   - Start with an extreme or provocative statement, shocking action, or intriguing question
+   - Introduce the conflict immediately to grab attention. Examples:
+     - "I can't believe you did that..."
+     - "You won't believe what happened..."
+     - "This changes everything!"  
+   - Aim for hooks that tap into relatable experiences, curiosity, or controversy
 
 3. Continuous Engagement:
-   - Include a mini-cliffhanger or surprise every 2-3 messages
-   - Build tension through miscommunication, escalating stakes, and plot twists
-   - Add unexpected elements every 10-15 messages to maintain engagement
-   - Use short, punchy messages to keep the pace rapid
+   - Introduce a major plot twist or shocking revelation every 10-15 messages (approx. every 15 seconds)
+   - Use miscommunication, escalating stakes, and plot twists to maintain tension
+   - Push the characters to their limits by dramatically escalating stakes with extreme emotions or moral dilemmas
 
 4. Rapid Pacing & Clipped Dialogue:
-   - Use 1-4 word messages and keep the conversation fast-paced
-   - Split thoughts across multiple rapid-fire texts for impact
-   - Add a very short dynamic pause (100ms-300ms) behind each message to maintain flow while keeping it fast-paced
-   - Eliminate filler and ensure every message adds drama, humor, or suspense
-   - Integrate appropriate internet slang, emojis, or memes
-   - Use ellipsis (...) to create suspense between messages
+   - Keep messages 1-3 words long to maintain a fast pace
+   - Split thoughts across multiple rapid-fire texts
+   - Add a short pause (100ms-300ms) after each message to maintain flow while ensuring the viewer stays engaged
+   - Eliminate filler – every message should add drama, humor, or suspense
 
-5. Extreme Stakes and Emotions:
+5. Extreme Stakes & Exaggerated Emotions:
    - Push the stakes to the limit without becoming confusing
-   - Dramatize and exaggerate reactions to heighten emotional connection
-   - Create moments of extreme contrast or irony for added impact
-   - Use ALL CAPS and multiple exclamation points for heightened emotions
+   - Incorporate extreme moral dilemmas or emotional conflict to keep viewers invested
+   - Use ALL CAPS, emojis, and punctuation sparingly but strategically to heighten emotional intensity
 
 6. Unexpected Resolutions:
-   - Resolve the story with an unexpected, ironic, or comedic twist
+   - Resolve the story with an unexpected, ironic or comedic twist
    - Avoid predictable endings and aim for resolutions that drive engagement
    - Consider multiple fake-out endings before the real resolution
    - End with a cliffhanger or open question to encourage discussion
 
-7. Character Quirks & Engagement:
-   - Give each character a distinct voice that aligns with the target audience
-   - Exaggerate misunderstandings, power shifts, or role reversals
-   - Ensure characters have clear, exaggerated motivations
-   - Use character-specific emojis or text styles to differentiate speakers
+7. Distinct Character Quirks:
+   - Give each character a distinct voice, aligned with the target audience. Think in terms of relatable archetypes or exaggerated personalities (e.g., the sarcastic friend, the over-the-top villain)
+   - Use character-specific emojis or unique text styles to differentiate them
+   - Ensure characters have clear motivations that are exaggerated for impact
 
-8. Viral Meme & Quotation Potential:
-   - Create at least three highly quotable lines or potential memes
-   - Reference or subvert popular memes in a fresh way
-   - Include a catchphrase or recurring joke that evolves throughout the story
-
-9. Cultural Relevance & Timeliness:
-   - Incorporate current trends or pop culture references relevant to the audience
-   - Address topical issues in a way that sparks discussion
-
-10. Interactive Elements:
-    - End with a question or call-to-action to encourage viewer engagement
-    - Create natural pause points for potential duets, stitches, or reactions
-    - Include a "choose your own adventure" element or ask viewers to vote on an outcome
+8. Interactive Elements:
+    - Conclude with a direct question or call-to-action to encourage comments. Examples:
+      - "What would you do?"
+      - "Who do you think is lying?"
+      - "Should they break up?"
+    - Consider adding a "choose your own adventure" element or asking viewers to vote on outcomes in the comments.
 
 Output your adapted viral chat story using the following JSON format:
 
@@ -92,7 +81,7 @@ Output your adapted viral chat story using the following JSON format:
     "events": [
         {
             "type": "Message",
-            "content": "First shocking message that hooks",
+            "content": "Extremely catchy, shocking message that hooks",
             "participantId": 1
         },
         {
@@ -114,21 +103,18 @@ Output your adapted viral chat story using the following JSON format:
 
 Ensure your story contains 70-110 messages (4-5k tokens) to reach the desired 60-90 second duration.
 
-Before submitting your adaptation, review this Final Viral Checklist:
-- Is the hook immediate and shocking? (First 1-2 messages)
-- Are the stakes high and emotions exaggerated?
-- Are there mini-hooks or surprises every 2-3 messages to keep viewers engaged?
-- Does the story deliver constant surprises and twists?
-- Is the pacing rapid, with no unnecessary filler?
-- Are short, dynamic pauses (100ms-300ms) behind each message included, fitting to the flow?
-- Are the characters distinct and memorable?
-- Is the resolution unexpected and viral-worthy?
-- Are there at least three quotable, meme-able lines?
-- Does the story incorporate current trends or cultural relevance?
-- Is there an interactive element or call-to-action at the end?
-- Will the audience be compelled to comment, share, or engage with the content?
-- Does the story contain 70-110 messages?
-- Have you used emojis, ALL CAPS, and punctuation effectively for emphasis?
-- Does the story align with the interests and language of the target audience?
+Before submitting, review this checklist to ensure your story has maximum viral potential:
+- Hook: Is the hook immediate, shocking, and engaging in the first 1-2 messages?
+- High Stakes: Are the stakes high, and are emotions exaggerated throughout?
+- Twists: Are there major plot twists or revelations every 10-15 messages?
+- Escalation: Does the story continuously escalate in intensity and stakes?
+- Rapid Pacing: Is the pacing fast and efficient, with no unnecessary filler?
+- Character Depth: Are the characters distinct, memorable, and aligned with the target audience?
+- Shocking Ending: Does the ending leave room for heated debate or discussion?
+- Audience Interaction: Is there a call-to-action or question to encourage viewer engagement?
+- Format: Are emojis, ALL CAPS, and punctuation used strategically to convey emotion?
+- Potential for Reaction: Does the story naturally encourage duets, stitches, or reaction videos?
 
 Now, adapt the given story or concept with maximum creativity and viral potential, adhering to the target audience's preferences and the provided format. Make it addictive, highly shareable, and impossible to scroll past!
+
+Output your viral chat story in the JSON format provided above, ensuring it meets all the criteria for maximum virality and engagement.

@@ -15,112 +15,54 @@ import { calculateTotalDurationFrames } from './calculate-total-duration-frames'
 import { createChatHistorySequence } from './create-chat-history-sequence';
 import { SChatStoryVideoDto } from './schema';
 
-router.post('/v1/video/chatstory/create', async (c) => {
-	const prompt = mapErr(
-		await getResource('prompts/chat-story-prompt.txt'),
-		(err) => new AppError(`#ERR_READ_PROMOT`, 500, { description: err.message, throwable: err })
-	).unwrap();
-
-	const response = await anthropicClient.messages
-		.create({
-			model: 'claude-3-5-sonnet-20240620',
-			max_tokens: 8190,
-			messages: [
-				{
-					role: 'user',
-					content: [
-						{
-							type: 'text',
-							text: prompt
-						}
-					]
-				}
-			],
-			temperature: 0.9 // 1 is ideal for generative tasks, and 0 for analyitical and deterministic thing
-			// tools: [
-			// 	{
-			// 		name: 'chat_story_generator',
-			// 		description:
-			// 			'Generates a chat story JSON following a specific format with title, participants, and events.',
-			// 		input_schema: {
-			// 			type: 'object',
-			// 			properties: {
-			// 				title: {
-			// 					type: 'string',
-			// 					description: 'The title of the chat story. Should be catchy and intriguing.'
-			// 				},
-			// 				participants: {
-			// 					type: 'array',
-			// 					items: {
-			// 						type: 'object',
-			// 						properties: {
-			// 							id: {
-			// 								type: 'number',
-			// 								description: 'The unique identifier for each participant.'
-			// 							},
-			// 							displayName: {
-			// 								type: 'string',
-			// 								description: 'The name of the participant displayed in the chat.'
-			// 							},
-			// 							isSelf: {
-			// 								type: 'boolean',
-			// 								description:
-			// 									"Indicates if this participant represents the user's perspective."
-			// 							}
-			// 						},
-			// 						required: ['id', 'displayName', 'isSelf']
-			// 					},
-			// 					description: 'List of participants in the chat.'
-			// 				},
-			// 				events: {
-			// 					type: 'array',
-			// 					items: {
-			// 						type: 'object',
-			// 						properties: {
-			// 							type: {
-			// 								type: 'string',
-			// 								enum: ['Message', 'Pause', 'Time'],
-			// 								description: "The type of the event: 'Message', 'Pause', or 'Time'."
-			// 							},
-			// 							content: {
-			// 								type: 'string',
-			// 								description: "The content of the message (if type is 'Message')."
-			// 							},
-			// 							participantId: {
-			// 								type: 'number',
-			// 								description:
-			// 									"The ID of the participant sending the message (if type is 'Message')."
-			// 							},
-			// 							durationMs: {
-			// 								type: 'number',
-			// 								description: "The duration of the pause in milliseconds (if type is 'Pause')."
-			// 							},
-			// 							passedTimeMin: {
-			// 								type: 'number',
-			// 								description: "The amount of time passed in minutes (if type is 'Time')."
-			// 							}
-			// 						},
-			// 						required: ['type']
-			// 					},
-			// 					description: 'List of events that occur in the chat story.'
-			// 				}
-			// 			},
-			// 			required: ['title', 'participants', 'events']
-			// 		}
-			// 	}
-			// ],
-			// tool_choice: { type: 'tool', name: 'chat_story_generator' }
+router.post(
+	'/v1/video/chatstory/create',
+	zValidator(
+		'json',
+		z.object({
+			targetAudience: z.string(),
+			originalStory: z.string()
 		})
-		.catch((err: unknown) => {
-			if (err instanceof Anthropic.APIError) {
-				throw new AppError('#ERR_ANTHROPIC', 500, { description: err.message, throwable: err });
-			} else {
-				throw new AppError('#ERR_ANTHROPIC', 500);
-			}
-		});
+	),
+	async (c) => {
+		const { targetAudience, originalStory } = c.req.valid('json');
 
-	return c.json({ prompt, response });
-});
+		const prompt = mapErr(
+			await getResource('prompts/chat-story-prompt.txt'),
+			(err) => new AppError(`#ERR_READ_PROMOT`, 500, { description: err.message, throwable: err })
+		)
+			.unwrap()
+			.replace('{{TARGET_AUDIENCE}}', targetAudience)
+			.replace('{{ORIGINAL_STORY}}', originalStory);
+
+		const response = await anthropicClient.messages
+			.create({
+				model: 'claude-3-5-sonnet-20240620',
+				max_tokens: 8190,
+				messages: [
+					{
+						role: 'user',
+						content: [
+							{
+								type: 'text',
+								text: prompt
+							}
+						]
+					}
+				],
+				temperature: 0.0 // So that it strictly follows the prompt and doesn't get too creative and comes up with secret agent, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
+			})
+			.catch((err: unknown) => {
+				if (err instanceof Anthropic.APIError) {
+					throw new AppError('#ERR_ANTHROPIC', 500, { description: err.message, throwable: err });
+				} else {
+					throw new AppError('#ERR_ANTHROPIC', 500);
+				}
+			});
+
+		return c.json({ response });
+	}
+);
 
 router.post(
 	'/v1/video/chatstory/render',
