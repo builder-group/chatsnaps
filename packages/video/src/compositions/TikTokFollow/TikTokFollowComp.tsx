@@ -6,23 +6,26 @@ import { TRemotionFC } from '@/types';
 import { STikTokFollowCompProps, TTikTokFollowCompProps } from './schema';
 
 export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => {
-	const { media, className } = props;
+	const { media, text, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, durationInFrames } = useVideoConfig();
 
-	const enter = spring({
+	const exitDuration = 30;
+	const enterDuration = 30;
+
+	const enterProgress = spring({
 		fps,
 		frame,
 		config: {
 			damping: 12,
 			stiffness: 100,
 			mass: 1
-		}
+		},
+		durationInFrames: enterDuration
 	});
 
-	const exitDuration = 20;
 	const exitStart = durationInFrames - exitDuration;
-	const exit = spring({
+	const exitProgress = spring({
 		fps,
 		frame: frame - exitStart,
 		config: {
@@ -32,24 +35,18 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 		},
 		durationInFrames: exitDuration
 	});
+	const exitScale = interpolate(exitProgress, [0, 0.3, 1], [1, 1.2, 0]);
+	const exitOpacity = interpolate(exitProgress, [0, 1], [1, 0]);
 
-	// Pulsing effect
+	const scale = frame < durationInFrames - exitDuration ? enterProgress : enterProgress * exitScale;
+
 	const pulseFrequency = 2;
 	const pulseAmplitude = 0.05;
 	const pulse = Math.sin(frame * (Math.PI / fps) * pulseFrequency) * pulseAmplitude;
 
-	const scale =
-		enter *
-		(1 +
-			interpolate(exit, [0, 0.5, 1], [0, 0.2, -1], {
-				extrapolateLeft: 'clamp',
-				extrapolateRight: 'clamp'
-			}));
+	const scaleWithPulse = scale * (1 + pulse);
 
-	// Apply pulsing to the scale
-	const finalScale = scale * (1 + pulse);
-
-	const buttonAnimation = spring({
+	const buttonProgress = spring({
 		fps,
 		frame,
 		config: {
@@ -59,23 +56,18 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 		},
 		durationInFrames: 80
 	});
-
-	const buttonScale = interpolate(buttonAnimation, [0, 0.3, 0.6, 1], [0.8, 1.5, 1.3, 1]);
-	const buttonRotation = interpolate(buttonAnimation, [0, 1], [0, 180]);
-	const isInitialState = buttonAnimation < 0.8;
-
-	const color = interpolateColors(frame, [0, 30], ['#ffffff', '#ef4444']);
+	const buttonScale = interpolate(buttonProgress, [0, 0.3, 0.6, 1], [0.8, 1.5, 1.3, 1]);
+	const buttonRotation = interpolate(buttonProgress, [0, 1], [0, 180]);
+	const isInitialState = buttonProgress < 0.8;
+	const buttonColor = interpolateColors(frame, [0, 30], ['#ffffff', '#ef4444']);
 
 	return (
-		<div className={cn('flex h-full w-full items-center justify-center', className)}>
+		<div className={cn('flex h-full w-full flex-col items-center justify-center', className)}>
 			<div
 				className="relative"
 				style={{
-					transform: `scale(${finalScale})`,
-					opacity: interpolate(frame, [exitStart, durationInFrames], [1, 0], {
-						extrapolateLeft: 'clamp',
-						extrapolateRight: 'clamp'
-					})
+					transform: `scale(${scaleWithPulse})`,
+					opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
 				}}
 			>
 				<Media media={media} className="h-64 w-64 rounded-full border-4 border-white shadow-lg" />
@@ -83,7 +75,7 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 					className="absolute -bottom-4 -right-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-md"
 					style={{
 						transform: `scale(${buttonScale}) rotate(${buttonRotation}deg)`,
-						backgroundColor: color
+						backgroundColor: buttonColor
 					}}
 				>
 					<div
@@ -104,6 +96,17 @@ export const TikTokFollowComp: TRemotionFC<TTikTokFollowCompProps> = (props) => 
 					</div>
 				</div>
 			</div>
+			{text != null && (
+				<div
+					className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+					style={{
+						opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
+						transform: `scale(${scale})`
+					}}
+				>
+					<h3 className="text-4xl font-bold text-white">{text}</h3>
+				</div>
+			)}
 		</div>
 	);
 };

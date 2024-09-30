@@ -84,24 +84,51 @@ router.post(
 		const { sequence, creditsSpent } = (
 			await createChatHistorySequence(data, { voiceover, fps: 30, messageDelayMs: 500 })
 		).unwrap();
+
+		const likeText = [
+			'Like this! ❤️',
+			'Tap to like! 🔥',
+			'Hit like! 💥',
+			'Show love! 💬',
+			'Like if you agree! 😉',
+			'Drop a like! ❤️',
+			'Tap for feels! 😲',
+			'Smash like! 💣',
+			'Feeling it? 👍',
+			'Love this? ❤️'
+		];
+		const followText = [
+			'Follow for more! 🔥',
+			'Don’t miss out! 👀',
+			'Tap follow! 📲',
+			'Hit follow! 💬',
+			'Follow now! 🚀',
+			'More? Follow! 🎯',
+			'Stay tuned—follow! 🔥',
+			'Join us! 👊',
+			'Follow for updates! 📱',
+			'Want more? Follow! 💥'
+		];
 		addCTAAnimations(
 			sequence,
 			[
-				{ type: 'TikTokLike' },
-				{
-					type: 'TikTokFollow',
-					media: {
-						type: 'Image',
-						src: 'https://p16-sign-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-euttp/7c74c317dd998c0c45551d5f6dd079fc~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=99338&refresh_token=c3764187a56c625cd8a0eed8e787a5ad&x-expires=1727766000&x-signature=2SyUC9P%2BCkhJX58ggspy6zbNXPg%3D&shp=a5d48078&shcp=81f88b70'
-					}
-				},
-				{ type: 'TikTokLike' },
+				{ type: 'TikTokLike', text: likeText[Math.floor(Math.random() * likeText.length)] },
 				{
 					type: 'TikTokFollow',
 					media: {
 						type: 'Image',
 						src: 'https://p16-sign-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-euttp/7c74c317dd998c0c45551d5f6dd079fc~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=99338&refresh_token=c3764187a56c625cd8a0eed8e787a5ad&x-expires=1727766000&x-signature=2SyUC9P%2BCkhJX58ggspy6zbNXPg%3D&shp=a5d48078&shcp=81f88b70'
 					},
+					text: followText[Math.floor(Math.random() * followText.length)]
+				},
+				{ type: 'TikTokLike', text: likeText[Math.floor(Math.random() * likeText.length)] },
+				{
+					type: 'TikTokFollow',
+					media: {
+						type: 'Image',
+						src: 'https://p16-sign-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-euttp/7c74c317dd998c0c45551d5f6dd079fc~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=99338&refresh_token=c3764187a56c625cd8a0eed8e787a5ad&x-expires=1727766000&x-signature=2SyUC9P%2BCkhJX58ggspy6zbNXPg%3D&shp=a5d48078&shcp=81f88b70'
+					},
+					text: followText[Math.floor(Math.random() * followText.length)],
 					atEnd: true
 				}
 			],

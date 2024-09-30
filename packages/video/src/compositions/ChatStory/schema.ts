@@ -34,12 +34,14 @@ export type TAudioSequenceItem = z.infer<typeof SAudioSequenceItem>;
 
 export const STikTokFollowSequenceItem = SBaseSequenceItem.extend({
 	type: z.literal('TikTokFollow'),
-	media: SVisualMedia
+	media: SVisualMedia,
+	text: z.string().optional()
 });
 export type TTikTokFollowSequenceItem = z.infer<typeof STikTokFollowSequenceItem>;
 
 export const STikTokLikeSequenceItem = SBaseSequenceItem.extend({
-	type: z.literal('TikTokLike')
+	type: z.literal('TikTokLike'),
+	text: z.string().optional()
 });
 export type TTikTokLikeSequenceItem = z.infer<typeof STikTokLikeSequenceItem>;
 

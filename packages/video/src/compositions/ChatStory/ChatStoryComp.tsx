@@ -46,7 +46,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 								durationInFrames={item.durationInFrames}
 								className="mt-64"
 							>
-								<TikTokFollowComp media={item.media} className="scale-100" />
+								<TikTokFollowComp media={item.media} text={item.text} />
 								<Audio src={staticFile(getStaticAsset('static/audio/sound/follow_1.mp3').path)} />
 							</Sequence>
 						);
@@ -59,7 +59,7 @@ export const ChatStoryComp: TRemotionFC<TChatStoryCompProps> = (props) => {
 									durationInFrames={item.durationInFrames}
 									className="mt-64"
 								>
-									<TikTokLikeComp className="scale-150" />
+									<TikTokLikeComp text={item.text} />
 									<Audio src={staticFile(getStaticAsset('static/audio/sound/like_1.mp3').path)} />
 								</Sequence>
 							</>

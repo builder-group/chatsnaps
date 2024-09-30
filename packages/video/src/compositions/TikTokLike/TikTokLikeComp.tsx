@@ -16,7 +16,7 @@ import { STikTokLikeCompProps, TTikTokLikeCompProps } from './schema';
 const COLORS = ['#FF69B4', '#FF1493', '#FF6347', '#FFD700', '#FF4500'];
 
 export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
-	const { className } = props;
+	const { text, className } = props;
 	const frame = useCurrentFrame();
 	const { fps, durationInFrames } = useVideoConfig();
 
@@ -24,7 +24,7 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 	const likeDuration = 60;
 	const exitDuration = 30;
 
-	const heartScale = spring({
+	const enterProgress = spring({
 		fps,
 		frame,
 		config: {
@@ -35,13 +35,10 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 		durationInFrames: enterDuration
 	});
 
-	const isLiked = frame > 15 && frame < durationInFrames - exitDuration;
-	const colorTransition = interpolateColors(frame, [10, 15], ['#FFFFFF', '#FF1493']);
-
-	// Exit animation
+	const exitStart = durationInFrames - exitDuration;
 	const exitProgress = spring({
 		fps,
-		frame: frame - (durationInFrames - exitDuration),
+		frame: frame - exitStart,
 		config: {
 			damping: 14,
 			stiffness: 160,
@@ -49,34 +46,32 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 		},
 		durationInFrames: exitDuration
 	});
-
 	const exitScale = interpolate(exitProgress, [0, 0.3, 1], [1, 1.2, 0]);
 	const exitOpacity = interpolate(exitProgress, [0, 1], [1, 0]);
 
-	// Combine enter, like, and exit scales
-	const scale = frame < durationInFrames - exitDuration ? heartScale : heartScale * exitScale;
+	const scale = frame < durationInFrames - exitDuration ? enterProgress : enterProgress * exitScale;
 
-	// Pulsing effect
 	const pulseFrequency = 2;
 	const pulseAmplitude = 0.05;
 	const pulse = Math.sin(frame * (Math.PI / fps) * pulseFrequency) * pulseAmplitude;
 
-	// Apply pulsing to the scale
-	const finalScale = scale * (1 + pulse);
+	const scaleWithPulse = scale * (1 + pulse);
 
-	// Generate confetti particles
+	const heartColor = interpolateColors(frame, [10, 15], ['#FFFFFF', '#FF1493']);
+
+	const isLiked = frame > 15 && frame < durationInFrames - exitDuration;
 	const particles: TParticle[] = React.useMemo(() => {
 		return new Array(50).fill(0).map((_, i) => ({
-			x: random(`x${i}`) * 60 - 30,
-			y: random(`y${i}`) * 60 - 30,
+			x: random(`x${i}`) * 60 - 32,
+			y: random(`y${i}`) * 60 - 32,
 			rotation: random(`rotation${i}`) * 360,
 			color: COLORS[Math.floor(random(`color${i}`) * COLORS.length)] as string,
-			size: random(`size${i}`) * 16 + 8
+			size: random(`size${i}`) * 32 + 16
 		}));
 	}, []);
 
 	return (
-		<div className={cn('flex h-full w-full items-center justify-center', className)}>
+		<div className={cn('flex h-full w-full flex-col items-center justify-center', className)}>
 			<div className="relative">
 				{isLiked &&
 					particles.map((particle, index) => {
@@ -86,8 +81,8 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 							config: { damping: 80, stiffness: 200, mass: 0.5 },
 							durationInFrames: likeDuration
 						});
-						const x = interpolate(progress, [0, 1], [0, particle.x * 10]);
-						const y = interpolate(progress, [0, 1], [0, particle.y * 10]);
+						const x = interpolate(progress, [0, 1], [0, particle.x * 15]);
+						const y = interpolate(progress, [0, 1], [0, particle.y * 15]);
 						return (
 							<div
 								key={index}
@@ -106,17 +101,28 @@ export const TikTokLikeComp: TRemotionFC<TTikTokLikeCompProps> = (props) => {
 				<div
 					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
 					style={{
-						transform: `translate(-50%, -50%) scale(${finalScale})`,
+						transform: `translate(-50%, -50%) scale(${scaleWithPulse})`,
 						opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
 					}}
 				>
 					<HeartIcon
-						stroke={colorTransition}
-						fill={colorTransition}
-						className="h-32 w-32 drop-shadow-lg transition-colors duration-300 ease-out"
+						stroke={heartColor}
+						fill={heartColor}
+						className="h-64 w-64 drop-shadow-lg transition-colors duration-300 ease-out"
 					/>
 				</div>
 			</div>
+			{text != null && (
+				<div
+					className="mt-40 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+					style={{
+						opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
+						transform: `scale(${scale})`
+					}}
+				>
+					<h3 className="text-4xl font-bold text-white">{text}</h3>
+				</div>
+			)}
 		</div>
 	);
 };

@@ -26,11 +26,13 @@ export const Root: React.FC = () => {
 				fps={30}
 				width={1080}
 				height={1920}
+				schema={TikTokFollowComp.schema}
 				defaultProps={{
 					media: {
 						type: 'Image',
 						src: 'https://avatars.githubusercontent.com/u/57860196?v=4&size=64'
 					},
+					text: 'Hello World',
 					className: 'bg-green-500'
 				}}
 			/>
@@ -41,7 +43,9 @@ export const Root: React.FC = () => {
 				fps={30}
 				width={1080}
 				height={1920}
+				schema={TikTokLikeComp.schema}
 				defaultProps={{
+					text: 'Hello World',
 					className: 'bg-green-500'
 				}}
 			/>

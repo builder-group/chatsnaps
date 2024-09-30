@@ -3,6 +3,7 @@ import { SVisualMedia } from '@/components';
 
 export const STikTokFollowCompProps = z.object({
 	media: SVisualMedia,
+	text: z.string().optional(),
 	className: z.string().optional()
 });
 
