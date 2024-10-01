@@ -33,7 +33,11 @@ router.post(
 		)
 			.unwrap()
 			.replace('{{TARGET_AUDIENCE}}', targetAudience)
-			.replace('{{ORIGINAL_STORY}}', originalStory);
+			.replace('{{ORIGINAL_STORY}}', originalStory)
+			.replace(
+				'{{TARGET_LENGTH}}',
+				'60-90 second conversation with approximately 70-110 messages (4-5k tokens)'
+			);
 
 		const response = await anthropicClient.messages
 			.create({
