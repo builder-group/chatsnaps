@@ -111,7 +111,7 @@ router.openapi(RenderChatStoryVideoRoute, async (c) => {
 				type: 'TikTokFollow',
 				media: {
 					type: 'Image',
-					src: 'https://p16-sign-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-euttp/7c74c317dd998c0c45551d5f6dd079fc~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=99338&refresh_token=c3764187a56c625cd8a0eed8e787a5ad&x-expires=1727766000&x-signature=2SyUC9P%2BCkhJX58ggspy6zbNXPg%3D&shp=a5d48078&shcp=81f88b70'
+					src: 'static/image/chatsnap.png'
 				},
 				text: followText[Math.floor(Math.random() * followText.length)]
 			},
@@ -120,7 +120,7 @@ router.openapi(RenderChatStoryVideoRoute, async (c) => {
 				type: 'TikTokFollow',
 				media: {
 					type: 'Image',
-					src: 'https://p16-sign-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-euttp/7c74c317dd998c0c45551d5f6dd079fc~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=99338&refresh_token=c3764187a56c625cd8a0eed8e787a5ad&x-expires=1727766000&x-signature=2SyUC9P%2BCkhJX58ggspy6zbNXPg%3D&shp=a5d48078&shcp=81f88b70'
+					src: 'static/image/chatsnap.png'
 				},
 				text: followText[Math.floor(Math.random() * followText.length)],
 				atEnd: true
