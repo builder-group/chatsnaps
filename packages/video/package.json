@@ -1,0 +1,70 @@
+{
+	"name": "@repo/video",
+	"version": "0.0.1",
+	"description": "ChatSnap Video",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && pnpm remotion:generate-asset-map && pnpm run css:build && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle && pnpm run remotion:build",
+		"css:build": "tailwindcss -i ./src/style.css -o ./dist/style.css",
+		"remotion:generate-asset-map": "tsx ./remotion.generate-asset-map.js",
+		"start:dev": "remotion studio ./remotion.root.js",
+		"remotion:build": "tsx remotion.build.js",
+		"remotion:upgrade": "remotion upgrade",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/shortify.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/builder-group/shortify/issues"
+	},
+	"homepage": "",
+	"dependencies": {
+		"@blgc/utils": "^0.0.20",
+		"@radix-ui/react-icons": "^1.3.0",
+		"@remotion/zod-types": "4.0.212",
+		"clsx": "^2.1.1",
+		"lucide-react": "^0.445.0",
+		"md5": "^2.3.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"remotion": "4.0.212",
+		"tailwind-merge": "^2.5.2",
+		"zod": "3.23.8"
+	},
+	"devDependencies": {
+		"@remotion/bundler": "^4.0.212",
+		"@remotion/cli": "4.0.212",
+		"@remotion/enable-scss": "^4.0.212",
+		"@remotion/eslint-config": "4.0.212",
+		"@remotion/tailwind": "^4.0.212",
+		"@types/md5": "^2.3.5",
+		"@types/react": "^18.3.7",
+		"@types/web": "^0.0.163",
+		"autoprefixer": "^10.4.20",
+		"css-loader": "^7.1.2",
+		"postcss": "^8.4.47",
+		"rollup-plugin-sass": "^1.13.2",
+		"sass": "^1.79.3",
+		"sass-loader": "^16.0.2",
+		"tailwindcss": "^3.4.12",
+		"tsconfig-paths-webpack-plugin": "^4.1.0",
+		"tsx": "^4.19.1"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"asset-map.json"
+	]
+}
