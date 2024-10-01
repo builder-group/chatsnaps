@@ -3,6 +3,8 @@ import type * as hono from 'hono/types';
 import { type StatusCode } from 'hono/utils/http-status';
 import { AppError } from '@blgc/openapi-router';
 
+import { type TAppErrorDto } from '../schema';
+
 type HeaderRecord = Record<string, string | string[]>;
 
 export const errorHandler: hono.ErrorHandler = async (err, c) => {
@@ -64,10 +66,3 @@ export const errorHandler: hono.ErrorHandler = async (err, c) => {
 
 	return c.json(jsonResponse, statusCode as StatusCode, headers);
 };
-
-interface TAppErrorDto {
-	error_code: string;
-	error_description?: string;
-	error_uri?: string | null;
-	additional_errors?: Record<string, never>[];
-}

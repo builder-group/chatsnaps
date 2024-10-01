@@ -1,5 +1,12 @@
+import { createRoute, z } from '@hono/zod-openapi';
 import { SChatStoryCompProps } from '@repo/video';
-import * as z from 'zod';
+
+import {
+	BadRequestResponse,
+	InternalServerErrorResponse,
+	JsonRequestBody,
+	JsonSuccessResponse
+} from '../../schema';
 
 const SChatStoryVideoEvent = z.union([
 	z.object({
@@ -36,3 +43,28 @@ export const SChatStoryVideoDto = z.object({
 	overlay: SChatStoryCompProps.shape.overlay
 });
 export type TChatStoryVideoDto = z.infer<typeof SChatStoryVideoDto>;
+
+export const RenderChatStoryVideoRoute = createRoute({
+	method: 'post',
+	path: '/v1/video/chatstory/render',
+	tags: ['video'],
+	operationId: 'renderChatStoryVideo',
+	request: {
+		body: JsonRequestBody(SChatStoryVideoDto),
+		query: z.object({
+			voiceover: z.enum(['true', 'false']).optional(),
+			renderVideo: z.enum(['true', 'false']).optional()
+		})
+	},
+	responses: {
+		200: JsonSuccessResponse(
+			z.object({
+				url: z.string().nullable(),
+				props: SChatStoryCompProps.nullable(),
+				creditsSpent: z.number()
+			})
+		),
+		400: BadRequestResponse,
+		500: InternalServerErrorResponse
+	}
+});
