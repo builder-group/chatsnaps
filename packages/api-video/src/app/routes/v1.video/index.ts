@@ -179,11 +179,14 @@ router.openapi(RenderChatStoryVideoRoute, async (c) => {
 	};
 
 	if (!renderVideo) {
-		return c.json({
-			url: null,
-			props: videoProps,
-			creditsSpent
-		});
+		return c.json(
+			{
+				url: null,
+				props: videoProps,
+				creditsSpent
+			},
+			200
+		);
 	}
 
 	const composition = await selectComposition({
@@ -212,9 +215,12 @@ router.openapi(RenderChatStoryVideoRoute, async (c) => {
 		(e) => new AppError('#ERR_DOWNLOAD_URL', 500, { description: e.message })
 	).unwrap();
 
-	return c.json({
-		url: downloadUrl,
-		props: null,
-		creditsSpent
-	});
+	return c.json(
+		{
+			url: downloadUrl,
+			props: null,
+			creditsSpent
+		},
+		200
+	);
 });

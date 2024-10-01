@@ -105,7 +105,7 @@ export const InternalServerErrorResponse: TResponseConfig<{
 
 export interface TResponseConfig<GContent extends ZodContentObject>
 	extends Omit<ResponseConfig, 'content'> {
-	content?: GContent;
+	content: GContent;
 }
 
 export interface TRequestBody<GContent extends ZodContentObject>
