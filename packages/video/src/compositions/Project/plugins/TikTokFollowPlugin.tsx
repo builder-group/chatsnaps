@@ -6,7 +6,18 @@ import { getInterpolatedValue } from '../helper';
 import { STimelinePluginItem } from '../schema';
 import { TTimelinePluginItemFC } from './types';
 
-export const TikTokFollowPlugin: TTimelinePluginItemFC<TTikTokFollowTimelineItem> = (props) => {
+const STikTokFollowTimelineItem = STimelinePluginItem.extend({
+	pluginId: z.literal('tiktok-follow'),
+	props: z.object({
+		media: SVisualMedia,
+		text: z.string().optional()
+	})
+});
+
+export const TikTokFollowPlugin: TTimelinePluginItemFC<
+	z.infer<typeof STikTokFollowTimelineItem>,
+	'tiktok-follow'
+> = (props) => {
 	const { item } = props;
 	const frame = useCurrentFrame();
 	const { fps } = useVideoConfig();
@@ -128,15 +139,4 @@ export const TikTokFollowPlugin: TTimelinePluginItemFC<TTikTokFollowTimelineItem
 	);
 };
 TikTokFollowPlugin.id = 'tiktok-follow';
-TikTokFollowPlugin.isPlugin = (item): item is TTikTokFollowTimelineItem => {
-	return STikTokFollowTimelineItem.safeParse(item).success;
-};
-
-const STikTokFollowTimelineItem = STimelinePluginItem.extend({
-	pluginId: z.literal('tiktok-follow'),
-	props: z.object({
-		media: SVisualMedia,
-		text: z.string().optional()
-	})
-});
-type TTikTokFollowTimelineItem = z.infer<typeof STikTokFollowTimelineItem>;
+TikTokFollowPlugin.schema = STikTokFollowTimelineItem;

@@ -1,10 +1,14 @@
 import React from 'react';
+import { ZodType } from 'zod';
 
 import { TTimelinePluginItem } from '../schema';
 
-export type TTimelinePluginItemFC<GTimelinePluginItem extends TTimelinePluginItem> = React.FC<{
+export type TTimelinePluginItemFC<
+	GTimelinePluginItem extends TTimelinePluginItem,
+	GPluginId extends string
+> = React.FC<{
 	item: GTimelinePluginItem;
 }> & {
-	id: string;
-	isPlugin: (item: unknown) => item is GTimelinePluginItem;
+	id: GPluginId;
+	schema: ZodType<Omit<GTimelinePluginItem, 'pluginId'> & { pluginId: GPluginId }>;
 };
