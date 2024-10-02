@@ -1,7 +1,7 @@
 import React from 'react';
 import { Audio, Sequence } from 'remotion';
 
-import { getAbsoluteSrc } from '../get-absolute-src';
+import { getAbsoluteSrc } from '../helper';
 import { TTimelineAudioItem } from '../schema';
 
 export const TimelineAudioItem: React.FC<TProps> = (props) => {

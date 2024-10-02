@@ -7,7 +7,7 @@ import {
 	STimelineMixin,
 	STransformMixin,
 	SVisibilityMixin
-} from './schema';
+} from '../schema';
 
 export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineMixin> {
 	return STimelineMixin.safeParse(item).success;

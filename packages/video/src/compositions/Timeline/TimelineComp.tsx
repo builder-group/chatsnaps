@@ -15,7 +15,7 @@ export const TimelineComp: TRemotionFC<z.infer<typeof STimelineCompProps>> = (pr
 	}, [timeline]);
 
 	return (
-		<AbsoluteFill style={{ width, height }}>
+		<AbsoluteFill className="bg-blue-500" style={{ width, height }}>
 			{sortedTimelineItems.map((item, index) => (
 				<TimelineItem key={`${item.id}-${index}`} item={item} />
 			))}

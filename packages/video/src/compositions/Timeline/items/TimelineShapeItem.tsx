@@ -1,16 +1,16 @@
 import React from 'react';
 import { Img, OffthreadVideo, Sequence, useCurrentFrame } from 'remotion';
 
-import { getAbsoluteSrc } from '../get-absolute-src';
-import { getInterpolatedValue } from '../get-interpolated-value';
 import {
+	getAbsoluteSrc,
+	getInterpolatedValue,
 	hasFillMixin,
 	hasOpacityMixin,
 	hasSizeMixin,
 	hasTimelineMixin,
 	hasTransformMixin,
 	hasVisibilityMixin
-} from '../has-mixin';
+} from '../helper';
 import { TTimelineShapeItem } from '../schema';
 
 export const TimelineShapeItem: React.FC<TProps> = (props) => {

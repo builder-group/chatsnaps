@@ -1,6 +1,6 @@
 import { interpolate } from 'remotion';
 
-import { TValueOrKeyframe } from './schema';
+import { TValueOrKeyframe } from '../schema';
 
 export function getInterpolatedValue<GValue extends number | string>(
 	valueOrKeyframes: TValueOrKeyframe<GValue>,
