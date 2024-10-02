@@ -26,12 +26,6 @@ export type TValueOrKeyframe<GValue> = GValue | { frame: number; value: GValue }
 // Mixin schemas
 // =============================================================================
 
-export const STimelineMixin = z.object({
-	id: z.string(),
-	startFrame: STimelinePosition,
-	durationInFrames: SDuration
-});
-
 export const SSizeMixin = z.object({
 	width: createValueOrKeyframeSchema(z.number()),
 	height: createValueOrKeyframeSchema(z.number())
@@ -79,16 +73,18 @@ export const SFillMixin = z.object({
 });
 
 // =============================================================================
-// Item schemas
+// Timeline Items
 // =============================================================================
 
-export const STimelinePluginItem = STimelineMixin.merge(SVisibilityMixin).extend({
-	type: z.literal('Plugin'),
-	pluginId: z.string(),
-	content: z.any()
+export const STimelineItemMixin = z.object({
+	type: z.string(),
+	id: z.string(),
+	startFrame: STimelinePosition,
+	durationInFrames: SDuration
 });
+export type TTimelineItemMixin = z.infer<typeof STimelineItemMixin>;
 
-export const STimelineAudioItem = STimelineMixin.extend({
+export const STimelineAudioItem = STimelineItemMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
 	volume: z.number().min(0).max(1),
@@ -97,7 +93,7 @@ export const STimelineAudioItem = STimelineMixin.extend({
 });
 export type TTimelineAudioItem = z.infer<typeof STimelineAudioItem>;
 
-export const STimelineRectangleItem = STimelineMixin.merge(SSizeMixin)
+export const STimelineRectangleItem = STimelineItemMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
 	.merge(SVisibilityMixin)
 	.merge(SOpacityMixin)
@@ -105,7 +101,7 @@ export const STimelineRectangleItem = STimelineMixin.merge(SSizeMixin)
 		type: z.literal('Rectangle')
 	});
 
-export const STimelineEllipseItem = STimelineMixin.merge(SSizeMixin)
+export const STimelineEllipseItem = STimelineItemMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
 	.merge(SVisibilityMixin)
 	.merge(SOpacityMixin)
@@ -113,28 +109,62 @@ export const STimelineEllipseItem = STimelineMixin.merge(SSizeMixin)
 		type: z.literal('Ellipse')
 	});
 
-export const STimelineShapeItem = z.union([STimelineRectangleItem, STimelineEllipseItem]);
+export const STimelineShapeItem = z.discriminatedUnion('type', [
+	STimelineRectangleItem,
+	STimelineEllipseItem
+]);
 export type TTimelineShapeItem = z.infer<typeof STimelineShapeItem>;
 
-export const STimelineItem = z.union([STimelinePluginItem, STimelineAudioItem, STimelineShapeItem]);
+export const STimelinePluginItem = STimelineItemMixin.merge(SVisibilityMixin)
+	.merge(SOpacityMixin)
+	.extend({
+		type: z.literal('Plugin'),
+		pluginId: z.string(),
+		props: z.unknown().optional()
+	});
+export type TTimelinePluginItem = z.infer<typeof STimelinePluginItem>;
+
+export const STimelineItem = z.discriminatedUnion('type', [
+	STimelineAudioItem,
+	STimelineRectangleItem,
+	STimelineEllipseItem,
+	STimelinePluginItem
+]);
 export type TTimelineItem = z.infer<typeof STimelineItem>;
 
 // =============================================================================
-// Other
+// Timeline
 // =============================================================================
 
-export const STimelineCompProps = z.object({
-	name: z.string(),
+export const STimelineMixin = z.object({
+	type: z.string(),
+	id: z.string(),
+	items: z.array(STimelineItemMixin)
+});
+export type TTimelineMixin = z.infer<typeof STimelineMixin>;
+
+export const STimelinePlugin = STimelineMixin.extend({
+	type: z.literal('Plugin'),
+	props: z.unknown().optional()
+});
+export type TTimelinePlugin = z.infer<typeof STimelinePlugin>;
+
+export const STimeline = STimelineMixin.extend({
+	type: z.literal('Timeline'),
+	items: z.array(STimelineItem)
+});
+export type TTimeline = z.infer<typeof STimeline>;
+
+// =============================================================================
+// Project
+// =============================================================================
+
+export const SProjectCompProps = z.object({
+	id: z.string(),
 	width: z.number().int().positive().optional(),
 	height: z.number().int().positive().optional(),
 	fps: z.number().positive().optional(),
 	durationInFrames: z.number().int().positive().optional(),
-	timeline: z.array(STimelineItem),
-	plugins: z.array(z.lazy(() => SPlugin))
-});
-
-const SPlugin = z.object({
-	id: z.string(),
-	version: z.string(),
-	render: z.function().args(STimelinePluginItem, z.number().int()).returns(z.void())
+	timelines: z.array(z.discriminatedUnion('type', [STimeline, STimelinePlugin])),
+	plugins: z.array(STimelinePlugin)
 });

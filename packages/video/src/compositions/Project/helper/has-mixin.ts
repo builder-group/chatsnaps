@@ -4,13 +4,13 @@ import {
 	SFillMixin,
 	SOpacityMixin,
 	SSizeMixin,
-	STimelineMixin,
+	STimelineItemMixin,
 	STransformMixin,
 	SVisibilityMixin
 } from '../schema';
 
-export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineMixin> {
-	return STimelineMixin.safeParse(item).success;
+export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineItemMixin> {
+	return STimelineItemMixin.safeParse(item).success;
 }
 
 export function hasSizeMixin(item: unknown): item is z.infer<typeof SSizeMixin> {

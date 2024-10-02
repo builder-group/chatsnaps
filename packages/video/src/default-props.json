@@ -2091,33 +2091,38 @@
 			"height": 1920
 		}
 	},
-	"timeline": {
-		"name": "Example Project",
+	"project": {
+		"id": "example-project",
 		"width": 1920,
 		"height": 1080,
 		"fps": 30,
 		"duration": 300,
-		"timeline": [
+		"timelines": [
 			{
-				"id": "moving-rectangle",
-				"type": "Rectangle",
-				"startFrame": 0,
-				"durationInFrames": 300,
-				"width": 200,
-				"height": 100,
-				"x": [
-					{ "frame": 0, "value": -200 },
-					{ "frame": 300, "value": 1920 }
-				],
-				"y": 490,
-				"visible": true,
-				"opacity": [
-					{ "frame": 0, "value": 0 },
-					{ "frame": 30, "value": 1 },
-					{ "frame": 270, "value": 1 },
-					{ "frame": 300, "value": 0 }
-				],
-				"fill": { "type": "solid", "color": "#ff0000" }
+				"id": "main",
+				"items": [
+					{
+						"id": "moving-rectangle",
+						"type": "Rectangle",
+						"startFrame": 0,
+						"durationInFrames": 300,
+						"width": 200,
+						"height": 100,
+						"x": [
+							{ "frame": 0, "value": -200 },
+							{ "frame": 300, "value": 1920 }
+						],
+						"y": 490,
+						"visible": true,
+						"opacity": [
+							{ "frame": 0, "value": 0 },
+							{ "frame": 30, "value": 1 },
+							{ "frame": 270, "value": 1 },
+							{ "frame": 300, "value": 0 }
+						],
+						"fill": { "type": "solid", "color": "#ff0000" }
+					}
+				]
 			}
 		],
 		"plugins": []

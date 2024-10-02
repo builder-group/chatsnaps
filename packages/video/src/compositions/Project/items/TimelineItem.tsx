@@ -2,6 +2,7 @@ import React from 'react';
 
 import { TTimelineItem } from '../schema';
 import { TimelineAudioItem } from './TimelineAudioItem';
+import { TimelinePluginItem } from './TimelinePluginItem';
 import { TimelineShapeItem } from './TimelineShapeItem';
 
 export const TimelineItem: React.FC<TProps> = (props) => {
@@ -9,7 +10,7 @@ export const TimelineItem: React.FC<TProps> = (props) => {
 
 	switch (item.type) {
 		case 'Plugin':
-			return null;
+			return <TimelinePluginItem item={item} />;
 		case 'Audio':
 			return <TimelineAudioItem item={item} />;
 		case 'Rectangle':

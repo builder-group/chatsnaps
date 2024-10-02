@@ -1,6 +1,6 @@
 import { Composition } from 'remotion';
 
-import { ChatStoryComp, TikTokFollowComp, TikTokLikeComp, TimelineComp } from './compositions';
+import { ChatStoryComp, ProjectComp, TikTokFollowComp, TikTokLikeComp } from './compositions';
 import defaultProps from './default-props.json';
 
 import './style.css';
@@ -20,15 +20,15 @@ export const Root: React.FC = () => {
 				defaultProps={defaultProps.chatstory as any}
 			/>
 			<Composition
-				id={TimelineComp.id}
-				component={TimelineComp}
-				calculateMetadata={TimelineComp.calculateMetadata}
+				id={ProjectComp.id}
+				component={ProjectComp}
+				calculateMetadata={ProjectComp.calculateMetadata}
 				durationInFrames={0} // Set by calculateMetadata
 				fps={30} // Set by calculateMetadata
 				width={1080} // Set by calculateMetadata
 				height={1920} // Set by calculateMetadata
 				schema={TikTokLikeComp.schema}
-				defaultProps={defaultProps.timeline as any}
+				defaultProps={defaultProps.project as any}
 			/>
 			<Composition
 				id={TikTokFollowComp.id}
