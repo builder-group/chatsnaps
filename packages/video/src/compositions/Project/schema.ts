@@ -36,10 +36,6 @@ export const STransformMixin = z.object({
 	y: createValueOrKeyframeSchema(z.number())
 });
 
-export const SVisibilityMixin = z.object({
-	visible: z.boolean()
-});
-
 export const SOpacityMixin = z.object({
 	opacity: createValueOrKeyframeSchema(z.number().min(0).max(1))
 });
@@ -78,7 +74,7 @@ export const SFillMixin = z.object({
 
 export const STimelineItemMixin = z.object({
 	type: z.string(),
-	id: z.string(),
+	// id: z.string(),
 	startFrame: STimelinePosition,
 	durationInFrames: SDuration
 });
@@ -95,7 +91,6 @@ export type TTimelineAudioItem = z.infer<typeof STimelineAudioItem>;
 
 export const STimelineRectangleItem = STimelineItemMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
-	.merge(SVisibilityMixin)
 	.merge(SOpacityMixin)
 	.extend({
 		type: z.literal('Rectangle')
@@ -103,7 +98,6 @@ export const STimelineRectangleItem = STimelineItemMixin.merge(SSizeMixin)
 
 export const STimelineEllipseItem = STimelineItemMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
-	.merge(SVisibilityMixin)
 	.merge(SOpacityMixin)
 	.extend({
 		type: z.literal('Ellipse')
@@ -115,7 +109,8 @@ export const STimelineShapeItem = z.discriminatedUnion('type', [
 ]);
 export type TTimelineShapeItem = z.infer<typeof STimelineShapeItem>;
 
-export const STimelinePluginItem = STimelineItemMixin.merge(SVisibilityMixin)
+export const STimelinePluginItem = STimelineItemMixin.merge(SSizeMixin)
+	.merge(STransformMixin)
 	.merge(SOpacityMixin)
 	.extend({
 		type: z.literal('Plugin'),
@@ -168,3 +163,23 @@ export const SProjectCompProps = z.object({
 	timelines: z.array(z.discriminatedUnion('type', [STimeline, STimelinePlugin])),
 	plugins: z.array(STimelinePlugin)
 });
+
+export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineItemMixin> {
+	return STimelineItemMixin.safeParse(item).success;
+}
+
+export function hasSizeMixin(item: unknown): item is z.infer<typeof SSizeMixin> {
+	return SSizeMixin.safeParse(item).success;
+}
+
+export function hasTransformMixin(item: unknown): item is z.infer<typeof STransformMixin> {
+	return STransformMixin.safeParse(item).success;
+}
+
+export function hasOpacityMixin(item: unknown): item is z.infer<typeof SOpacityMixin> {
+	return SOpacityMixin.safeParse(item).success;
+}
+
+export function hasFillMixin(item: unknown): item is z.infer<typeof SFillMixin> {
+	return SFillMixin.safeParse(item).success;
+}

@@ -1,21 +1,19 @@
 import React from 'react';
 import { Img, OffthreadVideo, Sequence, useCurrentFrame } from 'remotion';
 
+import { getAbsoluteSrc, getInterpolatedValue } from '../helper';
 import {
-	getAbsoluteSrc,
-	getInterpolatedValue,
 	hasFillMixin,
 	hasOpacityMixin,
 	hasSizeMixin,
 	hasTimelineMixin,
 	hasTransformMixin,
-	hasVisibilityMixin
-} from '../helper';
-import { TTimelineShapeItem } from '../schema';
+	TTimelineShapeItem
+} from '../schema';
 
 export const TimelineShapeItem: React.FC<TProps> = (props) => {
 	const { item } = props;
-	const currentFrame = useCurrentFrame();
+	const frame = useCurrentFrame();
 
 	if (!hasTimelineMixin(item)) {
 		return null;
@@ -27,21 +25,17 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 	};
 
 	if (hasSizeMixin(item)) {
-		style.width = getInterpolatedValue(item.width, currentFrame);
-		style.height = getInterpolatedValue(item.height, currentFrame);
+		style.width = getInterpolatedValue(item.width, frame);
+		style.height = getInterpolatedValue(item.height, frame);
 	}
 
 	if (hasTransformMixin(item)) {
-		style.left = getInterpolatedValue(item.x, currentFrame);
-		style.top = getInterpolatedValue(item.y, currentFrame);
-	}
-
-	if (hasVisibilityMixin(item)) {
-		style.display = item.visible ? 'block' : 'none';
+		style.left = getInterpolatedValue(item.x, frame);
+		style.top = getInterpolatedValue(item.y, frame);
 	}
 
 	if (hasOpacityMixin(item)) {
-		style.opacity = getInterpolatedValue(item.opacity, currentFrame);
+		style.opacity = getInterpolatedValue(item.opacity, frame);
 	}
 
 	if (hasFillMixin(item)) {
@@ -76,7 +70,7 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
+		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames} name={item.type}>
 			<div style={style}>{content}</div>
 		</Sequence>
 	);

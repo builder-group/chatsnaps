@@ -2092,7 +2092,6 @@
 		}
 	},
 	"project": {
-		"id": "example-project",
 		"width": 1920,
 		"height": 1080,
 		"fps": 30,
@@ -2103,7 +2102,6 @@
 				"id": "main",
 				"items": [
 					{
-						"id": "moving-rectangle",
 						"type": "Rectangle",
 						"startFrame": 0,
 						"durationInFrames": 300,
@@ -2122,6 +2120,25 @@
 							{ "frame": 300, "value": 0 }
 						],
 						"fill": { "type": "solid", "color": "#ff0000" }
+					},
+					{
+						"type": "Plugin",
+						"pluginId": "tiktok-follow",
+						"props": {
+							"media": {
+								"type": "Image",
+								"src": "static/image/chatsnap.png"
+							},
+							"text": "Tap follow! 📲"
+						},
+						"startFrame": 0,
+						"durationInFrames": 120,
+						"width": 1920,
+						"height": 500,
+						"x": 0,
+						"y": 10,
+						"visible": true,
+						"opacity": 1
 					}
 				]
 			}
