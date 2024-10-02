@@ -1,1 +1,5 @@
-export * from './TikTokFollow';
+import { TikTokFollowPlugin } from './TikTokFollowPlugin';
+
+export const timelinePluginItems = {
+	[TikTokFollowPlugin.id]: TikTokFollowPlugin
+};
