@@ -3,8 +3,8 @@ import { AbsoluteFill, useVideoConfig } from 'remotion';
 import { z } from 'zod';
 
 import { TRemotionFC } from '../../types';
+import { TimelineItem } from './items';
 import { STimelineCompProps } from './schema';
-import { TimelineItem } from './TimelineItem';
 
 export const TimelineComp: TRemotionFC<z.infer<typeof STimelineCompProps>> = (props) => {
 	const { timeline } = props;
@@ -17,7 +17,7 @@ export const TimelineComp: TRemotionFC<z.infer<typeof STimelineCompProps>> = (pr
 	return (
 		<AbsoluteFill style={{ width, height }}>
 			{sortedTimelineItems.map((item, index) => (
-				<TimelineItem item={item} index={index} key={`${item.id}-${index}`} />
+				<TimelineItem key={`${item.id}-${index}`} item={item} />
 			))}
 		</AbsoluteFill>
 	);

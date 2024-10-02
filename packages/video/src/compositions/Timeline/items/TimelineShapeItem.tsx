@@ -1,8 +1,8 @@
 import React from 'react';
-import { Sequence, useCurrentFrame } from 'remotion';
-import { z } from 'zod';
+import { Img, OffthreadVideo, Sequence, useCurrentFrame } from 'remotion';
 
-import { getInterpolatedValue } from './get-interpolated-value';
+import { getAbsoluteSrc } from '../get-absolute-src';
+import { getInterpolatedValue } from '../get-interpolated-value';
 import {
 	hasFillMixin,
 	hasOpacityMixin,
@@ -10,11 +10,11 @@ import {
 	hasTimelineMixin,
 	hasTransformMixin,
 	hasVisibilityMixin
-} from './has-mixin';
-import { STimelineItem } from './schema';
+} from '../has-mixin';
+import { TTimelineShapeItem } from '../schema';
 
-export const TimelineItem: React.FC<TProps> = (props) => {
-	const { item, index } = props;
+export const TimelineShapeItem: React.FC<TProps> = (props) => {
+	const { item } = props;
 	const currentFrame = useCurrentFrame();
 
 	if (!hasTimelineMixin(item)) {
@@ -47,23 +47,26 @@ export const TimelineItem: React.FC<TProps> = (props) => {
 	if (hasFillMixin(item)) {
 		if (item.fill.type === 'video') {
 			content = (
-				<video
-					src={item.fill.src}
+				<OffthreadVideo
+					src={getAbsoluteSrc(item.fill.src)}
 					style={{
 						objectFit: item.fill.objectFit,
-						width: '100%',
-						height: '100%'
+						width: item.fill.width ?? '100%',
+						height: item.fill.height ?? '100%'
 					}}
+					startFrom={item.fill.startFrom}
+					endAt={item.fill.endAt}
+					playbackRate={item.fill.playbackRate}
 				/>
 			);
 		} else if (item.fill.type === 'image') {
 			content = (
-				<img
-					src={item.fill.src}
+				<Img
+					src={getAbsoluteSrc(item.fill.src)}
 					style={{
 						objectFit: item.fill.objectFit,
-						width: '100%',
-						height: '100%'
+						width: item.fill.width ?? '100%',
+						height: item.fill.height ?? '100%'
 					}}
 				/>
 			);
@@ -73,17 +76,12 @@ export const TimelineItem: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<Sequence
-			key={`${item.id}-${index}`}
-			from={item.startFrame}
-			durationInFrames={item.durationInFrames}
-		>
+		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
 			<div style={style}>{content}</div>
 		</Sequence>
 	);
 };
 
 interface TProps {
-	item: z.infer<typeof STimelineItem>;
-	index: number;
+	item: TTimelineShapeItem;
 }

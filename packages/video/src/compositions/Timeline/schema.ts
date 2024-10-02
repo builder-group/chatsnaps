@@ -55,7 +55,10 @@ export const SVideoFill = z.object({
 	src: z.string().url(),
 	objectFit: SObjectFit,
 	width: z.number().int().positive(),
-	height: z.number().int().positive()
+	height: z.number().int().positive(),
+	startFrom: z.number().int().positive().optional(),
+	endAt: z.number().int().positive().optional(),
+	playbackRate: z.number().optional()
 });
 
 export const SImageFill = z.object({
@@ -79,19 +82,22 @@ export const SFillMixin = z.object({
 // Item schemas
 // =============================================================================
 
-export const SPluginItem = STimelineMixin.merge(SVisibilityMixin).extend({
+export const STimelinePluginItem = STimelineMixin.merge(SVisibilityMixin).extend({
 	type: z.literal('Plugin'),
 	pluginId: z.string(),
 	content: z.any()
 });
 
-export const SAudioItem = STimelineMixin.extend({
+export const STimelineAudioItem = STimelineMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
-	volume: z.number().min(0).max(1)
+	volume: z.number().min(0).max(1),
+	startFrom: z.number().int().positive().optional(),
+	endAt: z.number().int().positive().optional()
 });
+export type TTimelineAudioItem = z.infer<typeof STimelineAudioItem>;
 
-export const SRectangleItem = STimelineMixin.merge(SSizeMixin)
+export const STimelineRectangleItem = STimelineMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
 	.merge(SVisibilityMixin)
 	.merge(SOpacityMixin)
@@ -99,7 +105,19 @@ export const SRectangleItem = STimelineMixin.merge(SSizeMixin)
 		type: z.literal('Rectangle')
 	});
 
-export const STimelineItem = z.union([SPluginItem, SAudioItem, SRectangleItem]);
+export const STimelineEllipseItem = STimelineMixin.merge(SSizeMixin)
+	.merge(STransformMixin)
+	.merge(SVisibilityMixin)
+	.merge(SOpacityMixin)
+	.extend({
+		type: z.literal('Ellipse')
+	});
+
+export const STimelineShapeItem = z.union([STimelineRectangleItem, STimelineEllipseItem]);
+export type TTimelineShapeItem = z.infer<typeof STimelineShapeItem>;
+
+export const STimelineItem = z.union([STimelinePluginItem, STimelineAudioItem, STimelineShapeItem]);
+export type TTimelineItem = z.infer<typeof STimelineItem>;
 
 // =============================================================================
 // Other
@@ -118,5 +136,5 @@ export const STimelineCompProps = z.object({
 const SPlugin = z.object({
 	id: z.string(),
 	version: z.string(),
-	render: z.function().args(SPluginItem, z.number().int()).returns(z.void())
+	render: z.function().args(STimelinePluginItem, z.number().int()).returns(z.void())
 });
