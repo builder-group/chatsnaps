@@ -2099,6 +2099,7 @@
 		"duration": 300,
 		"timelines": [
 			{
+				"type": "Timeline",
 				"id": "main",
 				"items": [
 					{
