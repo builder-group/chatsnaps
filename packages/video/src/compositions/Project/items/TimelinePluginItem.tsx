@@ -2,15 +2,15 @@ import React from 'react';
 import { Sequence, useCurrentFrame } from 'remotion';
 
 import { getInterpolatedValue } from '../helper';
-import { TIMELINE_PLUGIN_ITEM_MAP } from '../plugins';
+import { getPlugin } from '../plugins';
 import { TTimelinePluginItem } from '../schema';
 
 export const TimelinePluginItem: React.FC<TProps> = (props) => {
 	const { item } = props;
 	const frame = useCurrentFrame();
 
-	const Plugin = TIMELINE_PLUGIN_ITEM_MAP[item.pluginId];
-	if (Plugin != null && Plugin.schema.safeParse(item).success) {
+	const plugin = getPlugin(item.pluginId);
+	if (plugin != null && plugin.schema.safeParse(item).success) {
 		return (
 			<Sequence
 				from={item.startFrame}
@@ -28,7 +28,7 @@ export const TimelinePluginItem: React.FC<TProps> = (props) => {
 						overflow: 'hidden'
 					}}
 				>
-					<Plugin item={item} />
+					<plugin.component item={item} />
 				</div>
 			</Sequence>
 		);
