@@ -1,6 +1,6 @@
 import { staticFile } from 'remotion';
 
-export function getAbsoluteSrc(src: string): string {
+export function getStaticSrc(src: string): string {
 	if (src.startsWith('http')) {
 		return src;
 	}

@@ -12,7 +12,7 @@ import { HeartIcon } from '@/components';
 import { cn } from '@/lib';
 
 import { STimelineItemPlugin } from '../schema';
-import { registerPlugin } from './plugin-registry';
+import { registerTimelineItemPlugin } from './plugin-registry';
 
 const COLORS = ['#FF69B4', '#FF1493', '#FF6347', '#FFD700', '#FF4500'];
 
@@ -25,8 +25,7 @@ export const STikTokLikePlugin = STimelineItemPlugin.extend({
 });
 export type TTkiTokLikePlugin = z.infer<typeof STikTokLikePlugin>;
 
-registerPlugin({
-	type: 'TimelineItem',
+registerTimelineItemPlugin({
 	id: 'tiktok-like',
 	schema: STikTokLikePlugin,
 	component: (props) => {

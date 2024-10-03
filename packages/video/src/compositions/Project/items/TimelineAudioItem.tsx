@@ -1,8 +1,8 @@
 import React from 'react';
 import { Audio, Sequence } from 'remotion';
+import { getStaticSrc } from '@/lib';
 
-import { getAbsoluteSrc } from '../helper';
-import { TTimelineAudioItem } from '../schema';
+import { TAudioTimelineItem } from '../schema';
 
 export const TimelineAudioItem: React.FC<TProps> = (props) => {
 	const { item } = props;
@@ -10,7 +10,7 @@ export const TimelineAudioItem: React.FC<TProps> = (props) => {
 	return (
 		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
 			<Audio
-				src={getAbsoluteSrc(item.src)}
+				src={getStaticSrc(item.src)}
 				startFrom={item.startFrom}
 				endAt={item.endAt}
 				volume={item.volume}
@@ -20,5 +20,5 @@ export const TimelineAudioItem: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	item: TTimelineAudioItem;
+	item: TAudioTimelineItem;
 }

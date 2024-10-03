@@ -1,6 +1,6 @@
 import { Audio, Img, OffthreadVideo } from 'remotion';
+import { getStaticSrc } from '@/lib';
 
-import { getAbsoluteSrc } from './get-absolute-src';
 import { TMedia } from './schema';
 
 export const Media: React.FC<TProps> = (props) => {
@@ -10,7 +10,7 @@ export const Media: React.FC<TProps> = (props) => {
 		case 'Image':
 			return (
 				<Img
-					src={getAbsoluteSrc(media.src)}
+					src={getStaticSrc(media.src)}
 					style={{
 						objectFit: media.objectFit,
 						width: media.width,
@@ -23,7 +23,7 @@ export const Media: React.FC<TProps> = (props) => {
 		case 'Video':
 			return (
 				<OffthreadVideo
-					src={getAbsoluteSrc(media.src)}
+					src={getStaticSrc(media.src)}
 					style={{
 						objectFit: media.objectFit,
 						width: media.width,
@@ -39,7 +39,7 @@ export const Media: React.FC<TProps> = (props) => {
 		case 'Audio':
 			return (
 				<Audio
-					src={getAbsoluteSrc(media.src)}
+					src={getStaticSrc(media.src)}
 					startFrom={media.startFrom}
 					style={style}
 					{...elementProps}

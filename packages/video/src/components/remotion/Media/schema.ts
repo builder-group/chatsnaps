@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
-const SBaseVisualMedia = z.object({
+const SVisualMediaMixin = z.object({
 	src: z.string(),
 	width: z.number().positive().optional(),
 	height: z.number().positive().optional(),
 	objectFit: z.enum(['fill', 'contain', 'cover', 'none']).optional()
 });
 
-export const SImageMedia = SBaseVisualMedia.extend({
+export const SImageMedia = SVisualMediaMixin.extend({
 	type: z.literal('Image')
 });
 
-export const SVideoMedia = SBaseVisualMedia.extend({
+export const SVideoMedia = SVisualMediaMixin.extend({
 	type: z.literal('Video'),
 	startFrom: z.number().optional(),
 	endAt: z.number().optional(),

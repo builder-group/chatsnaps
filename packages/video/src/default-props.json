@@ -2158,8 +2158,123 @@
 						"opacity": 1
 					}
 				]
+			},
+			{
+				"type": "Plugin",
+				"pluginId": "chat-story",
+				"width": 1080,
+				"height": 800,
+				"x": 0,
+				"y": 50,
+				"opacity": 1,
+				"props": {
+					"title": "Grandma's DEMONIC Possession?! 😱👵🏼👹",
+					"messenger": {
+						"type": "IMessage",
+						"contact": {
+							"profilePicture": {
+								"type": "Image",
+								"src": "static/image/memoji/1.png"
+							},
+							"name": "Mom"
+						}
+					},
+					"debug": true
+				},
+				"items": [
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "MOM!!! GRANDMA'S EYES JUST ROLLED BACK IN HER HEAD! 😱"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 0,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "What?! 😳"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 109,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "She's been staring at the mirror for 30 mins"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 136,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Not blinking"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 208,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "And now her eyes..."
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 240,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Oh no"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 289,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Not again 😖"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 314,
+						"durationInFrames": 0
+					}
+				]
 			}
-		],
-		"plugins": []
+		]
 	}
 }

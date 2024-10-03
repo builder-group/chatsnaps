@@ -1,14 +1,15 @@
 import React from 'react';
 import { Img, OffthreadVideo, Sequence, useCurrentFrame } from 'remotion';
+import { getStaticSrc } from '@/lib';
 
-import { getAbsoluteSrc, getInterpolatedValue } from '../helper';
+import { getInterpolatedValue } from '../helper';
 import {
 	hasFillMixin,
 	hasOpacityMixin,
 	hasSizeMixin,
 	hasTimelineMixin,
 	hasTransformMixin,
-	TTimelineShapeItem
+	TShapeTimelineItem
 } from '../schema';
 
 export const TimelineShapeItem: React.FC<TProps> = (props) => {
@@ -42,11 +43,11 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 		if (item.fill.type === 'video') {
 			content = (
 				<OffthreadVideo
-					src={getAbsoluteSrc(item.fill.src)}
+					src={getStaticSrc(item.fill.src)}
 					style={{
 						objectFit: item.fill.objectFit,
-						width: item.fill.width ?? '100%',
-						height: item.fill.height ?? '100%'
+						width: item.fill.width,
+						height: item.fill.height
 					}}
 					startFrom={item.fill.startFrom}
 					endAt={item.fill.endAt}
@@ -56,11 +57,11 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 		} else if (item.fill.type === 'image') {
 			content = (
 				<Img
-					src={getAbsoluteSrc(item.fill.src)}
+					src={getStaticSrc(item.fill.src)}
 					style={{
 						objectFit: item.fill.objectFit,
-						width: item.fill.width ?? '100%',
-						height: item.fill.height ?? '100%'
+						width: item.fill.width,
+						height: item.fill.height
 					}}
 				/>
 			);
@@ -77,5 +78,5 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	item: TTimelineShapeItem;
+	item: TShapeTimelineItem;
 }

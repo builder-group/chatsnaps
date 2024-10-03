@@ -4,7 +4,7 @@ import { CheckIcon, Media, SVisualMedia, XIcon } from '@/components';
 import { cn } from '@/lib';
 
 import { STimelineItemPlugin } from '../schema';
-import { registerPlugin } from './plugin-registry';
+import { registerTimelineItemPlugin } from './plugin-registry';
 
 export const STikTokFollowPlugin = STimelineItemPlugin.extend({
 	pluginId: z.literal('tiktok-follow'),
@@ -16,8 +16,7 @@ export const STikTokFollowPlugin = STimelineItemPlugin.extend({
 });
 export type TTikTokFollowPlugin = z.infer<typeof STikTokFollowPlugin>;
 
-registerPlugin({
-	type: 'TimelineItem',
+registerTimelineItemPlugin({
 	id: 'tiktok-follow',
 	schema: STikTokFollowPlugin,
 	component: (props) => {
