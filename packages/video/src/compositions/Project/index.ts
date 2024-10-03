@@ -1,2 +1,4 @@
+export * from './helper';
+export * from './plugins';
 export * from './ProjectComp';
-export { SProjectCompProps } from './schema';
+export * from './schema';

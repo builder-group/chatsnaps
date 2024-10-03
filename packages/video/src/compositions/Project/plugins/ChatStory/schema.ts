@@ -44,8 +44,8 @@ export const SChatStoryMessenger = z.discriminatedUnion('type', [
 export type TChatStoryMessenger = z.infer<typeof SChatStoryMessenger>;
 
 export const SChatStoryPlugin = STimelinePlugin.extend({
+	pluginId: z.literal('chat-story'),
 	props: z.object({
-		title: z.string(),
 		messenger: SChatStoryMessenger,
 		debug: z.boolean().optional()
 	}),

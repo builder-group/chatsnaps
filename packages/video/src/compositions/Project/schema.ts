@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 export const STimelinePosition = z.number().int().min(0);
 export const SDuration = z.number().int().min(0);
-export const SUrl = z.string().url();
+export const SUrl = z.string(); // .url(); // TODO: static path is not really url
 export const SObjectFit = z.enum(['contain', 'cover', 'fill', 'none', 'scale-down']);
 
 function createKeyframeSchema<T extends z.ZodTypeAny>(valueSchema: T) {
@@ -41,8 +41,8 @@ export const SOpacityMixin = z.object({
 });
 
 export const SVideoFill = z.object({
-	type: z.literal('video'),
-	src: z.string().url(),
+	type: z.literal('Video'),
+	src: SUrl,
 	objectFit: SObjectFit,
 	width: z.number().int().positive(),
 	height: z.number().int().positive(),
@@ -52,15 +52,15 @@ export const SVideoFill = z.object({
 });
 
 export const SImageFill = z.object({
-	type: z.literal('image'),
-	src: z.string().url(),
+	type: z.literal('Image'),
+	src: SUrl,
 	objectFit: SObjectFit,
 	width: z.number().int().positive(),
 	height: z.number().int().positive()
 });
 
 export const SSolidFill = z.object({
-	type: z.literal('solid'),
+	type: z.literal('Solid'),
 	color: z.string()
 });
 
@@ -74,7 +74,6 @@ export const SFillMixin = z.object({
 
 export const STimelineItemMixin = z.object({
 	type: z.string(),
-	// id: z.string(),
 	startFrame: STimelinePosition,
 	durationInFrames: SDuration
 });
@@ -90,15 +89,17 @@ export const SAudioTimelineItem = STimelineItemMixin.extend({
 export type TAudioTimelineItem = z.infer<typeof SAudioTimelineItem>;
 
 export const SRectangleTimelineItem = STimelineItemMixin.merge(SSizeMixin)
-	.merge(STransformMixin)
-	.merge(SOpacityMixin)
+	.merge(STransformMixin.partial())
+	.merge(SOpacityMixin.partial())
+	.merge(SFillMixin)
 	.extend({
 		type: z.literal('Rectangle')
 	});
 
 export const SEllipseTimelineItem = STimelineItemMixin.merge(SSizeMixin)
-	.merge(STransformMixin)
-	.merge(SOpacityMixin)
+	.merge(STransformMixin.partial())
+	.merge(SOpacityMixin.partial())
+	.merge(SFillMixin)
 	.extend({
 		type: z.literal('Ellipse')
 	});
@@ -109,11 +110,11 @@ export const SShapeTimelineItem = z.discriminatedUnion('type', [
 ]);
 export type TShapeTimelineItem = z.infer<typeof SShapeTimelineItem>;
 
-export const STimelineItemPlugin = STimelineItemMixin.merge(SSizeMixin)
-	.merge(STransformMixin)
-	.merge(SOpacityMixin)
+export const STimelineItemPlugin = STimelineItemMixin.merge(SSizeMixin.partial())
+	.merge(STransformMixin.partial())
+	.merge(SOpacityMixin.partial())
 	.extend({
-		type: z.literal('Plugin'),
+		type: z.literal('TimelineItemPlugin'),
 		pluginId: z.string(),
 		props: z.unknown().optional()
 	});
@@ -133,15 +134,16 @@ export type TTimelineItem = z.infer<typeof STimelineItem>;
 
 export const STimelineMixin = z.object({
 	type: z.string(),
+	id: z.string(),
 	items: z.array(STimelineItemMixin)
 });
 export type TTimelineMixin = z.infer<typeof STimelineMixin>;
 
-export const STimelinePlugin = STimelineMixin.merge(SSizeMixin)
-	.merge(STransformMixin)
-	.merge(SOpacityMixin)
+export const STimelinePlugin = STimelineMixin.merge(SSizeMixin.partial())
+	.merge(STransformMixin.partial())
+	.merge(SOpacityMixin.partial())
 	.extend({
-		type: z.literal('Plugin'),
+		type: z.literal('TimelinePlugin'),
 		pluginId: z.string(),
 		props: z.unknown().optional()
 	});
@@ -158,13 +160,14 @@ export type TTimeline = z.infer<typeof STimeline>;
 // =============================================================================
 
 export const SProjectCompProps = z.object({
+	name: z.string(),
 	width: z.number().int().positive().optional(),
 	height: z.number().int().positive().optional(),
 	fps: z.number().positive().optional(),
 	durationInFrames: z.number().int().positive().optional(),
-	timelines: z.array(z.discriminatedUnion('type', [STimeline, STimelinePlugin])),
-	plugins: z.array(STimelinePlugin)
+	timelines: z.array(z.discriminatedUnion('type', [STimeline, STimelinePlugin]))
 });
+export type TProjectCompProps = z.infer<typeof SProjectCompProps>;
 
 export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineItemMixin> {
 	return STimelineItemMixin.safeParse(item).success;

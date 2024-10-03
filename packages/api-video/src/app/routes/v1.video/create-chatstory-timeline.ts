@@ -1,4 +1,4 @@
-import { getStaticAsset, type TChatStoryCompProps } from '@repo/video';
+import { getStaticAsset, type TChatStoryPlugin, type TTimeline } from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
@@ -7,50 +7,101 @@ import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
 import { logger } from '@/logger';
 
 import {
-	type TChatStoryVideoDto,
-	type TChatStoryVideoEvent,
+	type TChatStoryScriptDto,
+	type TChatStoryScriptEvent,
 	type TChatStoryVideoParticipant
 } from './schema';
 
-export function createChatHistorySequence(
-	data: TChatStoryVideoDto,
-	options: Partial<TVideoSequenceCreatorConfig> = {}
-): Promise<TResult<{ sequence: TChatStoryCompProps['sequence']; creditsSpent: number }, AppError>> {
-	const creator = new ChatHistorySequenceCreator(data, options);
-	return creator.createSequence();
+export function createChatStoryTimeline(
+	script: TChatStoryScriptDto,
+	options: TChatStoryCreatorOptions = {}
+): Promise<
+	TResult<
+		{
+			messagesTimeline: TChatStoryPlugin;
+			voiceoverTimeline: TTimeline;
+			notificationTimeline: TTimeline;
+			creditsSpent: number;
+		},
+		AppError
+	>
+> {
+	const creator = new ChatStoryCreator(script, options);
+	return creator.create();
 }
 
-class ChatHistorySequenceCreator {
-	private sequence: TChatStoryCompProps['sequence'] = [];
+class ChatStoryCreator {
+	private messagesTimeline: TChatStoryPlugin;
+	private notificationTimeline: TTimeline = {
+		type: 'Timeline',
+		id: 'notification-timeline',
+		items: []
+	};
+	private voiceoverTimeline: TTimeline = {
+		type: 'Timeline',
+		id: 'voiceover-timeline',
+		items: []
+	};
+
 	private currentTimeMs = 0;
 	private creditsSpent = 0;
 
-	private data: TChatStoryVideoDto;
-	private config: TVideoSequenceCreatorConfig;
+	private script: TChatStoryScriptDto;
+	private config: TChatStoryCreatorConfig;
 
 	private voiceContextMap: Record<
 		string,
 		{
-			previousContent: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][];
+			previousContent: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][];
 			previousRequestIds: string[];
 		}
 	> = {};
 
-	constructor(data: TChatStoryVideoDto, options: Partial<TVideoSequenceCreatorConfig> = {}) {
-		this.data = data;
+	constructor(script: TChatStoryScriptDto, options: TChatStoryCreatorOptions = {}) {
+		this.script = script;
 		this.config = {
 			fps: options.fps ?? 30,
 			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
 			voiceover: options.voiceover ?? false,
 			useCached: true
 		};
+		this.messagesTimeline = {
+			type: 'TimelinePlugin',
+			pluginId: 'chat-story',
+			id: 'chat-story-timeline',
+			items: [],
+			width: 1080,
+			height: 800,
+			x: 0,
+			y: 256,
+			props: {
+				messenger: this.script.messenger ?? {
+					type: 'IMessage',
+					contact: {
+						profilePicture: {
+							type: 'Image',
+							src: 'static/image/memoji/1.png'
+						},
+						name: 'Mom'
+					}
+				}
+			}
+		};
 	}
 
-	public async createSequence(): Promise<
-		TResult<{ sequence: TChatStoryCompProps['sequence']; creditsSpent: number }, AppError>
+	public async create(): Promise<
+		TResult<
+			{
+				messagesTimeline: TChatStoryPlugin;
+				voiceoverTimeline: TTimeline;
+				notificationTimeline: TTimeline;
+				creditsSpent: number;
+			},
+			AppError
+		>
 	> {
 		// Resolve voices
-		for (const participant of this.data.participants) {
+		for (const participant of this.script.participants) {
 			if (participant.voice != null) {
 				const voiceId = isVoiceId(participant.voice)
 					? participant.voice
@@ -67,18 +118,25 @@ class ChatHistorySequenceCreator {
 			}
 		}
 
-		// Transform message events to video sequence
-		for (const [index, item] of this.data.events.entries()) {
+		// Transform message events to video timeline
+		for (const [index, item] of this.script.events.entries()) {
 			const result = await this.processEvent({ ...item, index });
 			if (result.isErr()) {
 				return Err(result.error);
 			}
 		}
 
-		return Ok({ sequence: this.sequence, creditsSpent: this.creditsSpent });
+		return Ok({
+			messagesTimeline: this.messagesTimeline,
+			voiceoverTimeline: this.voiceoverTimeline,
+			notificationTimeline: this.notificationTimeline,
+			creditsSpent: this.creditsSpent
+		});
 	}
 
-	private async processEvent(item: TExtendedChatStoryVideoEvent): Promise<TResult<void, AppError>> {
+	private async processEvent(
+		item: TExtendedChatStoryScriptEvent
+	): Promise<TResult<void, AppError>> {
 		switch (item.type) {
 			case 'Message':
 				return this.processMessageEvent(item);
@@ -91,17 +149,17 @@ class ChatHistorySequenceCreator {
 	}
 
 	private processPauseEvent(
-		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Pause' }>
+		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Pause' }>
 	): TResult<void, AppError> {
 		this.currentTimeMs += item.durationMs / 2;
 		return Ok(undefined);
 	}
 
 	private async processMessageEvent(
-		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>
+		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>
 	): Promise<TResult<void, AppError>> {
 		const startFrame = msToFrames(this.currentTimeMs, this.config.fps);
-		const participant = this.data.participants.find((p) => p.id === item.participantId);
+		const participant = this.script.participants.find((p) => p.id === item.participantId);
 		if (participant == null) {
 			logger.warn(`No participant for message '${item.content}' found!`);
 			return Ok(undefined);
@@ -118,7 +176,7 @@ class ChatHistorySequenceCreator {
 			voiceDurationMs = voiceResult.value;
 		}
 
-		this.addMessageToSequence(item, participant, startFrame);
+		this.addMessageToTimeline(item, participant, startFrame);
 		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs);
 		return Ok(undefined);
 	}
@@ -127,7 +185,7 @@ class ChatHistorySequenceCreator {
 		const audio = participant.isSelf
 			? getStaticAsset('static/audio/sound/ios_sent.mp3')
 			: getStaticAsset('static/audio/sound/ios_received.mp3');
-		this.sequence.push({
+		this.notificationTimeline.items.push({
 			type: 'Audio',
 			src: audio.path,
 			volume: 1,
@@ -137,7 +195,7 @@ class ChatHistorySequenceCreator {
 	}
 
 	private async processVoiceover(
-		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
+		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>,
 		voiceId: string,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
@@ -162,7 +220,7 @@ class ChatHistorySequenceCreator {
 		}
 
 		const durationMs = unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0;
-		this.addVoiceoverToSequence(
+		this.addVoiceoverToTimeline(
 			spokenMessageUrl.value,
 			startFrame,
 			msToFrames(durationMs, this.config.fps) || this.config.fps * 3
@@ -177,7 +235,7 @@ class ChatHistorySequenceCreator {
 	}
 
 	private async generateAndUploadVoiceover(
-		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
+		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>,
 		voiceId: string,
 		filename: string
 	): Promise<TResult<void, AppError>> {
@@ -258,8 +316,8 @@ class ChatHistorySequenceCreator {
 		return Ok(urlResult.value);
 	}
 
-	private addVoiceoverToSequence(src: string, startFrame: number, durationInFrames: number): void {
-		this.sequence.push({
+	private addVoiceoverToTimeline(src: string, startFrame: number, durationInFrames: number): void {
+		this.voiceoverTimeline.items.push({
 			type: 'Audio',
 			src,
 			volume: 1,
@@ -268,29 +326,30 @@ class ChatHistorySequenceCreator {
 		});
 	}
 
-	private addMessageToSequence(
-		item: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>,
+	private addMessageToTimeline(
+		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>,
 		participant: TChatStoryVideoParticipant,
 		startFrame: number
 	): void {
-		this.sequence.push({
+		this.messagesTimeline.items.push({
 			type: 'Message',
 			content: { type: 'Text', text: item.content },
 			participant: {
 				displayName: participant.displayName
 			},
 			messageType: participant.isSelf ? 'sent' : 'received',
-			startFrame
+			startFrame,
+			durationInFrames: 0
 		});
 	}
 
 	private getFutureContentForParticipant(
 		startIndex: number,
 		participantId: number
-	): Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][] {
-		const content: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'][] = [];
-		for (let i = startIndex; i < this.data.events.length; i++) {
-			const event = this.data.events[i];
+	): Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][] {
+		const content: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][] = [];
+		for (let i = startIndex; i < this.script.events.length; i++) {
+			const event = this.script.events[i];
 			if (event?.type === 'Message' && event.participantId === participantId) {
 				content.push(event.content);
 			}
@@ -305,7 +364,7 @@ class ChatHistorySequenceCreator {
 
 	private updateVoiceContext(
 		voiceId: string,
-		content: Extract<TExtendedChatStoryVideoEvent, { type: 'Message' }>['content'],
+		content: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'],
 		requestId?: string
 	): void {
 		if (this.voiceContextMap[voiceId] == null) {
@@ -396,11 +455,13 @@ class ChatHistorySequenceCreator {
 	}
 }
 
-type TExtendedChatStoryVideoEvent = TChatStoryVideoEvent & { index: number };
+type TExtendedChatStoryScriptEvent = TChatStoryScriptEvent & { index: number };
 
-interface TVideoSequenceCreatorConfig {
+interface TChatStoryCreatorConfig {
 	fps: number;
 	messageDelayMs: number;
 	voiceover: boolean;
 	useCached: boolean;
 }
+
+type TChatStoryCreatorOptions = Partial<TChatStoryCreatorConfig>;

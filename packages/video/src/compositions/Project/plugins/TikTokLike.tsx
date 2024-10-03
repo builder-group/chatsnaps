@@ -1,15 +1,17 @@
 import React from 'react';
 import {
+	Audio,
 	interpolate,
 	interpolateColors,
 	random,
 	spring,
+	staticFile,
 	useCurrentFrame,
 	useVideoConfig
 } from 'remotion';
 import { z } from 'zod';
 import { HeartIcon } from '@/components';
-import { cn } from '@/lib';
+import { cn, getStaticAsset } from '@/lib';
 
 import { STimelineItemPlugin } from '../schema';
 import { registerTimelineItemPlugin } from './plugin-registry';
@@ -85,64 +87,67 @@ registerTimelineItemPlugin({
 		}, []);
 
 		return (
-			<div
-				className={cn('flex h-full w-full flex-col items-center justify-center', {
-					'bg-green-400': item.props.debug
-				})}
-			>
+			<>
 				<div
-					className="relative"
-					style={{
-						opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
-					}}
+					className={cn('flex h-full w-full flex-col items-center justify-center', {
+						'bg-green-400': item.props.debug
+					})}
 				>
-					{isLiked &&
-						particles.map((particle, index) => {
-							const progress = spring({
-								fps,
-								frame: frame - 15,
-								config: { damping: 80, stiffness: 200, mass: 0.5 },
-								durationInFrames: likeDuration
-							});
-							const x = interpolate(progress, [0, 1], [0, particle.x * 15]);
-							const y = interpolate(progress, [0, 1], [0, particle.y * 15]);
-							return (
-								<div
-									key={index}
-									className="absolute"
-									style={{
-										top: `calc(50% + ${y}px)`,
-										left: `calc(50% + ${x}px)`,
-										transform: `rotate(${particle.rotation + progress * 720}deg)`,
-										opacity: 1 - progress
-									}}
-								>
-									<HeartIcon size={particle.size} fill={particle.color} stroke="none" />
-								</div>
-							);
-						})}
-
-					<HeartIcon
-						stroke={heartColor}
-						fill={heartColor}
-						className="h-64 w-64 drop-shadow-lg"
-						style={{
-							transform: `scale(${scaleWithPulse})`
-						}}
-					/>
-				</div>
-				{item.props.text != null && (
 					<div
-						className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+						className="relative"
 						style={{
-							opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
-							transform: `scale(${scale})`
+							opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
 						}}
 					>
-						<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
+						{isLiked &&
+							particles.map((particle, index) => {
+								const progress = spring({
+									fps,
+									frame: frame - 15,
+									config: { damping: 80, stiffness: 200, mass: 0.5 },
+									durationInFrames: likeDuration
+								});
+								const x = interpolate(progress, [0, 1], [0, particle.x * 15]);
+								const y = interpolate(progress, [0, 1], [0, particle.y * 15]);
+								return (
+									<div
+										key={index}
+										className="absolute"
+										style={{
+											top: `calc(50% + ${y}px)`,
+											left: `calc(50% + ${x}px)`,
+											transform: `rotate(${particle.rotation + progress * 720}deg)`,
+											opacity: 1 - progress
+										}}
+									>
+										<HeartIcon size={particle.size} fill={particle.color} stroke="none" />
+									</div>
+								);
+							})}
+
+						<HeartIcon
+							stroke={heartColor}
+							fill={heartColor}
+							className="h-64 w-64 drop-shadow-lg"
+							style={{
+								transform: `scale(${scaleWithPulse})`
+							}}
+						/>
 					</div>
-				)}
-			</div>
+					{item.props.text != null && (
+						<div
+							className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+							style={{
+								opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
+								transform: `scale(${scale})`
+							}}
+						>
+							<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
+						</div>
+					)}
+				</div>
+				<Audio src={staticFile(getStaticAsset('static/audio/sound/like_1.mp3').path)} />
+			</>
 		);
 	}
 });

@@ -38,35 +38,42 @@ export const TimelineShapeItem: React.FC<TProps> = (props) => {
 	if (hasOpacityMixin(item)) {
 		style.opacity = getInterpolatedValue(item.opacity, frame);
 	}
-
+	console.log({ item, hasFillMixin: hasFillMixin(item) });
 	if (hasFillMixin(item)) {
-		if (item.fill.type === 'video') {
-			content = (
-				<OffthreadVideo
-					src={getStaticSrc(item.fill.src)}
-					style={{
-						objectFit: item.fill.objectFit,
-						width: item.fill.width,
-						height: item.fill.height
-					}}
-					startFrom={item.fill.startFrom}
-					endAt={item.fill.endAt}
-					playbackRate={item.fill.playbackRate}
-				/>
-			);
-		} else if (item.fill.type === 'image') {
-			content = (
-				<Img
-					src={getStaticSrc(item.fill.src)}
-					style={{
-						objectFit: item.fill.objectFit,
-						width: item.fill.width,
-						height: item.fill.height
-					}}
-				/>
-			);
-		} else if (item.fill.type === 'solid') {
-			style.backgroundColor = item.fill.color;
+		switch (item.fill.type) {
+			case 'Video': {
+				content = (
+					<OffthreadVideo
+						src={getStaticSrc(item.fill.src)}
+						style={{
+							objectFit: item.fill.objectFit,
+							width: item.fill.width,
+							height: item.fill.height
+						}}
+						startFrom={item.fill.startFrom}
+						endAt={item.fill.endAt}
+						playbackRate={item.fill.playbackRate}
+					/>
+				);
+				break;
+			}
+			case 'Image': {
+				content = (
+					<Img
+						src={getStaticSrc(item.fill.src)}
+						style={{
+							objectFit: item.fill.objectFit,
+							width: item.fill.width,
+							height: item.fill.height
+						}}
+					/>
+				);
+				break;
+			}
+			case 'Solid': {
+				style.backgroundColor = item.fill.color;
+				break;
+			}
 		}
 	}
 

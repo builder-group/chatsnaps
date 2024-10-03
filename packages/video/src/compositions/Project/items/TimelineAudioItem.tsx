@@ -8,7 +8,7 @@ export const TimelineAudioItem: React.FC<TProps> = (props) => {
 	const { item } = props;
 
 	return (
-		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames}>
+		<Sequence from={item.startFrame} durationInFrames={item.durationInFrames} name="Audio">
 			<Audio
 				src={getStaticSrc(item.src)}
 				startFrom={item.startFrom}

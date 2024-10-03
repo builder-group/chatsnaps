@@ -1,51 +1,88 @@
-import {
-	type TChatStoryCompProps,
-	type TTikTokFollowSequenceItem,
-	type TTikTokLikeSequenceItem
-} from '@repo/video';
+import { type TTikTokFollowPlugin, type TTimeline, type TTkiTokLikePlugin } from '@repo/video';
 
-import { calculateTotalDurationFrames } from './calculate-total-duration-frames';
+export function createFollowCTA(
+	text: string,
+	durationInFrames = 120
+): Omit<TTikTokFollowPlugin, 'startFrame'> {
+	return {
+		type: 'TimelineItemPlugin',
+		pluginId: 'tiktok-follow',
+		props: {
+			media: {
+				type: 'Image',
+				src: 'static/image/chatsnap.png'
+			},
+			text
+		},
+		durationInFrames,
+		width: 1080,
+		height: 500,
+		x: 0,
+		y: 1000
+	};
+}
 
-export function addCTAAnimations(
-	sequence: TChatStoryCompProps['sequence'],
-	ctas: TCTAItem[],
-	options: TAddCTAAnimationsOptions = {}
-): void {
-	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even' } = options;
-	const totalDurationFrames = calculateTotalDurationFrames(sequence);
+export function createLikeCTA(
+	text: string,
+	durationInFrames = 120
+): Omit<TTkiTokLikePlugin, 'startFrame'> {
+	return {
+		type: 'TimelineItemPlugin',
+		pluginId: 'tiktok-like',
+		props: {
+			text
+		},
+		durationInFrames,
+		width: 1080,
+		height: 500,
+		x: 0,
+		y: 1000
+	};
+}
+
+export function createCTATimeline(ctas: TCTAItem[], config: TAddCTAAnimationsConfig): TTimeline {
+	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even', totalDurationInFrames } = config;
 	const minSpacingFrames = minSpacingSeconds * fps;
+
+	const timeline: TTimeline = {
+		type: 'Timeline',
+		id: 'cta-timeline',
+		items: []
+	};
 
 	const regularCTAs = ctas.filter((cta) => !cta.atEnd);
 	const endCTAs = ctas.filter((cta) => cta.atEnd);
 
 	// Calculate total duration of end CTAs and adjust available duration for regular CTAs
-	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + getDurationInFrames(cta, fps), 0);
-	const availableDurationForRegularCTAs = totalDurationFrames - endCTAsDuration;
+	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + cta.durationInFrames, 0);
+	const availableDurationForRegularCTAs = totalDurationInFrames - endCTAsDuration;
 
 	// Place CTAs
 	placeRegularCTAs(
 		regularCTAs,
-		sequence,
+		timeline.items,
 		availableDurationForRegularCTAs,
 		fps,
 		minSpacingFrames,
 		spreadType
 	);
-	placeEndCTAs(endCTAs, sequence, totalDurationFrames, fps);
+	placeEndCTAs(endCTAs, timeline.items, totalDurationInFrames, fps);
+
+	return timeline;
 }
 
 function placeEndCTAs(
 	ctas: TCTAItem[],
-	sequence: TChatStoryCompProps['sequence'],
-	totalDurationFrames: number,
+	items: TTimeline['items'],
+	totalDurationInFrames: number,
 	fps: number
 ): void {
-	let endPosition = totalDurationFrames;
+	let endPosition = totalDurationInFrames;
 	for (const cta of ctas.reverse()) {
 		// Reverse to place from end to start
-		const durationInFrames = getDurationInFrames(cta, fps);
+		const durationInFrames = cta.durationInFrames;
 		endPosition -= durationInFrames;
-		sequence.push({
+		items.push({
 			...cta,
 			durationInFrames,
 			startFrame: endPosition
@@ -55,13 +92,13 @@ function placeEndCTAs(
 
 function placeRegularCTAs(
 	ctas: TCTAItem[],
-	sequence: TChatStoryCompProps['sequence'],
+	items: TTimeline['items'],
 	availableDuration: number,
 	fps: number,
 	minSpacingFrames: number,
 	spreadType: 'even' | 'random'
 ): void {
-	const totalCTAsDuration = ctas.reduce((sum, cta) => sum + getDurationInFrames(cta, fps), 0);
+	const totalCTAsDuration = ctas.reduce((sum, cta) => sum + cta.durationInFrames, 0);
 	const availableSpace = availableDuration - totalCTAsDuration;
 
 	switch (spreadType) {
@@ -70,10 +107,10 @@ function placeRegularCTAs(
 			let currentPosition = spacing;
 
 			for (const cta of ctas) {
-				const durationInFrames = getDurationInFrames(cta, fps);
+				const durationInFrames = cta.durationInFrames;
 				const startFrame = Math.round(currentPosition);
 
-				sequence.push({
+				items.push({
 					...cta,
 					durationInFrames,
 					startFrame
@@ -92,10 +129,10 @@ function placeRegularCTAs(
 					continue;
 				}
 
-				const durationInFrames = getDurationInFrames(cta, fps);
+				const durationInFrames = cta.durationInFrames;
 				const remainingCTAsDuration = ctas
 					.slice(i + 1)
-					.reduce((sum, item) => sum + getDurationInFrames(item, fps), 0);
+					.reduce((sum, item) => sum + item.durationInFrames, 0);
 
 				const maxStart = availableDuration - remainingCTAsDuration - durationInFrames;
 				const minStart = Math.max(
@@ -105,7 +142,7 @@ function placeRegularCTAs(
 
 				const startFrame = Math.floor(Math.random() * (maxStart - minStart + 1) + minStart);
 
-				sequence.push({
+				items.push({
 					...cta,
 					durationInFrames,
 					startFrame
@@ -119,21 +156,15 @@ function placeRegularCTAs(
 }
 
 type TCTAItem = (
-	| Omit<TTikTokFollowSequenceItem, 'startFrame'>
-	| Omit<TTikTokLikeSequenceItem, 'startFrame'>
+	| Omit<TTikTokFollowPlugin, 'startFrame'>
+	| Omit<TTkiTokLikePlugin, 'startFrame'>
 ) & {
 	atEnd?: boolean;
 };
 
-interface TAddCTAAnimationsOptions {
+interface TAddCTAAnimationsConfig {
+	totalDurationInFrames: number;
 	spreadType?: 'even' | 'random';
 	minSpacingSeconds?: number;
 	fps?: number;
-}
-
-function getDurationInFrames(
-	item: Omit<TTikTokFollowSequenceItem, 'startFrame'> | Omit<TTikTokLikeSequenceItem, 'startFrame'>,
-	fps: number
-): number {
-	return item.durationInFrames ?? 4 * fps;
 }

@@ -16,9 +16,9 @@ export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (prop
 			{timelines.map((timeline) => {
 				switch (timeline.type) {
 					case 'Timeline':
-						return <Timeline timeline={timeline} />;
-					case 'Plugin':
-						return <TimelinePlugin timeline={timeline} />;
+						return <Timeline timeline={timeline} key={timeline.id} />;
+					case 'TimelinePlugin':
+						return <TimelinePlugin timeline={timeline} key={timeline.id} />;
 				}
 			})}
 		</AbsoluteFill>

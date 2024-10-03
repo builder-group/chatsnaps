@@ -9,7 +9,7 @@ export const TimelineItem: React.FC<TProps> = (props) => {
 	const { item } = props;
 
 	switch (item.type) {
-		case 'Plugin':
+		case 'TimelineItemPlugin':
 			return <TimelinePluginItem item={item} />;
 		case 'Audio':
 			return <TimelineAudioItem item={item} />;

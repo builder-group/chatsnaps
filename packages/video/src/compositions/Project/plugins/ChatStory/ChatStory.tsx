@@ -1,4 +1,4 @@
-import { useCurrentFrame } from 'remotion';
+import { useCurrentFrame, useVideoConfig } from 'remotion';
 import { cn } from '@/lib';
 
 import { getInterpolatedValue } from '../../helper';
@@ -12,6 +12,7 @@ registerTimelinePlugin({
 	component: (props) => {
 		const { timeline } = props;
 		const frame = useCurrentFrame();
+		const { height } = useVideoConfig();
 
 		return (
 			<div
@@ -24,7 +25,9 @@ registerTimelinePlugin({
 						(item) => item.type === 'Message' && item.startFrame <= frame
 					)}
 					messenger={timeline.props.messenger}
-					maxHeight={getInterpolatedValue(timeline.height, frame)}
+					maxHeight={
+						timeline.height != null ? getInterpolatedValue(timeline.height, frame) : height
+					}
 					className="origin-top scale-[.80] rounded-3xl shadow-2xl"
 				/>
 			</div>

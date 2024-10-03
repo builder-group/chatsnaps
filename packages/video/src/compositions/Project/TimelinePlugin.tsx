@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+import { useCurrentFrame, useVideoConfig } from 'remotion';
 
 import { getInterpolatedValue } from './helper';
 import { getTimelinePlugin } from './plugins';
@@ -8,6 +8,7 @@ import { TTimelinePlugin } from './schema';
 export const TimelinePlugin: React.FC<TProps> = (props) => {
 	const { timeline } = props;
 	const frame = useCurrentFrame();
+	const { width, height } = useVideoConfig();
 
 	const plugin = getTimelinePlugin(timeline.pluginId);
 	if (plugin != null) {
@@ -17,11 +18,11 @@ export const TimelinePlugin: React.FC<TProps> = (props) => {
 				<div
 					style={{
 						position: 'absolute',
-						left: getInterpolatedValue(timeline.x, frame),
-						top: getInterpolatedValue(timeline.y, frame),
-						width: getInterpolatedValue(timeline.width, frame),
-						height: getInterpolatedValue(timeline.height, frame),
-						opacity: getInterpolatedValue(timeline.opacity, frame),
+						left: timeline.x != null ? getInterpolatedValue(timeline.x, frame) : 0,
+						top: timeline.y != null ? getInterpolatedValue(timeline.y, frame) : 0,
+						width: timeline.width != null ? getInterpolatedValue(timeline.width, frame) : width,
+						height: timeline.height != null ? getInterpolatedValue(timeline.height, frame) : height,
+						opacity: timeline.opacity != null ? getInterpolatedValue(timeline.opacity, frame) : 1,
 						overflow: 'hidden'
 					}}
 				>
