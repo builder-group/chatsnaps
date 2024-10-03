@@ -9,20 +9,26 @@ import {
 } from 'remotion';
 import { z } from 'zod';
 import { HeartIcon } from '@/components';
+import { cn } from '@/lib';
 
-import { STimelinePluginItem } from '../schema';
+import { STimelineItemPlugin } from '../schema';
 import { registerPlugin } from './plugin-registry';
 
 const COLORS = ['#FF69B4', '#FF1493', '#FF6347', '#FFD700', '#FF4500'];
 
+export const STikTokLikePlugin = STimelineItemPlugin.extend({
+	pluginId: z.literal('tiktok-like'),
+	props: z.object({
+		text: z.string().optional(),
+		debug: z.boolean().optional()
+	})
+});
+export type TTkiTokLikePlugin = z.infer<typeof STikTokLikePlugin>;
+
 registerPlugin({
+	type: 'TimelineItem',
 	id: 'tiktok-like',
-	schema: STimelinePluginItem.extend({
-		pluginId: z.literal('tiktok-like'),
-		props: z.object({
-			text: z.string().optional()
-		})
-	}),
+	schema: STikTokLikePlugin,
 	component: (props) => {
 		const { item } = props;
 		const frame = useCurrentFrame();
@@ -80,8 +86,17 @@ registerPlugin({
 		}, []);
 
 		return (
-			<div className={'flex h-full w-full flex-col items-center justify-center'}>
-				<div className="relative">
+			<div
+				className={cn('flex h-full w-full flex-col items-center justify-center', {
+					'bg-green-400': item.props.debug
+				})}
+			>
+				<div
+					className="relative"
+					style={{
+						opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
+					}}
+				>
 					{isLiked &&
 						particles.map((particle, index) => {
 							const progress = spring({
@@ -107,23 +122,19 @@ registerPlugin({
 								</div>
 							);
 						})}
-					<div
-						className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
+
+					<HeartIcon
+						stroke={heartColor}
+						fill={heartColor}
+						className="h-64 w-64 drop-shadow-lg"
 						style={{
-							transform: `translate(-50%, -50%) scale(${scaleWithPulse})`,
-							opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
+							transform: `scale(${scaleWithPulse})`
 						}}
-					>
-						<HeartIcon
-							stroke={heartColor}
-							fill={heartColor}
-							className="h-64 w-64 drop-shadow-lg transition-colors duration-300 ease-out"
-						/>
-					</div>
+					/>
 				</div>
 				{item.props.text != null && (
 					<div
-						className="mt-40 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+						className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
 						style={{
 							opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
 							transform: `scale(${scale})`

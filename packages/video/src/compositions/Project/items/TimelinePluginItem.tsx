@@ -3,7 +3,7 @@ import { Sequence, useCurrentFrame } from 'remotion';
 
 import { getInterpolatedValue } from '../helper';
 import { getPlugin } from '../plugins';
-import { TTimelinePluginItem } from '../schema';
+import { TTimelineItemPlugin } from '../schema';
 
 export const TimelinePluginItem: React.FC<TProps> = (props) => {
 	const { item } = props;
@@ -38,5 +38,5 @@ export const TimelinePluginItem: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	item: TTimelinePluginItem;
+	item: TTimelineItemPlugin;
 }

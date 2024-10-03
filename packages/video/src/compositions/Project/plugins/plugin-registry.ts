@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { TTimelinePluginItem } from '../schema';
+import { TTimelineItemPlugin, TTimelinePlugin } from '../schema';
 
-const PLUGIN_REGISTRY: Record<string, TTimelinePlugin<any>> = {};
+const PLUGIN_REGISTRY: Record<string, TTimelineItemPluginFC<any>> = {};
 
-export function registerPlugin<GTimelinePluginItem extends z.ZodType<TTimelinePluginItem>>(
-	plugin: TTimelinePlugin<GTimelinePluginItem>
+export function registerPlugin<GTimelinePluginItem extends z.ZodType<TTimelineItemPlugin>>(
+	plugin: TTimelineItemPluginFC<GTimelinePluginItem>
 ) {
 	if (PLUGIN_REGISTRY[plugin.id] != null) {
 		console.warn(`Plugin with id ${plugin.id} already exists. Overwriting.`);
@@ -13,12 +13,20 @@ export function registerPlugin<GTimelinePluginItem extends z.ZodType<TTimelinePl
 	PLUGIN_REGISTRY[plugin.id] = plugin;
 }
 
-export function getPlugin(id: string): TTimelinePlugin<any> | null {
+export function getPlugin(id: string): TTimelineItemPluginFC<any> | null {
 	return PLUGIN_REGISTRY[id] ?? null;
 }
 
-export interface TTimelinePlugin<GTimelinePluginItem extends z.ZodType<TTimelinePluginItem>> {
+export interface TTimelineItemPluginFC<GTimelineItemPlugin extends z.ZodType<TTimelineItemPlugin>> {
+	type: 'TimelineItem';
 	id: string;
-	schema: GTimelinePluginItem;
-	component: React.FC<{ item: z.infer<GTimelinePluginItem> }>;
+	schema: GTimelineItemPlugin;
+	component: React.FC<{ item: z.infer<GTimelineItemPlugin> }>;
+}
+
+export interface TTimelinePluginFC<GTimelinePlugin extends z.ZodType<TTimelinePlugin>> {
+	type: 'Timeline';
+	id: string;
+	schema: GTimelinePlugin;
+	component: React.FC<{ item: z.infer<GTimelinePlugin> }>;
 }

@@ -2092,14 +2092,13 @@
 		}
 	},
 	"project": {
-		"width": 1920,
-		"height": 1080,
+		"width": 1080,
+		"height": 1920,
 		"fps": 30,
 		"duration": 300,
 		"timelines": [
 			{
 				"type": "Timeline",
-				"id": "main",
 				"items": [
 					{
 						"type": "Rectangle",
@@ -2109,10 +2108,9 @@
 						"height": 100,
 						"x": [
 							{ "frame": 0, "value": -200 },
-							{ "frame": 300, "value": 1920 }
+							{ "frame": 300, "value": 1080 }
 						],
 						"y": 490,
-						"visible": true,
 						"opacity": [
 							{ "frame": 0, "value": 0 },
 							{ "frame": 30, "value": 1 },
@@ -2129,15 +2127,34 @@
 								"type": "Image",
 								"src": "static/image/chatsnap.png"
 							},
-							"text": "Tap follow! 📲"
+							"text": "Tap follow! 📲",
+							"debug": true
 						},
 						"startFrame": 0,
 						"durationInFrames": 120,
-						"width": 1920,
+						"width": 1080,
 						"height": 500,
 						"x": 0,
-						"y": 10,
-						"visible": true,
+						"y": 1000,
+						"opacity": 1
+					},
+					{
+						"type": "Plugin",
+						"pluginId": "tiktok-like",
+						"props": {
+							"media": {
+								"type": "Image",
+								"src": "static/image/chatsnap.png"
+							},
+							"text": "Like now!",
+							"debug": true
+						},
+						"startFrame": 120,
+						"durationInFrames": 120,
+						"width": 1080,
+						"height": 500,
+						"x": 0,
+						"y": 1000,
 						"opacity": 1
 					}
 				]

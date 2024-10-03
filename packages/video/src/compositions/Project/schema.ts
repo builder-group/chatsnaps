@@ -109,7 +109,7 @@ export const STimelineShapeItem = z.discriminatedUnion('type', [
 ]);
 export type TTimelineShapeItem = z.infer<typeof STimelineShapeItem>;
 
-export const STimelinePluginItem = STimelineItemMixin.merge(SSizeMixin)
+export const STimelineItemPlugin = STimelineItemMixin.merge(SSizeMixin)
 	.merge(STransformMixin)
 	.merge(SOpacityMixin)
 	.extend({
@@ -117,13 +117,13 @@ export const STimelinePluginItem = STimelineItemMixin.merge(SSizeMixin)
 		pluginId: z.string(),
 		props: z.unknown().optional()
 	});
-export type TTimelinePluginItem = z.infer<typeof STimelinePluginItem>;
+export type TTimelineItemPlugin = z.infer<typeof STimelineItemPlugin>;
 
 export const STimelineItem = z.discriminatedUnion('type', [
 	STimelineAudioItem,
 	STimelineRectangleItem,
 	STimelineEllipseItem,
-	STimelinePluginItem
+	STimelineItemPlugin
 ]);
 export type TTimelineItem = z.infer<typeof STimelineItem>;
 
@@ -155,7 +155,6 @@ export type TTimeline = z.infer<typeof STimeline>;
 // =============================================================================
 
 export const SProjectCompProps = z.object({
-	id: z.string(),
 	width: z.number().int().positive().optional(),
 	height: z.number().int().positive().optional(),
 	fps: z.number().positive().optional(),

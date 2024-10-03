@@ -1,19 +1,25 @@
 import { interpolate, interpolateColors, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { z } from 'zod';
 import { CheckIcon, Media, SVisualMedia, XIcon } from '@/components';
+import { cn } from '@/lib';
 
-import { STimelinePluginItem } from '../schema';
+import { STimelineItemPlugin } from '../schema';
 import { registerPlugin } from './plugin-registry';
 
+export const STikTokFollowPlugin = STimelineItemPlugin.extend({
+	pluginId: z.literal('tiktok-follow'),
+	props: z.object({
+		media: SVisualMedia,
+		text: z.string().optional(),
+		debug: z.boolean().optional()
+	})
+});
+export type TTikTokFollowPlugin = z.infer<typeof STikTokFollowPlugin>;
+
 registerPlugin({
+	type: 'TimelineItem',
 	id: 'tiktok-follow',
-	schema: STimelinePluginItem.extend({
-		pluginId: z.literal('tiktok-follow'),
-		props: z.object({
-			media: SVisualMedia,
-			text: z.string().optional()
-		})
-	}),
+	schema: STikTokFollowPlugin,
 	component: (props) => {
 		const { item } = props;
 		const frame = useCurrentFrame();
@@ -72,7 +78,11 @@ registerPlugin({
 		const buttonColor = interpolateColors(frame, [0, 30], ['#ffffff', '#ef4444']);
 
 		return (
-			<div className={'flex h-full w-full flex-col items-center justify-center'}>
+			<div
+				className={cn('flex h-full w-full flex-col items-center justify-center', {
+					'bg-green-400': item.props.debug
+				})}
+			>
 				<div
 					className="relative"
 					style={{
