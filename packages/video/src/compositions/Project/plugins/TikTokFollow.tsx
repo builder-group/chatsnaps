@@ -2,7 +2,6 @@ import { interpolate, interpolateColors, spring, useCurrentFrame, useVideoConfig
 import { z } from 'zod';
 import { CheckIcon, Media, SVisualMedia, XIcon } from '@/components';
 
-import { getInterpolatedValue } from '../helper';
 import { STimelinePluginItem } from '../schema';
 import { TTimelinePluginItemFC } from './types';
 
@@ -14,7 +13,7 @@ const STikTokFollowTimelineItem = STimelinePluginItem.extend({
 	})
 });
 
-export const TikTokFollowPlugin: TTimelinePluginItemFC<
+export const TikTokFollowTimelineItem: TTimelinePluginItemFC<
 	z.infer<typeof STikTokFollowTimelineItem>,
 	'tiktok-follow'
 > = (props) => {
@@ -75,68 +74,56 @@ export const TikTokFollowPlugin: TTimelinePluginItemFC<
 	const buttonColor = interpolateColors(frame, [0, 30], ['#ffffff', '#ef4444']);
 
 	return (
-		<div
-			style={{
-				position: 'absolute',
-				left: getInterpolatedValue(item.x, frame),
-				top: getInterpolatedValue(item.y, frame),
-				width: getInterpolatedValue(item.width, frame),
-				height: getInterpolatedValue(item.height, frame),
-				opacity: getInterpolatedValue(item.opacity, frame),
-				overflow: 'hidden'
-			}}
-		>
-			<div className={'flex h-full w-full flex-col items-center justify-center'}>
+		<div className={'flex h-full w-full flex-col items-center justify-center'}>
+			<div
+				className="relative"
+				style={{
+					transform: `scale(${scaleWithPulse})`,
+					opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity
+				}}
+			>
+				<Media
+					media={item.props.media}
+					className="h-64 w-64 rounded-full border-4 border-white shadow-lg"
+				/>
 				<div
-					className="relative"
+					className="absolute -bottom-4 -right-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-md"
 					style={{
-						transform: `scale(${scaleWithPulse})`,
-						opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity
+						transform: `scale(${buttonScale}) rotate(${buttonRotation}deg)`,
+						backgroundColor: buttonColor
 					}}
 				>
-					<Media
-						media={item.props.media}
-						className="h-64 w-64 rounded-full border-4 border-white shadow-lg"
-					/>
 					<div
-						className="absolute -bottom-4 -right-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-md"
+						className="absolute inset-0 flex items-center justify-center"
+						style={{ opacity: isInitialState ? 1 : 0, color: 'rgb(239, 68, 68)' }}
+					>
+						<XIcon className="h-10 w-10 stroke-[4px]" />
+					</div>
+					<div
+						className="absolute inset-0 flex items-center justify-center"
 						style={{
-							transform: `scale(${buttonScale}) rotate(${buttonRotation}deg)`,
-							backgroundColor: buttonColor
+							opacity: isInitialState ? 0 : 1,
+							color: 'white',
+							transform: 'rotate(-180deg)'
 						}}
 					>
-						<div
-							className="absolute inset-0 flex items-center justify-center"
-							style={{ opacity: isInitialState ? 1 : 0, color: 'rgb(239, 68, 68)' }}
-						>
-							<XIcon className="h-10 w-10 stroke-[4px]" />
-						</div>
-						<div
-							className="absolute inset-0 flex items-center justify-center"
-							style={{
-								opacity: isInitialState ? 0 : 1,
-								color: 'white',
-								transform: 'rotate(-180deg)'
-							}}
-						>
-							<CheckIcon className="h-10 w-10 stroke-[4px]" />
-						</div>
+						<CheckIcon className="h-10 w-10 stroke-[4px]" />
 					</div>
 				</div>
-				{item.props.text != null && (
-					<div
-						className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
-						style={{
-							opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity,
-							transform: `scale(${scale})`
-						}}
-					>
-						<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
-					</div>
-				)}
 			</div>
+			{item.props.text != null && (
+				<div
+					className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
+					style={{
+						opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity,
+						transform: `scale(${scale})`
+					}}
+				>
+					<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
+				</div>
+			)}
 		</div>
 	);
 };
-TikTokFollowPlugin.id = 'tiktok-follow';
-TikTokFollowPlugin.schema = STikTokFollowTimelineItem;
+TikTokFollowTimelineItem.id = 'tiktok-follow';
+TikTokFollowTimelineItem.schema = STikTokFollowTimelineItem;

@@ -1,5 +1,7 @@
-import { TikTokFollowPlugin } from './TikTokFollowPlugin';
+import { TikTokFollowTimelineItem } from './TikTokFollow';
+import { TikTokLikeTimelineItem } from './TikTokLike';
 
-export const timelinePluginItems = {
-	[TikTokFollowPlugin.id]: TikTokFollowPlugin
+export const TIMELINE_PLUGIN_ITEM_MAP = {
+	[TikTokFollowTimelineItem.id as string]: TikTokFollowTimelineItem,
+	[TikTokLikeTimelineItem.id as string]: TikTokLikeTimelineItem
 };

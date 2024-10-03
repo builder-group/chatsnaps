@@ -1,14 +1,15 @@
 import React from 'react';
-import { Sequence } from 'remotion';
-import { z } from 'zod';
+import { Sequence, useCurrentFrame } from 'remotion';
 
-import { timelinePluginItems } from '../plugins';
+import { getInterpolatedValue } from '../helper';
+import { TIMELINE_PLUGIN_ITEM_MAP } from '../plugins';
 import { TTimelinePluginItem } from '../schema';
 
 export const TimelinePluginItem: React.FC<TProps> = (props) => {
 	const { item } = props;
+	const frame = useCurrentFrame();
 
-	const Plugin = timelinePluginItems[item.pluginId as keyof typeof timelinePluginItems];
+	const Plugin = TIMELINE_PLUGIN_ITEM_MAP[item.pluginId];
 	if (Plugin != null && Plugin.schema.safeParse(item).success) {
 		return (
 			<Sequence
@@ -16,7 +17,19 @@ export const TimelinePluginItem: React.FC<TProps> = (props) => {
 				durationInFrames={item.durationInFrames}
 				name={`Plugin: ${item.pluginId}`}
 			>
-				<Plugin item={item as z.infer<typeof Plugin.schema>} />
+				<div
+					style={{
+						position: 'absolute',
+						left: getInterpolatedValue(item.x, frame),
+						top: getInterpolatedValue(item.y, frame),
+						width: getInterpolatedValue(item.width, frame),
+						height: getInterpolatedValue(item.height, frame),
+						opacity: getInterpolatedValue(item.opacity, frame),
+						overflow: 'hidden'
+					}}
+				>
+					<Plugin item={item} />
+				</div>
 			</Sequence>
 		);
 	}

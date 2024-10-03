@@ -11,7 +11,7 @@ export const Timeline: React.FC<TProps> = (props) => {
 	}, [timeline]);
 
 	return sortedTimelineItems.map((item, index) => (
-		<TimelineItem key={`${item.id}-${index}`} item={item} />
+		<TimelineItem key={`${index}-${item.startFrame}-${item.durationInFrames}`} item={item} />
 	));
 };
 
