@@ -16,5 +16,6 @@ export const Messenger: React.FC<TProps> = (props) => {
 interface TProps {
 	messenger: TChatStoryMessenger;
 	items: TMessageChatStoryTimelineItem[];
+	maxHeight: number;
 	className?: string;
 }

@@ -2165,7 +2165,7 @@
 				"width": 1080,
 				"height": 800,
 				"x": 0,
-				"y": 50,
+				"y": 32,
 				"opacity": 1,
 				"props": {
 					"title": "Grandma's DEMONIC Possession?! 😱👵🏼👹",
@@ -2271,6 +2271,158 @@
 						},
 						"messageType": "received",
 						"startFrame": 314,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "AGAIN?! 😱"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 342,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Charlotte, listen carefully"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 374,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Run to the attic"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 433,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Lock the door"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 475,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Mom, wtf is happening?!"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 511,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "JUST GO!"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 572,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "OMG 😱"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 629,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Purple goo is oozing from her ears!"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 665,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "And her nose!"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 735,
+						"durationInFrames": 0
+					},
+
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "GET TO THE ATTIC NOW!"
+						},
+						"participant": {
+							"displayName": "Mom"
+						},
+						"messageType": "received",
+						"startFrame": 768,
+						"durationInFrames": 0
+					},
+					{
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "I'm running!"
+						},
+						"participant": {
+							"displayName": "Charlotte"
+						},
+						"messageType": "sent",
+						"startFrame": 813,
 						"durationInFrames": 0
 					}
 				]

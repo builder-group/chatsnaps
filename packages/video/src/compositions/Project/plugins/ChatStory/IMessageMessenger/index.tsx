@@ -8,10 +8,9 @@ import { TIMessageChatStoryMessenger, TMessageChatStoryTimelineItem } from '../s
 import './style.scss';
 
 export const IMessageMessenger: React.FC<TProps> = (props) => {
-	const { items, contact, className } = props;
+	const { items, contact, className, maxHeight } = props;
 	const frame = useCurrentFrame();
-	const { fps, height } = useVideoConfig();
-	const maxHeight = React.useMemo(() => height / 2.5, [height]);
+	const { fps } = useVideoConfig();
 	const contentRef = React.useRef<HTMLOListElement>(null);
 	const [contentHeight, setContentHeight] = React.useState(0);
 	const headerHeight = 240;
@@ -25,7 +24,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 	const overflow = Math.max(0, contentHeight - maxHeight);
 
 	return (
-		<div className={cn('overflow-hidden bg-black', className)} style={{ maxHeight }}>
+		<div className={cn('relative overflow-hidden bg-black', className)} style={{ maxHeight }}>
 			{/* <Img
 				src={staticFile('static/image/imessage.png')}
 				className="absolute left-0 right-0 top-[-130px] z-50 opacity-50"
@@ -79,7 +78,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					return (
 						<li
 							key={JSON.stringify(content)}
-							className={cn('relative', messageType === 'sent' ? 'self-end' : 'self-start')}
+							className={cn('relative mx-16', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
 							<div
 								className={cn(
@@ -114,5 +113,6 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 
 interface TProps extends Omit<TIMessageChatStoryMessenger, 'type'> {
 	items: TMessageChatStoryTimelineItem[];
+	maxHeight: number;
 	className?: string;
 }
