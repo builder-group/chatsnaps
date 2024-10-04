@@ -5,18 +5,13 @@ import { ProjectComp, type TProjectCompProps } from '@repo/video';
 
 import '@repo/video/dist/style.css';
 
-import {
-	Timeline,
-	type TimelineAction,
-	type TimelineRow,
-	type TimelineState
-} from '@xzdarcy/react-timeline-editor';
+import { Timeline, type TimelineRow, type TimelineState } from '@xzdarcy/react-timeline-editor';
 import React from 'react';
 
-import { project1 } from './mock';
+import { chatStoryProject } from './mock';
 
 export const TimelineEditor: React.FC = () => {
-	const [project, setProject] = React.useState<TProjectCompProps>(project1);
+	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
 	const [currentTime, setCurrentTime] = React.useState(0);
 	const playerRef = React.useRef<PlayerRef>(null);
 	const timelineRef = React.useRef<TimelineState>(null);
@@ -29,19 +24,17 @@ export const TimelineEditor: React.FC = () => {
 		() =>
 			project.timeline.tracks.map((track) => ({
 				id: track.id,
-				actions: track.actions.map(
-					(item): TimelineAction => ({
-						id: `${item.type}-${item.startFrame.toString()}`,
-						start: item.startFrame / project.fps,
-						end: (item.startFrame + item.durationInFrames) / project.fps,
-						effectId: item.type
-					})
-				),
+				actions: track.actions.map((item) => ({
+					id: `${item.type}-${item.startFrame.toString()}`,
+					start: item.startFrame / project.fps,
+					end: (item.startFrame + item.durationInFrames) / project.fps,
+					effectId: item.type // Required but not used since its based on Remotion video
+				})),
 				rowHeight: 32,
 				selected: false,
 				classNames: []
 			})),
-		[project]
+		[project.timeline.tracks, project.fps]
 	);
 
 	const handleTimeUpdate = React.useCallback(
@@ -76,7 +69,7 @@ export const TimelineEditor: React.FC = () => {
 
 	return (
 		<div className="bg-gray-100 p-4">
-			<div className="mb-5 max-w-[500px] overflow-hidden shadow-2xl">
+			<div className="m-auto mb-5 max-w-[500px] overflow-hidden shadow-2xl">
 				<Player
 					ref={playerRef}
 					component={ProjectComp}
