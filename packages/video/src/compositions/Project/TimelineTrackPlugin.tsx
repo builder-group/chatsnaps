@@ -3,9 +3,9 @@ import { useCurrentFrame, useVideoConfig } from 'remotion';
 
 import { getInterpolatedValue } from './helper';
 import { getTimelinePlugin } from './plugins';
-import { TTimelinePlugin } from './schema';
+import { TTimelineTrackPlugin } from './schema';
 
-export const TimelinePlugin: React.FC<TProps> = (props) => {
+export const TimelineTrackPlugin: React.FC<TProps> = (props) => {
 	const { timeline } = props;
 	const frame = useCurrentFrame();
 	const { width, height } = useVideoConfig();
@@ -38,5 +38,5 @@ export const TimelinePlugin: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	timeline: TTimelinePlugin;
+	timeline: TTimelineTrackPlugin;
 }

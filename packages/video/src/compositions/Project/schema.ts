@@ -4,8 +4,6 @@ import { z } from 'zod';
 // Basic schemas
 // =============================================================================
 
-export const STimelinePosition = z.number().int().min(0);
-export const SDuration = z.number().int().min(0);
 export const SUrl = z.string(); // .url(); // TODO: static path is not really url
 export const SObjectFit = z.enum(['contain', 'cover', 'fill', 'none', 'scale-down']);
 
@@ -72,23 +70,23 @@ export const SFillMixin = z.object({
 // Timeline Items
 // =============================================================================
 
-export const STimelineItemMixin = z.object({
+export const STimelineActionMixin = z.object({
 	type: z.string(),
-	startFrame: STimelinePosition,
-	durationInFrames: SDuration
+	startFrame: z.number().int().min(0),
+	durationInFrames: z.number().int().min(0)
 });
-export type TTimelineItemMixin = z.infer<typeof STimelineItemMixin>;
+export type TTimelineActionMixin = z.infer<typeof STimelineActionMixin>;
 
-export const SAudioTimelineItem = STimelineItemMixin.extend({
+export const SAudioTimelineAction = STimelineActionMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
 	volume: z.number().min(0).max(1),
 	startFrom: z.number().int().positive().optional(),
 	endAt: z.number().int().positive().optional()
 });
-export type TAudioTimelineItem = z.infer<typeof SAudioTimelineItem>;
+export type TAudioTimelineAction = z.infer<typeof SAudioTimelineAction>;
 
-export const SRectangleTimelineItem = STimelineItemMixin.merge(SSizeMixin)
+export const SRectangleTimelineAction = STimelineActionMixin.merge(SSizeMixin)
 	.merge(STransformMixin.partial())
 	.merge(SOpacityMixin.partial())
 	.merge(SFillMixin)
@@ -96,7 +94,7 @@ export const SRectangleTimelineItem = STimelineItemMixin.merge(SSizeMixin)
 		type: z.literal('Rectangle')
 	});
 
-export const SEllipseTimelineItem = STimelineItemMixin.merge(SSizeMixin)
+export const SEllipseTimelineAction = STimelineActionMixin.merge(SSizeMixin)
 	.merge(STransformMixin.partial())
 	.merge(SOpacityMixin.partial())
 	.merge(SFillMixin)
@@ -104,54 +102,59 @@ export const SEllipseTimelineItem = STimelineItemMixin.merge(SSizeMixin)
 		type: z.literal('Ellipse')
 	});
 
-export const SShapeTimelineItem = z.discriminatedUnion('type', [
-	SRectangleTimelineItem,
-	SEllipseTimelineItem
+export const SShapeTimelineAction = z.discriminatedUnion('type', [
+	SRectangleTimelineAction,
+	SEllipseTimelineAction
 ]);
-export type TShapeTimelineItem = z.infer<typeof SShapeTimelineItem>;
+export type TShapeTimelineAction = z.infer<typeof SShapeTimelineAction>;
 
-export const STimelineItemPlugin = STimelineItemMixin.merge(SSizeMixin.partial())
+export const STimelineActionPlugin = STimelineActionMixin.merge(SSizeMixin.partial())
 	.merge(STransformMixin.partial())
 	.merge(SOpacityMixin.partial())
 	.extend({
-		type: z.literal('TimelineItemPlugin'),
+		type: z.literal('Plugin'),
 		pluginId: z.string(),
 		props: z.unknown().optional()
 	});
-export type TTimelineItemPlugin = z.infer<typeof STimelineItemPlugin>;
+export type TTimelineActionPlugin = z.infer<typeof STimelineActionPlugin>;
 
-export const STimelineItem = z.discriminatedUnion('type', [
-	SAudioTimelineItem,
-	SRectangleTimelineItem,
-	SEllipseTimelineItem,
-	STimelineItemPlugin
+export const STimelineAction = z.discriminatedUnion('type', [
+	SAudioTimelineAction,
+	SRectangleTimelineAction,
+	SEllipseTimelineAction,
+	STimelineActionPlugin
 ]);
-export type TTimelineItem = z.infer<typeof STimelineItem>;
+export type TTimelineAction = z.infer<typeof STimelineAction>;
 
 // =============================================================================
 // Timeline
 // =============================================================================
 
-export const STimelineMixin = z.object({
+export const STimelineTrackMixin = z.object({
 	type: z.string(),
 	id: z.string(),
-	items: z.array(STimelineItemMixin)
+	actions: z.array(STimelineActionMixin)
 });
-export type TTimelineMixin = z.infer<typeof STimelineMixin>;
+export type TTimelineTrackMixin = z.infer<typeof STimelineTrackMixin>;
 
-export const STimelinePlugin = STimelineMixin.merge(SSizeMixin.partial())
+export const STimelineTrackPlugin = STimelineTrackMixin.merge(SSizeMixin.partial())
 	.merge(STransformMixin.partial())
 	.merge(SOpacityMixin.partial())
 	.extend({
-		type: z.literal('TimelinePlugin'),
+		type: z.literal('Plugin'),
 		pluginId: z.string(),
 		props: z.unknown().optional()
 	});
-export type TTimelinePlugin = z.infer<typeof STimelinePlugin>;
+export type TTimelineTrackPlugin = z.infer<typeof STimelineTrackPlugin>;
 
-export const STimeline = STimelineMixin.extend({
-	type: z.literal('Timeline'),
-	items: z.array(STimelineItem)
+export const STimelineTrack = STimelineTrackMixin.extend({
+	type: z.literal('Track'),
+	actions: z.array(STimelineAction)
+});
+export type TTimelineTrack = z.infer<typeof STimelineTrack>;
+
+export const STimeline = z.object({
+	tracks: z.array(z.discriminatedUnion('type', [STimelineTrack, STimelineTrackPlugin]))
 });
 export type TTimeline = z.infer<typeof STimeline>;
 
@@ -161,16 +164,18 @@ export type TTimeline = z.infer<typeof STimeline>;
 
 export const SProjectCompProps = z.object({
 	name: z.string(),
-	width: z.number().int().positive().optional(),
-	height: z.number().int().positive().optional(),
-	fps: z.number().positive().optional(),
+	width: z.number().int().positive(),
+	height: z.number().int().positive(),
+	fps: z.number().positive(),
 	durationInFrames: z.number().int().positive().optional(),
-	timelines: z.array(z.discriminatedUnion('type', [STimeline, STimelinePlugin]))
+	timeline: STimeline
 });
 export type TProjectCompProps = z.infer<typeof SProjectCompProps>;
 
-export function hasTimelineMixin(item: unknown): item is z.infer<typeof STimelineItemMixin> {
-	return STimelineItemMixin.safeParse(item).success;
+export function hasTimelineActionMixin(
+	item: unknown
+): item is z.infer<typeof STimelineActionMixin> {
+	return STimelineActionMixin.safeParse(item).success;
 }
 
 export function hasSizeMixin(item: unknown): item is z.infer<typeof SSizeMixin> {

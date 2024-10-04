@@ -1,11 +1,11 @@
-import { type TTikTokFollowPlugin, type TTimeline, type TTkiTokLikePlugin } from '@repo/video';
+import { type TTikTokFollowPlugin, type TTimelineTrack, type TTkiTokLikePlugin } from '@repo/video';
 
 export function createFollowCTA(
 	text: string,
 	durationInFrames = 120
 ): Omit<TTikTokFollowPlugin, 'startFrame'> {
 	return {
-		type: 'TimelineItemPlugin',
+		type: 'Plugin',
 		pluginId: 'tiktok-follow',
 		props: {
 			media: {
@@ -27,7 +27,7 @@ export function createLikeCTA(
 	durationInFrames = 120
 ): Omit<TTkiTokLikePlugin, 'startFrame'> {
 	return {
-		type: 'TimelineItemPlugin',
+		type: 'Plugin',
 		pluginId: 'tiktok-like',
 		props: {
 			text
@@ -40,14 +40,14 @@ export function createLikeCTA(
 	};
 }
 
-export function createCTATimeline(ctas: TCTAItem[], config: TAddCTAAnimationsConfig): TTimeline {
+export function createCTATrack(ctas: TCTA[], config: TAddCTAAnimationsConfig): TTimelineTrack {
 	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even', totalDurationInFrames } = config;
 	const minSpacingFrames = minSpacingSeconds * fps;
 
-	const timeline: TTimeline = {
-		type: 'Timeline',
+	const track: TTimelineTrack = {
+		type: 'Track',
 		id: 'cta-timeline',
-		items: []
+		actions: []
 	};
 
 	const regularCTAs = ctas.filter((cta) => !cta.atEnd);
@@ -60,29 +60,27 @@ export function createCTATimeline(ctas: TCTAItem[], config: TAddCTAAnimationsCon
 	// Place CTAs
 	placeRegularCTAs(
 		regularCTAs,
-		timeline.items,
+		track.actions,
 		availableDurationForRegularCTAs,
-		fps,
 		minSpacingFrames,
 		spreadType
 	);
-	placeEndCTAs(endCTAs, timeline.items, totalDurationInFrames, fps);
+	placeEndCTAs(endCTAs, track.actions, totalDurationInFrames);
 
-	return timeline;
+	return track;
 }
 
 function placeEndCTAs(
-	ctas: TCTAItem[],
-	items: TTimeline['items'],
-	totalDurationInFrames: number,
-	fps: number
+	ctas: TCTA[],
+	actions: TTimelineTrack['actions'],
+	totalDurationInFrames: number
 ): void {
 	let endPosition = totalDurationInFrames;
 	for (const cta of ctas.reverse()) {
 		// Reverse to place from end to start
 		const durationInFrames = cta.durationInFrames;
 		endPosition -= durationInFrames;
-		items.push({
+		actions.push({
 			...cta,
 			durationInFrames,
 			startFrame: endPosition
@@ -91,10 +89,9 @@ function placeEndCTAs(
 }
 
 function placeRegularCTAs(
-	ctas: TCTAItem[],
-	items: TTimeline['items'],
+	ctas: TCTA[],
+	actions: TTimelineTrack['actions'],
 	availableDuration: number,
-	fps: number,
 	minSpacingFrames: number,
 	spreadType: 'even' | 'random'
 ): void {
@@ -110,7 +107,7 @@ function placeRegularCTAs(
 				const durationInFrames = cta.durationInFrames;
 				const startFrame = Math.round(currentPosition);
 
-				items.push({
+				actions.push({
 					...cta,
 					durationInFrames,
 					startFrame
@@ -142,7 +139,7 @@ function placeRegularCTAs(
 
 				const startFrame = Math.floor(Math.random() * (maxStart - minStart + 1) + minStart);
 
-				items.push({
+				actions.push({
 					...cta,
 					durationInFrames,
 					startFrame
@@ -155,10 +152,7 @@ function placeRegularCTAs(
 	}
 }
 
-type TCTAItem = (
-	| Omit<TTikTokFollowPlugin, 'startFrame'>
-	| Omit<TTkiTokLikePlugin, 'startFrame'>
-) & {
+type TCTA = (Omit<TTikTokFollowPlugin, 'startFrame'> | Omit<TTkiTokLikePlugin, 'startFrame'>) & {
 	atEnd?: boolean;
 };
 

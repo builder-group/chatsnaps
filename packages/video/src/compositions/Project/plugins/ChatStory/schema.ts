@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { SVisualMedia } from '@/components';
 
-import { STimelineItemMixin, STimelinePlugin } from '../../schema';
+import { STimelineActionMixin, STimelineTrackPlugin } from '../../schema';
 
 export { SImageMedia, SVisualMedia } from '@/components';
 
-export const SMessageChatStoryTimelineItem = STimelineItemMixin.extend({
+export const SMessageChatStoryTimelineAction = STimelineActionMixin.extend({
 	type: z.literal('Message'),
 	messageType: z.enum(['sent', 'received']),
 	participant: z.object({
@@ -19,10 +19,12 @@ export const SMessageChatStoryTimelineItem = STimelineItemMixin.extend({
 		})
 	])
 });
-export type TMessageChatStoryTimelineItem = z.infer<typeof SMessageChatStoryTimelineItem>;
+export type TMessageChatStoryTimelineAction = z.infer<typeof SMessageChatStoryTimelineAction>;
 
-export const SChatStoryTimelineItem = z.discriminatedUnion('type', [SMessageChatStoryTimelineItem]);
-export type TChatStoryTimelineItem = z.infer<typeof SChatStoryTimelineItem>;
+export const SChatStoryTimelineAction = z.discriminatedUnion('type', [
+	SMessageChatStoryTimelineAction
+]);
+export type TChatStoryTimelineAction = z.infer<typeof SChatStoryTimelineAction>;
 
 export const SIMessageChatStoryMessenger = z.object({
 	type: z.literal('IMessage'),
@@ -43,12 +45,12 @@ export const SChatStoryMessenger = z.discriminatedUnion('type', [
 ]);
 export type TChatStoryMessenger = z.infer<typeof SChatStoryMessenger>;
 
-export const SChatStoryPlugin = STimelinePlugin.extend({
+export const SChatStoryPlugin = STimelineTrackPlugin.extend({
 	pluginId: z.literal('chat-story'),
 	props: z.object({
 		messenger: SChatStoryMessenger,
 		debug: z.boolean().optional()
 	}),
-	items: z.array(SChatStoryTimelineItem)
+	actions: z.array(SChatStoryTimelineAction)
 });
 export type TChatStoryPlugin = z.infer<typeof SChatStoryPlugin>;

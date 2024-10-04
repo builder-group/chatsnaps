@@ -1,7 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { zValidator } from '@hono/zod-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
-import { getStaticAsset, ProjectComp, type TProjectCompProps, type TTimeline } from '@repo/video';
+import {
+	getMaxTracksDuration,
+	getStaticAsset,
+	ProjectComp,
+	type TTimeline,
+	type TTimelineTrack
+} from '@repo/video';
 import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr } from '@blgc/utils';
@@ -10,9 +16,8 @@ import { getResource, selectRandomVideo } from '@/lib';
 import { logger } from '@/logger';
 
 import { router } from '../../router';
-import { createChatStoryTimeline } from './create-chatstory-timeline';
-import { createCTATimeline, createFollowCTA, createLikeCTA } from './create-cta-timeline';
-import { getMaxTimelineDuration } from './get-max-timeline-duration';
+import { createChatStoryTracks } from './create-chatstory-tracks';
+import { createCTATrack, createFollowCTA, createLikeCTA } from './create-cta-track';
 import { ChatStoryScriptToVideoProjectRoute, RenderVideoProjectRoute } from './schema';
 
 router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
@@ -27,26 +32,22 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	const useCached = useCachedString === 'true';
 	const fps = 30;
 
-	const timelines: TProjectCompProps['timelines'] = [];
+	const timeline: TTimeline = { tracks: [] };
 
-	const { messagesTimeline, voiceoverTimeline, notificationTimeline, creditsSpent } = (
-		await createChatStoryTimeline(data, {
+	const { messageTrack, voiceoverTrack, notificationTrack, creditsSpent } = (
+		await createChatStoryTracks(data, {
 			voiceover: includeVoiceover,
 			fps,
 			messageDelayMs: 500,
 			useCached
 		})
 	).unwrap();
-	const durationInFrames = getMaxTimelineDuration([
-		messagesTimeline,
-		voiceoverTimeline,
-		notificationTimeline
-	]);
-	timelines.push(messagesTimeline);
-	if (voiceoverTimeline.items.length > 0) {
-		timelines.push(voiceoverTimeline);
+	const durationInFrames = getMaxTracksDuration([messageTrack, voiceoverTrack, notificationTrack]);
+	timeline.tracks.push(messageTrack);
+	if (voiceoverTrack.actions.length > 0) {
+		timeline.tracks.push(voiceoverTrack);
 	}
-	timelines.push(notificationTimeline);
+	timeline.tracks.push(notificationTrack);
 
 	const likeText = [
 		'Like this! ❤️',
@@ -72,7 +73,7 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 		'Follow for updates! 📱',
 		'Want more? Follow! 💥'
 	];
-	const ctaTimeline = createCTATimeline(
+	const ctaTrack = createCTATrack(
 		[
 			createLikeCTA(likeText[Math.floor(Math.random() * likeText.length)] as unknown as string),
 			createFollowCTA(
@@ -88,7 +89,7 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 		],
 		{ fps, totalDurationInFrames: durationInFrames }
 	);
-	timelines.push(ctaTimeline);
+	timeline.tracks.push(ctaTrack);
 
 	const backgroundVideo = includeBackgroundVideo
 		? selectRandomVideo(
@@ -113,10 +114,10 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 				}
 			)
 		: null;
-	const backgroundVideoTimeline: TTimeline = {
-		type: 'Timeline',
+	const backgroundVideoTrack: TTimelineTrack = {
+		type: 'Track',
 		id: 'background-video-timeline',
-		items: [
+		actions: [
 			{
 				type: 'Rectangle',
 				width: 1080,
@@ -137,7 +138,7 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 			}
 		]
 	};
-	timelines.unshift(backgroundVideoTimeline);
+	timeline.tracks.unshift(backgroundVideoTrack);
 
 	logger.info(`Total credits spent: ${creditsSpent.toString()}`);
 
@@ -145,9 +146,11 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 		{
 			project: {
 				name: data.title,
-				timelines,
+				timeline,
 				durationInFrames,
-				fps
+				fps,
+				width: 1080,
+				height: 1920
 			},
 			creditsSpent
 		},

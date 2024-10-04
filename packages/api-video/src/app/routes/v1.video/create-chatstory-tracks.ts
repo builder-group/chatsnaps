@@ -1,4 +1,4 @@
-import { getStaticAsset, type TChatStoryPlugin, type TTimeline } from '@repo/video';
+import { getStaticAsset, type TChatStoryPlugin, type TTimelineTrack } from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
@@ -12,15 +12,15 @@ import {
 	type TChatStoryVideoParticipant
 } from './schema';
 
-export function createChatStoryTimeline(
+export function createChatStoryTracks(
 	script: TChatStoryScriptDto,
 	options: TChatStoryCreatorOptions = {}
 ): Promise<
 	TResult<
 		{
-			messagesTimeline: TChatStoryPlugin;
-			voiceoverTimeline: TTimeline;
-			notificationTimeline: TTimeline;
+			messageTrack: TChatStoryPlugin;
+			voiceoverTrack: TTimelineTrack;
+			notificationTrack: TTimelineTrack;
 			creditsSpent: number;
 		},
 		AppError
@@ -31,16 +31,16 @@ export function createChatStoryTimeline(
 }
 
 class ChatStoryCreator {
-	private messagesTimeline: TChatStoryPlugin;
-	private notificationTimeline: TTimeline = {
-		type: 'Timeline',
+	private messageTrack: TChatStoryPlugin;
+	private notificationTrack: TTimelineTrack = {
+		type: 'Track',
 		id: 'notification-timeline',
-		items: []
+		actions: []
 	};
-	private voiceoverTimeline: TTimeline = {
-		type: 'Timeline',
+	private voiceoverTrack: TTimelineTrack = {
+		type: 'Track',
 		id: 'voiceover-timeline',
-		items: []
+		actions: []
 	};
 
 	private currentTimeMs = 0;
@@ -65,8 +65,8 @@ class ChatStoryCreator {
 			voiceover: options.voiceover ?? false,
 			useCached: options.useCached ?? true
 		};
-		this.messagesTimeline = {
-			type: 'TimelinePlugin',
+		this.messageTrack = {
+			type: 'Plugin',
 			pluginId: 'chat-story',
 			id: 'chat-story-timeline',
 			props: {
@@ -85,16 +85,16 @@ class ChatStoryCreator {
 			height: 800,
 			x: 0,
 			y: 256,
-			items: []
+			actions: []
 		};
 	}
 
 	public async create(): Promise<
 		TResult<
 			{
-				messagesTimeline: TChatStoryPlugin;
-				voiceoverTimeline: TTimeline;
-				notificationTimeline: TTimeline;
+				messageTrack: TChatStoryPlugin;
+				voiceoverTrack: TTimelineTrack;
+				notificationTrack: TTimelineTrack;
 				creditsSpent: number;
 			},
 			AppError
@@ -127,9 +127,9 @@ class ChatStoryCreator {
 		}
 
 		return Ok({
-			messagesTimeline: this.messagesTimeline,
-			voiceoverTimeline: this.voiceoverTimeline,
-			notificationTimeline: this.notificationTimeline,
+			messageTrack: this.messageTrack,
+			voiceoverTrack: this.voiceoverTrack,
+			notificationTrack: this.notificationTrack,
 			creditsSpent: this.creditsSpent
 		});
 	}
@@ -185,7 +185,7 @@ class ChatStoryCreator {
 		const audio = participant.isSelf
 			? getStaticAsset('static/audio/sound/ios_sent.mp3')
 			: getStaticAsset('static/audio/sound/ios_received.mp3');
-		this.notificationTimeline.items.push({
+		this.notificationTrack.actions.push({
 			type: 'Audio',
 			src: audio.path,
 			volume: 1,
@@ -317,7 +317,7 @@ class ChatStoryCreator {
 	}
 
 	private addVoiceoverToTimeline(src: string, startFrame: number, durationInFrames: number): void {
-		this.voiceoverTimeline.items.push({
+		this.voiceoverTrack.actions.push({
 			type: 'Audio',
 			src,
 			volume: 1,
@@ -331,7 +331,7 @@ class ChatStoryCreator {
 		participant: TChatStoryVideoParticipant,
 		startFrame: number
 	): void {
-		this.messagesTimeline.items.push({
+		this.messageTrack.actions.push({
 			type: 'Message',
 			content: { type: 'Text', text: item.content },
 			participant: {

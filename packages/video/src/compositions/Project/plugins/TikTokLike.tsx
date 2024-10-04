@@ -13,12 +13,12 @@ import { z } from 'zod';
 import { HeartIcon } from '@/components';
 import { cn, getStaticAsset } from '@/lib';
 
-import { STimelineItemPlugin } from '../schema';
-import { registerTimelineItemPlugin } from './plugin-registry';
+import { STimelineActionPlugin } from '../schema';
+import { registerTimelineActionPlugin } from './plugin-registry';
 
 const COLORS = ['#FF69B4', '#FF1493', '#FF6347', '#FFD700', '#FF4500'];
 
-export const STikTokLikePlugin = STimelineItemPlugin.extend({
+export const STikTokLikePlugin = STimelineActionPlugin.extend({
 	pluginId: z.literal('tiktok-like'),
 	props: z.object({
 		text: z.string().optional(),
@@ -27,7 +27,7 @@ export const STikTokLikePlugin = STimelineItemPlugin.extend({
 });
 export type TTkiTokLikePlugin = z.infer<typeof STikTokLikePlugin>;
 
-registerTimelineItemPlugin({
+registerTimelineActionPlugin({
 	id: 'tiktok-like',
 	schema: STikTokLikePlugin,
 	component: (props) => {

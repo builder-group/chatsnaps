@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { IMessageMessenger } from './IMessageMessenger';
-import { TChatStoryMessenger, TMessageChatStoryTimelineItem } from './schema';
+import { TChatStoryMessenger, TMessageChatStoryTimelineAction } from './schema';
 
 export const Messenger: React.FC<TProps> = (props) => {
-	const { messenger, items, ...elementProps } = props;
+	const { messenger, actions, ...elementProps } = props;
 	switch (messenger.type) {
 		case 'IMessage':
-			return <IMessageMessenger items={items} {...messenger} {...elementProps} />;
+			return <IMessageMessenger actions={actions} {...messenger} {...elementProps} />;
 		default:
 			return null;
 	}
@@ -15,7 +15,7 @@ export const Messenger: React.FC<TProps> = (props) => {
 
 interface TProps {
 	messenger: TChatStoryMessenger;
-	items: TMessageChatStoryTimelineItem[];
+	actions: TMessageChatStoryTimelineAction[];
 	maxHeight: number;
 	className?: string;
 }

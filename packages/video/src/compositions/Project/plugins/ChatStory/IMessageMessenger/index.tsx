@@ -3,12 +3,12 @@ import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '@/components';
 import { cn } from '@/lib';
 
-import { TIMessageChatStoryMessenger, TMessageChatStoryTimelineItem } from '../schema';
+import { TIMessageChatStoryMessenger, TMessageChatStoryTimelineAction } from '../schema';
 
 import './style.scss';
 
 export const IMessageMessenger: React.FC<TProps> = (props) => {
-	const { items, contact, className, maxHeight } = props;
+	const { actions, contact, className, maxHeight } = props;
 	const frame = useCurrentFrame();
 	const { fps } = useVideoConfig();
 	const contentRef = React.useRef<HTMLOListElement>(null);
@@ -58,9 +58,9 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					paddingTop: headerHeight + 16
 				}}
 			>
-				{items.map(({ content, messageType, startFrame }, i) => {
-					const isLast = i === items.length - 1;
-					const noTail = !isLast && items[i + 1]?.messageType === messageType;
+				{actions.map(({ content, messageType, startFrame }, i) => {
+					const isLast = i === actions.length - 1;
+					const noTail = !isLast && actions[i + 1]?.messageType === messageType;
 
 					// Interpolate opacity and y position
 					const springAnimation = spring({
@@ -112,7 +112,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 };
 
 interface TProps extends Omit<TIMessageChatStoryMessenger, 'type'> {
-	items: TMessageChatStoryTimelineItem[];
+	actions: TMessageChatStoryTimelineAction[];
 	maxHeight: number;
 	className?: string;
 }

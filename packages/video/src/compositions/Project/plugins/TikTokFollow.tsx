@@ -11,10 +11,10 @@ import { z } from 'zod';
 import { CheckIcon, Media, SVisualMedia, XIcon } from '@/components';
 import { cn, getStaticAsset } from '@/lib';
 
-import { STimelineItemPlugin } from '../schema';
-import { registerTimelineItemPlugin } from './plugin-registry';
+import { STimelineActionPlugin } from '../schema';
+import { registerTimelineActionPlugin } from './plugin-registry';
 
-export const STikTokFollowPlugin = STimelineItemPlugin.extend({
+export const STikTokFollowPlugin = STimelineActionPlugin.extend({
 	pluginId: z.literal('tiktok-follow'),
 	props: z.object({
 		media: SVisualMedia,
@@ -24,7 +24,7 @@ export const STikTokFollowPlugin = STimelineItemPlugin.extend({
 });
 export type TTikTokFollowPlugin = z.infer<typeof STikTokFollowPlugin>;
 
-registerTimelineItemPlugin({
+registerTimelineActionPlugin({
 	id: 'tiktok-follow',
 	schema: STikTokFollowPlugin,
 	component: (props) => {

@@ -21,7 +21,7 @@ registerTimelinePlugin({
 				})}
 			>
 				<Messenger
-					items={timeline.items.filter(
+					actions={timeline.actions.filter(
 						(item) => item.type === 'Message' && item.startFrame <= frame
 					)}
 					messenger={timeline.props.messenger}

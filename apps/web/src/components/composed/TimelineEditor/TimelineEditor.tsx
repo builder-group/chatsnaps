@@ -1,40 +1,109 @@
 'use client';
 
-import { Player } from '@remotion/player';
-import { ProjectComp } from '@repo/video';
+import { Player, type CallbackListener, type PlayerRef } from '@remotion/player';
+import { ProjectComp, type TProjectCompProps } from '@repo/video';
 
 import '@repo/video/dist/style.css';
 
-import { Timeline } from '@xzdarcy/react-timeline-editor';
+import {
+	Timeline,
+	type TimelineAction,
+	type TimelineRow,
+	type TimelineState
+} from '@xzdarcy/react-timeline-editor';
 import React from 'react';
 
-import { mockData, mockEffect, project1 } from './mock';
+import { project1 } from './mock';
 
 export const TimelineEditor: React.FC = () => {
-	const [data, setData] = React.useState(mockData);
+	const [project, setProject] = React.useState<TProjectCompProps>(project1);
+	const [currentTime, setCurrentTime] = React.useState(0);
+	const playerRef = React.useRef<PlayerRef>(null);
+	const timelineRef = React.useRef<TimelineState>(null);
+
+	const handleTimelineChange = React.useCallback((newData: TimelineRow[]) => {
+		console.log({ newData });
+	}, []);
+
+	const editorData: TimelineRow[] = React.useMemo(
+		() =>
+			project.timeline.tracks.map((track) => ({
+				id: track.id,
+				actions: track.actions.map(
+					(item): TimelineAction => ({
+						id: `${item.type}-${item.startFrame.toString()}`,
+						start: item.startFrame / project.fps,
+						end: (item.startFrame + item.durationInFrames) / project.fps,
+						effectId: item.type
+					})
+				),
+				rowHeight: 32,
+				selected: false,
+				classNames: []
+			})),
+		[project]
+	);
+
+	const handleTimeUpdate = React.useCallback(
+		(time: number) => {
+			setCurrentTime(time);
+			if (playerRef.current) {
+				playerRef.current.seekTo(time * project.fps);
+			}
+			if (timelineRef.current) {
+				timelineRef.current.setTime(time);
+			}
+		},
+		[project.fps]
+	);
+
+	React.useEffect(() => {
+		if (playerRef.current) {
+			const timeUpadeListener: CallbackListener<'timeupdate'> = (event) => {
+				const newTime = event.detail.frame / project.fps;
+				if (Math.abs(newTime - currentTime) > 0.1) {
+					handleTimeUpdate(newTime);
+				}
+			};
+
+			playerRef.current.addEventListener('timeupdate', timeUpadeListener);
+
+			return () => {
+				playerRef.current?.removeEventListener('timeupdate', timeUpadeListener);
+			};
+		}
+	}, [currentTime, project.fps, handleTimeUpdate]);
 
 	return (
-		<div className="bg-red-400">
-			<div className="b-5 max-w-[500px] overflow-hidden shadow-2xl">
+		<div className="bg-gray-100 p-4">
+			<div className="mb-5 max-w-[500px] overflow-hidden shadow-2xl">
 				<Player
+					ref={playerRef}
 					component={ProjectComp}
-					inputProps={project1}
+					inputProps={project}
 					durationInFrames={300}
-					fps={30}
-					compositionWidth={1080}
-					compositionHeight={1920}
+					fps={project.fps}
+					compositionWidth={project.width}
+					compositionHeight={project.height}
 					style={{ width: '100%' }}
-					autoPlay
 				/>
 			</div>
 
 			<Timeline
-				onChange={setData}
-				editorData={data}
-				effects={mockEffect}
+				ref={timelineRef}
+				onChange={handleTimelineChange}
+				editorData={editorData}
+				effects={{}}
 				hideCursor={false}
 				dragLine
 				style={{ width: '100%' }}
+				onClickTimeArea={(time) => {
+					handleTimeUpdate(time);
+					return true;
+				}}
+				onCursorDrag={(time) => {
+					handleTimeUpdate(time);
+				}}
 			/>
 		</div>
 	);
