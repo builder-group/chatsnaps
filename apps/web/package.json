@@ -24,6 +24,8 @@
 		"@blgc/utils": "^0.0.20",
 		"@radix-ui/react-icons": "^1.3.0",
 		"@radix-ui/react-slot": "^1.1.0",
+		"@remotion/player": "^4.0.216",
+		"@repo/video": "workspace:*",
 		"@xzdarcy/react-timeline-editor": "^0.1.9",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",

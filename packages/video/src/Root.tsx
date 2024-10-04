@@ -17,7 +17,7 @@ export const Root: React.FC = () => {
 				width={1080} // Set by calculateMetadata
 				height={1920} // Set by calculateMetadata
 				schema={ProjectComp.schema}
-				defaultProps={defaultProps.chatstory as any}
+				defaultProps={defaultProps.project1 as any}
 			/>
 		</>
 	);
