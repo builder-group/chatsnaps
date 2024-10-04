@@ -51,7 +51,8 @@ export const ChatStoryScriptToVideoProjectRoute = createRoute({
 		body: JsonRequestBody(SChatStoryScriptDto),
 		query: z.object({
 			includeVoiceover: z.enum(['true', 'false']).optional(),
-			includeBackgroundVideo: z.enum(['true', 'false']).optional()
+			includeBackgroundVideo: z.enum(['true', 'false']).optional(),
+			useCached: z.enum(['true', 'false']).optional()
 		})
 	},
 	responses: {

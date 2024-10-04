@@ -19,16 +19,23 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	const data = c.req.valid('json');
 	const {
 		includeVoiceover: includeVoiceoverString = 'false',
-		includeBackgroundVideo: includeBackgroundVideoString = 'false'
+		includeBackgroundVideo: includeBackgroundVideoString = 'false',
+		useCached: useCachedString = 'true'
 	} = c.req.valid('query');
 	const includeVoiceover = includeVoiceoverString === 'true';
 	const includeBackgroundVideo = includeBackgroundVideoString === 'true';
+	const useCached = useCachedString === 'true';
 	const fps = 30;
 
 	const timelines: TProjectCompProps['timelines'] = [];
 
 	const { messagesTimeline, voiceoverTimeline, notificationTimeline, creditsSpent } = (
-		await createChatStoryTimeline(data, { voiceover: includeVoiceover, fps, messageDelayMs: 500 })
+		await createChatStoryTimeline(data, {
+			voiceover: includeVoiceover,
+			fps,
+			messageDelayMs: 500,
+			useCached
+		})
 	).unwrap();
 	const durationInFrames = getMaxTimelineDuration([
 		messagesTimeline,

@@ -63,17 +63,12 @@ class ChatStoryCreator {
 			fps: options.fps ?? 30,
 			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
 			voiceover: options.voiceover ?? false,
-			useCached: true
+			useCached: options.useCached ?? true
 		};
 		this.messagesTimeline = {
 			type: 'TimelinePlugin',
 			pluginId: 'chat-story',
 			id: 'chat-story-timeline',
-			items: [],
-			width: 1080,
-			height: 800,
-			x: 0,
-			y: 256,
 			props: {
 				messenger: this.script.messenger ?? {
 					type: 'IMessage',
@@ -85,7 +80,12 @@ class ChatStoryCreator {
 						name: 'Mom'
 					}
 				}
-			}
+			},
+			width: 1080,
+			height: 800,
+			x: 0,
+			y: 256,
+			items: []
 		};
 	}
 
@@ -433,7 +433,8 @@ class ChatStoryCreator {
 			'e.g.': 'for example',
 			'i.e.': 'that is',
 			'etc.': 'et cetera',
-			'mins': 'minutes'
+			'mins': 'minutes',
+			'F\\*\\*\\*': 'FRICK!'
 		};
 
 		// Replace abbreviations with their full forms
