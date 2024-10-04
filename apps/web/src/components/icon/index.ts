@@ -2,4 +2,4 @@
 export * from './SpinnerIcon';
 
 // Third Party Icons
-export { DotsVerticalIcon } from '@radix-ui/react-icons';
+export { PauseIcon, PlayIcon } from '@radix-ui/react-icons';

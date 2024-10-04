@@ -38,7 +38,6 @@ export const TimelineShapeAction: React.FC<TProps> = (props) => {
 	if (hasOpacityMixin(action)) {
 		style.opacity = getInterpolatedValue(action.opacity, frame);
 	}
-	console.log({ item: action, hasFillMixin: hasFillMixin(action) });
 	if (hasFillMixin(action)) {
 		switch (action.fill.type) {
 			case 'Video': {
