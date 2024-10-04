@@ -114,7 +114,7 @@ export const STimelineActionPlugin = STimelineActionMixin.merge(SSizeMixin.parti
 	.extend({
 		type: z.literal('Plugin'),
 		pluginId: z.string(),
-		props: z.any().optional()
+		props: z.unknown().optional()
 	});
 export type TTimelineActionPlugin = z.infer<typeof STimelineActionPlugin>;
 
@@ -143,8 +143,7 @@ export const STimelineTrackPlugin = STimelineTrackMixin.merge(SSizeMixin.partial
 	.extend({
 		type: z.literal('Plugin'),
 		pluginId: z.string(),
-		actions: z.array(z.any()),
-		props: z.any().optional()
+		props: z.unknown().optional()
 	});
 export type TTimelineTrackPlugin = z.infer<typeof STimelineTrackPlugin>;
 

@@ -28,7 +28,7 @@ export const TimelineEditor: React.FC = () => {
 					id: `${item.type}-${item.startFrame.toString()}`,
 					start: item.startFrame / project.fps,
 					end: (item.startFrame + item.durationInFrames) / project.fps,
-					effectId: item.type // Required but not used since its based on Remotion video
+					effectId: item.type
 				})),
 				rowHeight: 32,
 				selected: false,
@@ -97,6 +97,9 @@ export const TimelineEditor: React.FC = () => {
 				onCursorDrag={(time) => {
 					handleTimeUpdate(time);
 				}}
+				// getActionRender={(action, row) => {
+				// 	return <Timeline
+				// }}
 			/>
 		</div>
 	);

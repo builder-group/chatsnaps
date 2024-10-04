@@ -1,4 +1,4 @@
-import { type TProjectCompProps } from '@repo/video';
+import { type TChatStoryPlugin, type TProjectCompProps } from '@repo/video';
 
 export const project1: TProjectCompProps = {
 	name: 'Project 1',
@@ -940,7 +940,7 @@ export const chatStoryProject: TProjectCompProps = {
 						durationInFrames: 0
 					}
 				]
-			},
+			} as TChatStoryPlugin,
 			{
 				type: 'Track',
 				id: 'voiceover-timeline',
