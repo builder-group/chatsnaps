@@ -58,7 +58,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					paddingTop: headerHeight + 16
 				}}
 			>
-				{actions.map(({ content, messageType, startFrame }, i) => {
+				{actions.map(({ content, messageType, startFrame, durationInFrames }, i) => {
 					const isLast = i === actions.length - 1;
 					const noTail = !isLast && actions[i + 1]?.messageType === messageType;
 
@@ -70,7 +70,8 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 							damping: 20,
 							stiffness: 200,
 							mass: 0.2
-						}
+						},
+						durationInFrames
 					});
 					const opacity = interpolate(springAnimation, [0, 1], [0, 1]);
 					const yPosition = interpolate(springAnimation, [0, 1], [300, 0]);

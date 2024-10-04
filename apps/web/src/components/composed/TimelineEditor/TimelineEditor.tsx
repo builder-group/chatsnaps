@@ -78,7 +78,9 @@ export const TimelineEditor: React.FC = () => {
 					fps={project.fps}
 					compositionWidth={project.width}
 					compositionHeight={project.height}
+					numberOfSharedAudioTags={0}
 					style={{ width: '100%' }}
+					controls
 				/>
 			</div>
 

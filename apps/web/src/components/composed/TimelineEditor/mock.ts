@@ -131,7 +131,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 0,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -144,7 +144,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 29,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -157,7 +157,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 59,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -170,7 +170,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 100,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -183,7 +183,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 131,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -196,7 +196,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 151,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -209,7 +209,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 188,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -222,7 +222,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 214,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -235,7 +235,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 242,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -248,7 +248,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 271,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -261,7 +261,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 304,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -274,7 +274,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 322,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -287,7 +287,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 356,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -300,7 +300,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 385,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -313,7 +313,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 408,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -326,7 +326,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 434,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -339,7 +339,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 462,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -352,7 +352,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 485,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -365,7 +365,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 518,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -378,7 +378,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 543,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -391,7 +391,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 581,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -404,7 +404,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 613,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -417,7 +417,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 632,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -430,7 +430,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 674,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -443,7 +443,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 712,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -456,7 +456,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 742,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -469,7 +469,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 781,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -482,7 +482,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 817,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -495,7 +495,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 845,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -508,7 +508,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 874,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -521,7 +521,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 908,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -534,7 +534,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 936,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -547,7 +547,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 984,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -560,7 +560,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1003,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -573,7 +573,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1055,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -586,7 +586,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1085,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -599,7 +599,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1111,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -612,7 +612,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1163,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -625,7 +625,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1200,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -638,7 +638,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1255,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -651,7 +651,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1296,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -664,7 +664,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1327,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -677,7 +677,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1363,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -690,7 +690,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1390,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -703,7 +703,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1416,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -716,7 +716,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1441,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -729,7 +729,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1472,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -742,7 +742,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1508,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -755,7 +755,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1553,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -768,7 +768,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1583,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -781,7 +781,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1620,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -794,7 +794,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1644,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -807,7 +807,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1681,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -820,7 +820,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1702,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -833,7 +833,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1739,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -846,7 +846,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1763,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -859,7 +859,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1788,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -872,7 +872,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1813,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -885,7 +885,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'received',
 						startFrame: 1855,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -898,7 +898,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1888,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -911,7 +911,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1909,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -924,7 +924,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1957,
-						durationInFrames: 0
+						durationInFrames: 15
 					},
 					{
 						type: 'Message',
@@ -937,7 +937,7 @@ export const chatStoryProject: TProjectCompProps = {
 						},
 						messageType: 'sent',
 						startFrame: 1980,
-						durationInFrames: 0
+						durationInFrames: 15
 					}
 				]
 			} as TChatStoryPlugin,

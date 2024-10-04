@@ -339,7 +339,7 @@ class ChatStoryCreator {
 			},
 			messageType: participant.isSelf ? 'sent' : 'received',
 			startFrame,
-			durationInFrames: 0
+			durationInFrames: this.config.fps / 2
 		});
 	}
 
