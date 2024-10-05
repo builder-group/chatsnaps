@@ -73,9 +73,11 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 			/>
 			<EditArea
 				timeline={timeline}
-				scrollLeft={scrollLeft}
 				timeGridVirtualizer={timeGridVirtualizer}
 				scaleSplitCount={scaleSplitCount}
+				scale={scale}
+				scaleWidth={scaleWidth}
+				startLeft={startLeft}
 			/>
 		</div>
 	);
