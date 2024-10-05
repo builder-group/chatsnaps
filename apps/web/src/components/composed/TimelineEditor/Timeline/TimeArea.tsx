@@ -4,19 +4,19 @@ import { type Virtualizer } from '@tanstack/react-virtual';
 import React from 'react';
 import { cn } from '@/lib';
 
-import { parsePixelToTime } from './parse-pixel-to-time';
+import { parsePixelToTime } from './helper';
 
-export const TimeArea: React.FC<TTimeAreaProps> = ({
-	scrollLeft,
-	maxScaleCount,
-	scale,
-	scaleWidth,
-	scaleSplitCount,
-	startLeft,
-	onClickTimeArea,
-	getScaleRender,
-	virtualizer
-}) => {
+export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
+	const {
+		scrollLeft,
+		scale,
+		scaleWidth,
+		scaleSplitCount,
+		startLeft,
+		onClickTimeArea,
+		getScaleRender,
+		timeGridVirtualizer
+	} = props;
 	const showUnit = scaleSplitCount > 0;
 
 	const handleClick = React.useCallback(
@@ -29,23 +29,19 @@ export const TimeArea: React.FC<TTimeAreaProps> = ({
 			const position = e.clientX - rect.x;
 			const left = Math.max(position + scrollLeft, startLeft);
 
-			if (left > maxScaleCount * scaleWidth + startLeft - scrollLeft) {
-				return;
-			}
-
 			const time = parsePixelToTime(left, { startLeft, scale, scaleWidth });
 			onClickTimeArea(time, e);
 		},
-		[onClickTimeArea, maxScaleCount, scale, scaleWidth, scrollLeft, startLeft]
+		[onClickTimeArea, scale, scaleWidth, scrollLeft, startLeft]
 	);
 
 	return (
 		<div // Note: Using native scroll bar because its much more performant than ScrollArea
 			onClick={handleClick}
 			className="relative h-8 bg-purple-400"
-			style={{ width: `${virtualizer.getTotalSize().toString()}px` }}
+			style={{ width: `${timeGridVirtualizer.getTotalSize().toString()}px` }}
 		>
-			{virtualizer.getVirtualItems().map((virtualItem) => {
+			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
 				const isShowScale = showUnit ? virtualItem.index % scaleSplitCount === 0 : true;
 				const item = (showUnit ? virtualItem.index / scaleSplitCount : virtualItem.index) * scale;
 
@@ -75,13 +71,11 @@ export const TimeArea: React.FC<TTimeAreaProps> = ({
 
 interface TTimeAreaProps {
 	scrollLeft: number;
-	maxScaleCount: number;
 	scale: number;
 	scaleWidth: number;
-	scaleCount: number;
 	scaleSplitCount: number;
 	startLeft: number;
 	onClickTimeArea?: (time: number, event: React.MouseEvent) => void;
 	getScaleRender?: (item: number) => React.ReactNode;
-	virtualizer: Virtualizer<HTMLDivElement, Element>;
+	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
 }

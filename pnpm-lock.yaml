@@ -92,12 +92,18 @@ importers:
       feature-logger:
         specifier: ^0.0.23
         version: 0.0.23
+      feature-react:
+        specifier: ^0.0.26
+        version: 0.0.26(react@18.3.1)
       feature-state:
         specifier: ^0.0.29
         version: 0.0.29
       lucide-react:
         specifier: ^0.447.0
         version: 0.447.0(react@18.3.1)
+      nanoid:
+        specifier: ^5.0.7
+        version: 5.0.7
       next:
         specifier: 14.2.14
         version: 14.2.14(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.79.4)
@@ -3993,6 +3999,11 @@ packages:
   feature-logger@0.0.23:
     resolution: {integrity: sha512-5OfwQr3fvFp+gay/DNWVwXcGaVK0aM9tXswjI+EXS7RJUAUv3fOdzMhoP+uq7Hee0qH+IDTYql8IQALB8RfhbQ==}
 
+  feature-react@0.0.26:
+    resolution: {integrity: sha512-W5/OrcAvRHbUa3P8NAy9AzyBZ/QnDnnIY2p/c33f8E+5/3RqI72ZQExGtkRC8PCLMQyycx+zXOCRadv6SM0Lug==}
+    peerDependencies:
+      react: ^18.3.1
+
   feature-state@0.0.29:
     resolution: {integrity: sha512-xwy37vAjaAWxVhdWEVEMWIL6tgMgG1nhUIvWhNVUnZiwDsEvN66CMypADnGAkyFRy3GWdfIyoZGF5VgHsE1wFw==}
 
@@ -4823,6 +4834,11 @@ packages:
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.0.7:
+    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -11579,6 +11595,10 @@ snapshots:
       '@blgc/types': 0.0.7
       '@blgc/utils': 0.0.19
 
+  feature-react@0.0.26(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
   feature-state@0.0.29:
     dependencies:
       '@blgc/types': 0.0.7
@@ -12383,6 +12403,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
+
+  nanoid@5.0.7: {}
 
   natural-compare@1.4.0: {}
 

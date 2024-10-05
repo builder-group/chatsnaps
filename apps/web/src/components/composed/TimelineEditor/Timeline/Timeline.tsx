@@ -1,44 +1,44 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React from 'react';
 
-import { Cursor } from './Cursor';
 import { EditArea } from './EditArea';
+import { getMaxTimelinePixel } from './helper';
 import { TimeArea } from './TimeArea';
 import { type TTimeline } from './types';
 
-export const Timeline = React.forwardRef<TRef | null, TTimelineProps>((props, ref) => {
+export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((props, ref) => {
 	const {
 		timeline,
-		maxScaleCount = 20,
 		scale = 5,
-		scaleCount = 500, // TODO should be based on row length?
 		scaleSplitCount = 5,
 		scaleWidth = 100,
 		startLeft = 20,
 		initialScrollLeft = 0
 	} = props;
 
-	const divRef = React.useRef<HTMLDivElement>(null);
-
+	const containerRef = React.useRef<HTMLDivElement>(null);
 	React.useImperativeHandle(ref, () => {
-		if (divRef.current != null) {
+		if (containerRef.current != null) {
 			return {
-				...divRef.current,
+				...containerRef.current,
 				timeline
 			};
 		}
-		return null as unknown as TRef;
+		return null as unknown as TTimelineRef;
 	});
 
 	const [scrollLeft, setScrollLeft] = React.useState(initialScrollLeft);
-	const [cursorTime, setCursorTime] = React.useState(0);
-	const timelineRef = React.useRef<HTMLDivElement>(null);
 
-	const totalCount = scaleSplitCount > 0 ? scaleCount * scaleSplitCount + 1 : scaleCount;
-
-	const virtualizer = useVirtualizer({
-		count: totalCount,
-		getScrollElement: () => timelineRef.current,
+	const totalScaleCount = React.useMemo(() => {
+		const scaleCount = Math.ceil(
+			getMaxTimelinePixel(Object.values(timeline._actionMap), { startLeft, scale, scaleWidth }) /
+				scaleWidth
+		);
+		return scaleSplitCount > 0 ? scaleCount * scaleSplitCount + 1 : scaleCount;
+	}, [scaleSplitCount, timeline._actionMap, startLeft, scale, scaleWidth]);
+	const timeGridVirtualizer = useVirtualizer({
+		count: totalScaleCount,
+		getScrollElement: () => containerRef.current,
 		estimateSize: React.useCallback(
 			(index) => {
 				if (index === 0) return startLeft;
@@ -51,22 +51,13 @@ export const Timeline = React.forwardRef<TRef | null, TTimelineProps>((props, re
 		initialOffset: scrollLeft
 	});
 
-	const timelineWidth = virtualizer.getTotalSize();
-
 	const handleScroll = React.useCallback((newScrollLeft: number) => {
 		setScrollLeft(newScrollLeft);
 	}, []);
 
-	const handleCursorChange = React.useCallback(({ time }: { time?: number }) => {
-		if (time !== undefined) {
-			setCursorTime(time);
-		}
-		return true;
-	}, []);
-
 	return (
 		<div
-			ref={timelineRef}
+			ref={containerRef}
 			className="relative overflow-auto bg-green-300"
 			onScroll={(e) => {
 				handleScroll(e.currentTarget.scrollLeft);
@@ -74,29 +65,17 @@ export const Timeline = React.forwardRef<TRef | null, TTimelineProps>((props, re
 		>
 			<TimeArea
 				scrollLeft={scrollLeft}
-				maxScaleCount={maxScaleCount}
+				timeGridVirtualizer={timeGridVirtualizer}
 				scale={scale}
 				scaleWidth={scaleWidth}
-				scaleCount={scaleCount}
 				scaleSplitCount={scaleSplitCount}
 				startLeft={startLeft}
-				virtualizer={virtualizer}
 			/>
-			<EditArea scrollLeft={scrollLeft} virtualizer={virtualizer} />
-			<Cursor
-				disableDrag={false}
-				cursorTime={cursorTime}
-				setCursor={handleCursorChange}
-				startLeft={startLeft}
-				timelineWidth={timelineWidth}
-				scaleWidth={scaleWidth}
-				scale={scale}
+			<EditArea
+				timeline={timeline}
 				scrollLeft={scrollLeft}
-				areaRef={timelineRef}
-				maxScaleCount={maxScaleCount}
-				deltaScrollLeft={(delta) => {
-					setScrollLeft((prev) => prev + delta);
-				}}
+				timeGridVirtualizer={timeGridVirtualizer}
+				scaleSplitCount={scaleSplitCount}
 			/>
 		</div>
 	);
@@ -113,6 +92,7 @@ interface TTimelineProps {
 	startLeft?: number;
 	initialScrollLeft?: number;
 }
-interface TRef extends HTMLDivElement {
+
+interface TTimelineRef extends HTMLDivElement {
 	timeline: TTimeline;
 }

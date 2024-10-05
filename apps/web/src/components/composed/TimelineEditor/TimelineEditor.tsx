@@ -68,7 +68,7 @@ export const TimelineEditor: React.FC = () => {
 			</BufferingProvider>
 
 			<TimelinePlayer mediaPlayer={mediaPlayerRef} />
-			<Timeline timeline={createTimeline()} />
+			<Timeline timeline={createTimeline(project)} />
 		</div>
 	);
 };
