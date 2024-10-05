@@ -21,6 +21,7 @@ import '@vidstack/react/player/styles/base.css';
 import './style.css';
 
 import { chatStoryProject } from './mock';
+import { TimeArea } from './Timeline/TimeArea';
 import { TimelinePlayer } from './TimelinePlayer';
 
 export const TimelineEditor: React.FC = () => {
@@ -33,6 +34,8 @@ export const TimelineEditor: React.FC = () => {
 	const handleTimelineChange = React.useCallback((newData: TimelineRow[]) => {
 		console.log({ newData });
 	}, []);
+
+	console.log({ timelineStateRef });
 
 	React.useEffect(() => {
 		if (isPlaying) {
@@ -83,6 +86,22 @@ export const TimelineEditor: React.FC = () => {
 
 	return (
 		<div className="bg-gray-100 p-4">
+			<TimeArea
+				hideCursor
+				maxScaleCount={20}
+				onScroll={() => {
+					// do nothgin
+				}}
+				scale={5}
+				scaleCount={500}
+				scaleSplitCount={5}
+				scaleWidth={100}
+				startLeft={20}
+				scrollLeft={0}
+				setCursor={() => {
+					// do nothing
+				}}
+			/>
 			<BufferingProvider>
 				<MediaPlayer
 					src={
