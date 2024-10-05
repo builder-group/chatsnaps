@@ -1,27 +1,19 @@
-import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useGlobalState } from 'feature-react/state';
 
 import { parseTimeToXAndWidth } from './helper';
 import { type TTimeline, type TTimelineTrack } from './types';
 
 export const Track: React.FC<TTrackProps> = (props) => {
-	const {
-		timeline,
-		track,
-		index,
-		timeGridVirtualizer,
-		containerRef,
-		trackHeight,
-		startLeft,
-		scale,
-		scaleWidth
-	} = props;
+	const { timeline, track, containerRef, trackHeight, startLeft, scale, scaleWidth, scrollLeft } =
+		props;
+	const { actionIds } = useGlobalState(track);
 
-	// Horizontal virtualization for actions within each track
 	const actionVirtualizer = useVirtualizer({
-		count: track._value.actionIds.length,
+		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
 		estimateSize: (i) => {
-			const actionId = track._value.actionIds[i];
+			const actionId = actionIds[i];
 			if (actionId == null) {
 				return 0;
 			}
@@ -29,64 +21,62 @@ export const Track: React.FC<TTrackProps> = (props) => {
 			if (action == null) {
 				return 0;
 			}
-			return parseTimeToXAndWidth(action._value.start, action._value.duration, {
+			const { width } = parseTimeToXAndWidth(action._value.start, action._value.duration, {
 				startLeft,
 				scale,
 				scaleWidth
-			}).width;
+			});
+			return width;
 		},
 		horizontal: true,
-		overscan: 5
+		overscan: 50,
+		initialOffset: scrollLeft
 	});
 
 	return (
 		<div
-			className="relative"
+			className="relative bg-red-400"
 			style={{
-				height: `${trackHeight.toString()}px`,
-				transform: `translateY(${(index * trackHeight).toString()}px)`,
-				width: '100%'
+				height: trackHeight
 			}}
 		>
-			<div
-				style={{ height: '100%', width: actionVirtualizer.getTotalSize(), position: 'relative' }}
-			>
-				{actionVirtualizer.getVirtualItems().map((virtualAction) => {
-					const actionId = track._value.actionIds[virtualAction.index];
-					if (actionId == null) {
-						return;
-					}
-					const action = timeline._actionMap[actionId];
-					if (action == null) {
-						return;
-					}
-					const width = virtualAction.size;
-					const left = action._value.start * timeGridVirtualizer.options.estimateSize(0);
+			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
+				const actionId = actionIds[virtualAction.index];
+				if (actionId == null) {
+					return;
+				}
+				const action = timeline._actionMap[actionId];
+				if (action == null) {
+					return;
+				}
+				const { x } = parseTimeToXAndWidth(action._value.start, action._value.duration, {
+					startLeft,
+					scale,
+					scaleWidth
+				});
 
-					return (
-						<div
-							key={actionId}
-							className="absolute top-0 h-full bg-blue-500"
-							style={{
-								left: `${left.toString()}px`,
-								width: `${width.toString()}px`
-							}}
-						/>
-					);
-				})}
-			</div>
+				return (
+					<div
+						key={virtualAction.key}
+						className="absolute top-0 h-full bg-blue-500"
+						style={{
+							left: x, // TODO: We don't use 'virtualAction.start' because it doesn't account for spacing between items
+							width: virtualAction.size
+						}}
+					/>
+				);
+			})}
 		</div>
 	);
 };
 
 interface TTrackProps {
-	index: number;
 	track: TTimelineTrack;
 	timeline: TTimeline;
-	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
 	containerRef: React.RefObject<HTMLDivElement>;
 	trackHeight: number;
 	startLeft: number;
 	scale: number;
 	scaleWidth: number;
+	scrollLeft: number;
 }

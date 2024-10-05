@@ -11,7 +11,7 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 		timeline,
 		scale = 5,
 		scaleSplitCount = 5,
-		scaleWidth = 100,
+		scaleWidth = 200,
 		startLeft = 20,
 		initialScrollLeft = 0
 	} = props;
@@ -41,7 +41,9 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 		getScrollElement: () => containerRef.current,
 		estimateSize: React.useCallback(
 			(index) => {
-				if (index === 0) return startLeft;
+				if (index === 0) {
+					return startLeft;
+				}
 				return scaleSplitCount > 0 ? scaleWidth / scaleSplitCount : scaleWidth;
 			},
 			[startLeft, scaleSplitCount, scaleWidth]
@@ -78,6 +80,7 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 				scale={scale}
 				scaleWidth={scaleWidth}
 				startLeft={startLeft}
+				scrollLeft={scrollLeft}
 			/>
 		</div>
 	);

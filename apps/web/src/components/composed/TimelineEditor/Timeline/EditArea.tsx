@@ -6,33 +6,40 @@ import { Track } from './Track';
 import { type TTimeline } from './types';
 
 export const EditArea: React.FC<EditAreaProps> = (props) => {
-	const { timeline, timeGridVirtualizer, scaleSplitCount, scale, scaleWidth, startLeft } = props;
+	const {
+		timeline,
+		timeGridVirtualizer,
+		scaleSplitCount,
+		scale,
+		scaleWidth,
+		startLeft,
+		scrollLeft
+	} = props;
 	const containerRef = React.useRef<HTMLDivElement>(null);
 	const trackIds = useGlobalState(timeline._trackIds);
 	const trackHeight = 50;
 
-	// Vertical virtualization for tracks
 	const trackVirtualizer = useVirtualizer({
 		count: trackIds.length,
 		getScrollElement: () => containerRef.current,
 		estimateSize: () => trackHeight,
-		overscan: 5
+		horizontal: false,
+		overscan: 10,
+		initialOffset: 0
 	});
 
 	return (
 		<div
 			ref={containerRef}
-			className="relative overflow-auto"
+			className="relative h-full overflow-auto"
 			style={{
-				width: `${timeGridVirtualizer.getTotalSize().toString()}px`,
-				height: '100%'
+				width: timeGridVirtualizer.getTotalSize()
 			}}
 		>
 			<div
+				className="relative w-full overflow-auto"
 				style={{
-					height: `${trackVirtualizer.getTotalSize().toString()}px`,
-					width: '100%',
-					position: 'relative'
+					height: trackVirtualizer.getTotalSize()
 				}}
 			>
 				{trackVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -48,14 +55,13 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 						<Track
 							key={trackId}
 							track={track}
-							index={virtualRow.index}
 							timeline={timeline}
 							containerRef={containerRef}
-							timeGridVirtualizer={timeGridVirtualizer}
 							trackHeight={trackHeight}
 							scale={scale}
 							scaleWidth={scaleWidth}
 							startLeft={startLeft}
+							scrollLeft={scrollLeft}
 						/>
 					);
 				})}
@@ -68,8 +74,8 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 							key={virtualItem.key}
 							className="absolute top-0 h-full border-r-2 border-white/20"
 							style={{
-								left: `${virtualItem.start.toString()}px`,
-								width: `${virtualItem.size.toString()}px`
+								left: virtualItem.start,
+								width: virtualItem.size
 							}}
 						/>
 					);
@@ -87,4 +93,5 @@ interface EditAreaProps {
 	startLeft: number;
 	scale: number;
 	scaleWidth: number;
+	scrollLeft: number;
 }

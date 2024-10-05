@@ -36,10 +36,10 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 	);
 
 	return (
-		<div // Note: Using native scroll bar because its much more performant than ScrollArea
+		<div
 			onClick={handleClick}
 			className="relative h-8 bg-purple-400"
-			style={{ width: `${timeGridVirtualizer.getTotalSize().toString()}px` }}
+			style={{ width: timeGridVirtualizer.getTotalSize() }}
 		>
 			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
 				const isShowScale = showUnit ? virtualItem.index % scaleSplitCount === 0 : true;
@@ -53,8 +53,8 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 							'h-1': !isShowScale
 						})}
 						style={{
-							left: `${virtualItem.start.toString()}px`,
-							width: `${virtualItem.size.toString()}px`
+							left: virtualItem.start,
+							width: virtualItem.size
 						}}
 					>
 						{isShowScale ? (
