@@ -65,6 +65,9 @@ importers:
       '@repo/video':
         specifier: workspace:*
         version: link:../../packages/video
+      '@vidstack/react':
+        specifier: ^1.12.11
+        version: 1.12.11(@types/react@18.3.11)(react@18.3.1)
       '@xzdarcy/react-timeline-editor':
         specifier: ^0.1.9
         version: 0.1.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -89,6 +92,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      remotion:
+        specifier: 4.0.216
+        version: 4.0.216(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tailwind-merge:
         specifier: ^2.5.3
         version: 2.5.3
@@ -2712,6 +2718,13 @@ packages:
       typescript:
         optional: true
 
+  '@vidstack/react@1.12.11':
+    resolution: {integrity: sha512-rtSRjjob1k/mkzImN0wWPKYFi/Y7bsuSkDl/RfTxTKlDs4QzFtVwkUfgN1h8y+EUKJvMe9ozVHKdBtGYKDr6FQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/react': ^18.0.0
+      react: ^18.0.0
+
   '@vitest/expect@2.1.1':
     resolution: {integrity: sha512-YeueunS0HiHiQxk+KEOnq/QMzlUuOzbU1Go+PgAsHvvv3tUkJPm9xWt+6ITNTlzsMXUjmgm5T+U7KBPK2qQV6w==}
 
@@ -4653,6 +4666,10 @@ packages:
 
   mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
+
+  media-captions@1.0.4:
+    resolution: {integrity: sha512-cyDNmuZvvO4H27rcBq2Eudxo9IZRDCOX/I7VEyqbxsEiD2Ei7UYUhG/Sc5fvMZjmathgz3fEK7iAKqvpY+Ux1w==}
+    engines: {node: '>=16'}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -9666,6 +9683,13 @@ snapshots:
       - supports-color
       - vitest
 
+  '@vidstack/react@1.12.11(@types/react@18.3.11)(react@18.3.1)':
+    dependencies:
+      '@floating-ui/dom': 1.6.11
+      '@types/react': 18.3.11
+      media-captions: 1.0.4
+      react: 18.3.1
+
   '@vitest/expect@2.1.1':
     dependencies:
       '@vitest/spy': 2.1.1
@@ -12165,6 +12189,8 @@ snapshots:
       is-buffer: 1.1.6
 
   mdn-data@2.0.14: {}
+
+  media-captions@1.0.4: {}
 
   media-typer@0.3.0: {}
 
