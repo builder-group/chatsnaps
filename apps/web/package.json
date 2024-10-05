@@ -22,7 +22,10 @@
 	},
 	"dependencies": {
 		"@blgc/utils": "^0.0.20",
+		"@dnd-kit/core": "^6.1.0",
+		"@dnd-kit/utilities": "^3.2.2",
 		"@radix-ui/react-icons": "^1.3.0",
+		"@radix-ui/react-scroll-area": "^1.2.0",
 		"@radix-ui/react-select": "^2.1.2",
 		"@radix-ui/react-slot": "^1.1.0",
 		"@remotion/player": "^4.0.216",

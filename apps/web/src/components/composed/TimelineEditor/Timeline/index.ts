@@ -1,3 +1,4 @@
+export * from './create-timeline';
 export * from './TimeArea';
 export * from './Timeline';
 export * from './types';

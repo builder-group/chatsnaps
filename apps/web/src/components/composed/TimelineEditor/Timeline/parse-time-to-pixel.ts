@@ -1,4 +1,4 @@
-export function parsePixelToTime(
+export function parseTimeToPixel(
 	data: number,
 	param: {
 		startLeft: number;
@@ -7,5 +7,5 @@ export function parsePixelToTime(
 	}
 ): number {
 	const { startLeft, scale, scaleWidth } = param;
-	return ((data - startLeft) / scaleWidth) * scale;
+	return startLeft + (data / scale) * scaleWidth;
 }
