@@ -8,6 +8,7 @@ import {
 	MediaPlayer,
 	MediaProvider,
 	useMediaRemote,
+	useMediaState,
 	type MediaPlayerInstance
 } from '@vidstack/react';
 import { RemotionProviderLoader, type RemotionSrc } from '@vidstack/react/player/remotion';
@@ -27,31 +28,41 @@ export const TimelineEditor: React.FC = () => {
 	const timelineStateRef = React.useRef<TimelineState>(null);
 	const autoScrollWhenPlay = React.useRef<boolean>(true);
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
+	const isPlaying = useMediaState('playing', mediaPlayerRef);
 
 	const handleTimelineChange = React.useCallback((newData: TimelineRow[]) => {
 		console.log({ newData });
 	}, []);
 
 	React.useEffect(() => {
-		if (timelineStateRef.current != null && mediaPlayerRef.current != null) {
-			timelineStateRef.current.listener.on('afterSetTime', ({ time }) => {
-				mediaPlayerRef.current?.remoteControl.seek(time);
-			});
-			timelineStateRef.current.listener.on('setTimeByTick', ({ time }) => {
-				mediaPlayerRef.current?.remoteControl.seek(time);
-			});
+		if (isPlaying) {
+			timelineStateRef.current?.play({});
+		} else {
+			timelineStateRef.current?.pause();
 		}
-	}, [project.fps]);
+	}, [isPlaying]);
 
 	React.useEffect(() => {
-		if (mediaPlayerRef.current != null) {
-			console.log({ mediaPlayer: mediaPlayerRef.current });
-		}
+		const unsubscribeAfterSetTime = timelineStateRef.current?.listener.on(
+			'afterSetTime',
+			({ time, engine }) => {
+				if (!engine.isPlaying) {
+					mediaPlayerRef.current?.remoteControl.seek(time);
+				}
+			}
+		);
+
+		const unsubscribeCurrentTime = mediaPlayerRef.current?.subscribe(({ currentTime }) => {
+			timelineStateRef.current?.setTime(currentTime);
+		});
+
+		return () => {
+			unsubscribeCurrentTime?.();
+			unsubscribeAfterSetTime?.offAll();
+		};
 	}, []);
 
-	// const {  } = useMediaStore(mediaPlayerRef);
-	const remote = useMediaRemote();
-	// remote.
+	const remote = useMediaRemote(mediaPlayerRef);
 
 	const editorData: TimelineRow[] = React.useMemo(
 		() =>
@@ -70,34 +81,34 @@ export const TimelineEditor: React.FC = () => {
 		[project.timeline.tracks, project.fps]
 	);
 
-	const src: RemotionSrc = {
-		type: 'video/remotion',
-		src: ProjectComp as any,
-		durationInFrames: 30 * project.fps,
-		fps: project.fps,
-		initialFrame: 0,
-		compositionWidth: project.width,
-		compositionHeight: project.height,
-		inputProps: project,
-		renderLoading: () => {
-			console.log('RenderLoading');
-			return null;
-		},
-		errorFallback: () => {
-			console.log('Error Fallback');
-			return null;
-		},
-		onError(e) {
-			console.log('Error', { e });
-		},
-		numberOfSharedAudioTags: 0
-	};
-
 	return (
 		<div className="bg-gray-100 p-4">
 			<BufferingProvider>
 				<MediaPlayer
-					src={src}
+					src={
+						{
+							type: 'video/remotion',
+							src: ProjectComp as any,
+							durationInFrames: 30 * project.fps,
+							fps: project.fps,
+							initialFrame: 0,
+							compositionWidth: project.width,
+							compositionHeight: project.height,
+							inputProps: project,
+							renderLoading: () => {
+								console.log('RenderLoading');
+								return null;
+							},
+							errorFallback: () => {
+								console.log('Error Fallback');
+								return null;
+							},
+							onError(e) {
+								console.log('Error', { e });
+							},
+							numberOfSharedAudioTags: 0
+						} as RemotionSrc
+					}
 					title="Hello World"
 					aspectRatio="9/16"
 					ref={mediaPlayerRef}
@@ -108,7 +119,7 @@ export const TimelineEditor: React.FC = () => {
 				</MediaPlayer>
 			</BufferingProvider>
 
-			<TimelinePlayer timelineState={timelineStateRef} autoScrollWhenPlay={autoScrollWhenPlay} />
+			<TimelinePlayer mediaPlayer={mediaPlayerRef} />
 			<Timeline
 				ref={timelineStateRef}
 				onChange={handleTimelineChange}

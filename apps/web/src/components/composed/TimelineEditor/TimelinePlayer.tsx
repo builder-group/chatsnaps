@@ -1,5 +1,5 @@
 import { PauseIcon, PlayIcon } from '@radix-ui/react-icons';
-import { type TimelineState } from '@xzdarcy/react-timeline-editor';
+import { useMediaState, type MediaPlayerInstance } from '@vidstack/react';
 import React from 'react';
 
 import { Button } from '../../input';
@@ -10,57 +10,26 @@ export const scale = 5;
 export const startLeft = 20;
 
 export const TimelinePlayer: React.FC<TProps> = (props) => {
-	const { timelineState, autoScrollWhenPlay } = props;
-	const [isPlaying, setIsPlaying] = React.useState(false);
-	const [currentTime, setCurrentTime] = React.useState(0);
+	const { mediaPlayer } = props;
+	const isPlaying = useMediaState('playing', mediaPlayer);
+	const currentTime = useMediaState('currentTime', mediaPlayer);
 
-	React.useEffect(() => {
-		if (timelineState.current == null) {
+	const handlePlayOrPause = React.useCallback((): void => {
+		if (mediaPlayer.current == null) {
 			return;
 		}
-
-		const engine = timelineState.current;
-		engine.listener.on('play', () => {
-			setIsPlaying(true);
-		});
-		engine.listener.on('paused', () => {
-			setIsPlaying(false);
-		});
-		engine.listener.on('afterSetTime', ({ time }) => {
-			setCurrentTime(time);
-		});
-		engine.listener.on('setTimeByTick', ({ time }) => {
-			setCurrentTime(time);
-
-			if (autoScrollWhenPlay.current) {
-				const autoScrollFrom = 500;
-				const left = time * (scaleWidth / scale) + startLeft - autoScrollFrom;
-				engine.setScrollLeft(left);
-			}
-		});
-
-		return () => {
-			engine.pause();
-			engine.listener.offAll();
-		};
-	}, [timelineState, autoScrollWhenPlay]);
-
-	const handlePlayOrPause = (): void => {
-		if (timelineState.current == null) {
-			return;
-		}
-		if (timelineState.current.isPlaying) {
-			timelineState.current.pause();
+		if (mediaPlayer.current.state.playing) {
+			mediaPlayer.current.remoteControl.pause();
 		} else {
-			timelineState.current.play({ autoEnd: true });
+			mediaPlayer.current.remoteControl.play();
 		}
-	};
+	}, [mediaPlayer]);
 
-	const getDisplayTime = (time: number): string => {
+	const getDisplayTime = React.useCallback((time: number): string => {
 		const min = (time / 60).toFixed(0).toString().padStart(2, '0');
 		const second = (time % 60).toFixed(2).toString().padStart(2, '0');
 		return `${min}:${second}`;
-	};
+	}, []);
 
 	return (
 		<div className="flex h-8 w-full flex-row items-center bg-[#3a3a3a] px-2 text-[#ddd]">
@@ -78,6 +47,5 @@ export const TimelinePlayer: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	timelineState: React.MutableRefObject<TimelineState | null>;
-	autoScrollWhenPlay: React.MutableRefObject<boolean>;
+	mediaPlayer: React.RefObject<MediaPlayerInstance>;
 }
