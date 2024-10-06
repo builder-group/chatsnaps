@@ -2,7 +2,7 @@ import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
-import { Track } from './Track';
+import { EditTrackArea } from './EditTrackArea';
 import { type TTimeline } from './types';
 
 export const EditArea: React.FC<EditAreaProps> = (props) => {
@@ -48,7 +48,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 						return null;
 					}
 					return (
-						<Track
+						<EditTrackArea
 							key={virtualTrack.key}
 							track={track}
 							timeline={timeline}

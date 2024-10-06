@@ -4,7 +4,7 @@ import { useGlobalState } from 'feature-react/state';
 import { parseTimeToXAndWidth } from './helper';
 import { type TTimeline, type TTimelineTrack } from './types';
 
-export const Track: React.FC<TTrackProps> = (props) => {
+export const EditTrackArea: React.FC<TEditTrackAreaProps> = (props) => {
 	const { timeline, track, containerRef, trackHeight, startLeft, scale, scaleWidth, scrollLeft } =
 		props;
 	const { actionIds } = useGlobalState(track);
@@ -62,7 +62,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	);
 };
 
-interface TTrackProps {
+interface TEditTrackAreaProps {
 	track: TTimelineTrack;
 	timeline: TTimeline;
 	containerRef: React.RefObject<HTMLDivElement>;
