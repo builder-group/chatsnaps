@@ -11,7 +11,7 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 		timeline,
 		scale = 5,
 		scaleSplitCount = 5,
-		scaleWidth = 200,
+		scaleWidth = 500,
 		startLeft = 20,
 		initialScrollLeft = 0
 	} = props;

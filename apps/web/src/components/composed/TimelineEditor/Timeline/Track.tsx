@@ -27,7 +27,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 			return width;
 		},
 		horizontal: true,
-		overscan: 50,
+		overscan: 5,
 		initialOffset: scrollLeft
 	});
 

@@ -24,7 +24,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 		getScrollElement: () => containerRef.current,
 		estimateSize: React.useCallback(() => trackHeight, [trackHeight]),
 		horizontal: false,
-		overscan: 10,
+		overscan: 5,
 		initialOffset: 0
 	});
 
