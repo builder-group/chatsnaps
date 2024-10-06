@@ -56,13 +56,17 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 			switch (interaction) {
 				case 'drag': {
-					action.set((v) => ({ ...v, start: interactionState.startTime + deltaTime }));
+					const newStart = Math.max(interactionState.startTime + deltaTime, 0);
+					action.set((v) => ({ ...v, start: newStart }));
 					break;
 				}
 				case 'left': {
-					const newStart = Math.min(
-						interactionState.startTime + deltaTime,
-						interactionState.startTime + interactionState.startDuration
+					const newStart = Math.max(
+						Math.min(
+							interactionState.startTime + deltaTime,
+							interactionState.startTime + interactionState.startDuration
+						),
+						0
 					);
 					const newDuration =
 						interactionState.startDuration - (newStart - interactionState.startTime);
@@ -83,13 +87,24 @@ export const Action: React.FC<TActionProps> = (props) => {
 		setInteraction('none');
 	}, []);
 
+	// TODO: Overwriting global cursor doens't really work
 	React.useEffect(() => {
 		if (interaction !== 'none') {
+			document.body.style.userSelect = 'none';
+			// document.body.style.pointerEvents = 'none'; // Disables custom set cursor
+			if (interaction === 'drag') {
+				document.body.style.cursor = 'grabbing !important';
+			} else {
+				document.body.style.cursor = 'ew-resize !important';
+			}
 			document.addEventListener('mousemove', handleMouseMove);
 			document.addEventListener('mouseup', handleMouseUp);
 		}
 
 		return () => {
+			// document.body.style.pointerEvents = '';
+			document.body.style.userSelect = '';
+			document.body.style.cursor = '';
 			document.removeEventListener('mousemove', handleMouseMove);
 			document.removeEventListener('mouseup', handleMouseUp);
 		};
