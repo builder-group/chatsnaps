@@ -1,0 +1,148 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions -- WIP */
+import { useGlobalState } from 'feature-react/state';
+import React from 'react';
+
+import { parsePixelToTime, parseTimeToXAndWidth } from './helper';
+import { type TTimelineAction } from './types';
+
+export const Action: React.FC<TActionProps> = (props) => {
+	const { action, scale, scaleWidth, startLeft } = props;
+	const { id, start, duration } = useGlobalState(action);
+	const [interaction, setInteraction] = React.useState<TInteraction>('none');
+
+	const { x, width } = React.useMemo(
+		() =>
+			parseTimeToXAndWidth(start, duration, {
+				startLeft,
+				scale,
+				scaleWidth
+			}),
+		[start, duration, startLeft, scale, scaleWidth]
+	);
+
+	const interactionStateRef = React.useRef<TInteractionState>({
+		startTime: start,
+		startDuration: duration,
+		startClientX: 0,
+		startWidth: width,
+		startX: x
+	});
+
+	const handleMouseDown = React.useCallback(
+		(e: React.MouseEvent, type: 'drag' | 'left' | 'right') => {
+			e.stopPropagation();
+			interactionStateRef.current = {
+				startClientX: e.clientX,
+				startTime: start,
+				startDuration: duration,
+				startWidth: width,
+				startX: x
+			};
+			setInteraction(type);
+		},
+		[start, duration, x, width]
+	);
+
+	const handleMouseMove = React.useCallback(
+		(e: MouseEvent) => {
+			if (interaction === 'none') {
+				return;
+			}
+
+			const interactionState = interactionStateRef.current;
+			const deltaX = e.clientX - interactionState.startClientX;
+			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
+			const deltaTime = parsePixelToTime(deltaX, { scale, scaleWidth, startLeft: 0 });
+
+			switch (interaction) {
+				case 'drag': {
+					action.set((v) => ({ ...v, start: interactionState.startTime + deltaTime }));
+					break;
+				}
+				case 'left': {
+					const newStart = Math.min(
+						interactionState.startTime + deltaTime,
+						interactionState.startTime + interactionState.startDuration
+					);
+					const newDuration =
+						interactionState.startDuration - (newStart - interactionState.startTime);
+					action.set((v) => ({ ...v, start: newStart, duration: newDuration }));
+					break;
+				}
+				case 'right': {
+					const newDuration = Math.max(interactionState.startDuration + deltaTime, 0);
+					action.set((v) => ({ ...v, duration: newDuration }));
+					break;
+				}
+			}
+		},
+		[interaction, action, scale, scaleWidth]
+	);
+
+	const handleMouseUp = React.useCallback(() => {
+		setInteraction('none');
+	}, []);
+
+	React.useEffect(() => {
+		if (interaction !== 'none') {
+			document.addEventListener('mousemove', handleMouseMove);
+			document.addEventListener('mouseup', handleMouseUp);
+		}
+
+		return () => {
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+	}, [interaction, handleMouseMove, handleMouseUp]);
+
+	return (
+		<div
+			className={`absolute top-0 h-full border border-blue-300 bg-blue-500 ${
+				interaction === 'drag' ? 'bg-blue-600' : ''
+			}`}
+			style={{
+				left: x,
+				width,
+				boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+				borderRadius: '4px',
+				cursor: interaction === 'drag' ? 'grabbing' : 'grab'
+			}}
+			onMouseDown={(e) => {
+				handleMouseDown(e, 'drag');
+			}}
+		>
+			<div
+				className="resize-handle absolute left-0 top-0 h-full w-2 bg-blue-700 opacity-50 hover:opacity-100"
+				style={{ cursor: 'ew-resize' }}
+				onMouseDown={(e) => {
+					handleMouseDown(e, 'left');
+				}}
+			/>
+			<div
+				className="resize-handle absolute right-0 top-0 h-full w-2 bg-blue-700 opacity-50 hover:opacity-100"
+				style={{ cursor: 'ew-resize' }}
+				onMouseDown={(e) => {
+					handleMouseDown(e, 'right');
+				}}
+			/>
+			<div className="truncate px-2 py-1 text-xs text-white">{id || 'Untitled'}</div>
+		</div>
+	);
+};
+
+interface TActionProps {
+	action: TTimelineAction;
+	scale: number;
+	scaleWidth: number;
+	startLeft: number;
+}
+
+type TInteraction = 'drag' | 'left' | 'right' | 'none';
+
+interface TInteractionState {
+	startClientX: number;
+	startX: number;
+	startWidth: number;
+	startTime: number;
+	startDuration: number;
+}

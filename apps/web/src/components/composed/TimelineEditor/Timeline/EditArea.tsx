@@ -2,7 +2,7 @@ import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
-import { EditTrackArea } from './EditTrackArea';
+import { Track } from './Track';
 import { type TTimeline } from './types';
 
 export const EditArea: React.FC<EditAreaProps> = (props) => {
@@ -36,32 +36,6 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 				width: timeGridVirtualizer.getTotalSize()
 			}}
 		>
-			<div
-				className="relative w-full overflow-auto"
-				style={{
-					height: trackVirtualizer.getTotalSize()
-				}}
-			>
-				{trackVirtualizer.getVirtualItems().map((virtualTrack) => {
-					const track = timeline.getTrackAtIndex(virtualTrack.index);
-					if (track == null) {
-						return null;
-					}
-					return (
-						<EditTrackArea
-							key={virtualTrack.key}
-							track={track}
-							timeline={timeline}
-							containerRef={containerRef}
-							trackHeight={trackHeight}
-							scale={scale}
-							scaleWidth={scaleWidth}
-							startLeft={startLeft}
-							scrollLeft={scrollLeft}
-						/>
-					);
-				})}
-			</div>
 			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
 				const isShowScale = virtualItem.index % scaleSplitCount === 0;
 				if (isShowScale) {
@@ -78,6 +52,32 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 				}
 				return null;
 			})}
+			<div
+				className="relative w-full overflow-auto"
+				style={{
+					height: trackVirtualizer.getTotalSize()
+				}}
+			>
+				{trackVirtualizer.getVirtualItems().map((virtualTrack) => {
+					const track = timeline.getTrackAtIndex(virtualTrack.index);
+					if (track == null) {
+						return null;
+					}
+					return (
+						<Track
+							key={virtualTrack.key}
+							track={track}
+							timeline={timeline}
+							containerRef={containerRef}
+							trackHeight={trackHeight}
+							scale={scale}
+							scaleWidth={scaleWidth}
+							startLeft={startLeft}
+							scrollLeft={scrollLeft}
+						/>
+					);
+				})}
+			</div>
 		</div>
 	);
 };

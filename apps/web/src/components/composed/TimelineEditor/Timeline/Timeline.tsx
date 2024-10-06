@@ -60,7 +60,7 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 	return (
 		<div
 			ref={containerRef}
-			className="relative overflow-auto bg-green-300"
+			className="relative overflow-auto bg-red-400"
 			onScroll={(e) => {
 				handleScroll(e.currentTarget.scrollLeft);
 			}}

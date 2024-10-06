@@ -1,10 +1,12 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useGlobalState } from 'feature-react/state';
+import React from 'react';
 
+import { Action } from './Action';
 import { parseTimeToXAndWidth } from './helper';
 import { type TTimeline, type TTimelineTrack } from './types';
 
-export const EditTrackArea: React.FC<TEditTrackAreaProps> = (props) => {
+export const Track: React.FC<TTrackProps> = (props) => {
 	const { timeline, track, containerRef, trackHeight, startLeft, scale, scaleWidth, scrollLeft } =
 		props;
 	const { actionIds } = useGlobalState(track);
@@ -31,30 +33,23 @@ export const EditTrackArea: React.FC<TEditTrackAreaProps> = (props) => {
 
 	return (
 		<div
-			className="relative bg-red-400"
+			className="relative bg-yellow-400"
 			style={{
 				height: trackHeight
 			}}
 		>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
-				const action = track.getActionAtIndex(timeline, virtualAction.index)?.get();
+				const action = track.getActionAtIndex(timeline, virtualAction.index);
 				if (action == null) {
-					return;
+					return null;
 				}
-				const { x } = parseTimeToXAndWidth(action.start, action.duration, {
-					startLeft,
-					scale,
-					scaleWidth
-				});
-
 				return (
-					<div
+					<Action
 						key={virtualAction.key}
-						className="absolute top-0 h-full border border-blue-100 bg-blue-500"
-						style={{
-							left: x, // TODO: We don't use 'virtualAction.start' because it doesn't account for spacing between items
-							width: virtualAction.size
-						}}
+						action={action}
+						scale={scale}
+						scaleWidth={scaleWidth}
+						startLeft={startLeft}
 					/>
 				);
 			})}
@@ -62,7 +57,7 @@ export const EditTrackArea: React.FC<TEditTrackAreaProps> = (props) => {
 	);
 };
 
-interface TEditTrackAreaProps {
+interface TTrackProps {
 	track: TTimelineTrack;
 	timeline: TTimeline;
 	containerRef: React.RefObject<HTMLDivElement>;
