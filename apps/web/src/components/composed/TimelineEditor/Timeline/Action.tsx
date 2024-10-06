@@ -23,9 +23,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 	const interactionStateRef = React.useRef<TInteractionState>({
 		startTime: start,
 		startDuration: duration,
-		startClientX: 0,
-		startWidth: width,
-		startX: x
+		startClientX: 0
 	});
 
 	const handleMouseDown = React.useCallback(
@@ -34,13 +32,11 @@ export const Action: React.FC<TActionProps> = (props) => {
 			interactionStateRef.current = {
 				startClientX: e.clientX,
 				startTime: start,
-				startDuration: duration,
-				startWidth: width,
-				startX: x
+				startDuration: duration
 			};
 			setInteraction(type);
 		},
-		[start, duration, x, width]
+		[start, duration]
 	);
 
 	const handleMouseMove = React.useCallback(
@@ -156,8 +152,6 @@ type TInteraction = 'drag' | 'left' | 'right' | 'none';
 
 interface TInteractionState {
 	startClientX: number;
-	startX: number;
-	startWidth: number;
 	startTime: number;
 	startDuration: number;
 }
