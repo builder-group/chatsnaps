@@ -1,22 +1,17 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- WIP */
 /* eslint-disable jsx-a11y/click-events-have-key-events -- WIP */
 import { type Virtualizer } from '@tanstack/react-virtual';
+import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/lib';
 
 import { parsePixelToTime } from './helper';
+import { type TTimeline } from './types';
 
 export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
-	const {
-		scrollLeft,
-		scale,
-		scaleWidth,
-		scaleSplitCount,
-		startLeft,
-		onClickTimeArea,
-		getScaleRender,
-		timeGridVirtualizer
-	} = props;
+	const { timeline, timeGridVirtualizer, onClickTimeArea, getScaleRender } = props;
+	const { baseValue: scale, splitCount: scaleSplitCount, startLeft } = timeline._config.scale;
+	const scrollLeft = useGlobalState(timeline.scrollLeft);
 	const showUnit = scaleSplitCount > 0;
 
 	const handleClick = React.useCallback(
@@ -29,10 +24,10 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 			const position = e.clientX - rect.x;
 			const left = Math.max(position + scrollLeft, startLeft);
 
-			const time = parsePixelToTime(left, { startLeft, scale, scaleWidth });
+			const time = parsePixelToTime(left, timeline._config.scale);
 			onClickTimeArea(time, e);
 		},
-		[onClickTimeArea, scale, scaleWidth, scrollLeft, startLeft]
+		[onClickTimeArea, timeline, scrollLeft, startLeft]
 	);
 
 	return (
@@ -70,12 +65,8 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 };
 
 interface TTimeAreaProps {
-	scrollLeft: number;
-	scale: number;
-	scaleWidth: number;
-	scaleSplitCount: number;
-	startLeft: number;
+	timeline: TTimeline;
+	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
 	onClickTimeArea?: (time: number, event: React.MouseEvent) => void;
 	getScaleRender?: (item: number) => React.ReactNode;
-	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
 }

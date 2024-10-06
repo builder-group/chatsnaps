@@ -2,20 +2,49 @@ import { type TProjectCompProps } from '@repo/video';
 import { createState } from 'feature-state';
 import { nanoid } from 'nanoid';
 
+import { createTimelineAction } from './create-timeline-action';
 import { createTimelineTrack } from './create-timeline-track';
 import {
 	type TPlayState,
 	type TTimeline,
-	type TTimelineAction,
 	type TTimelineActionValue,
-	type TTimelineTrack,
 	type TTimelineTrackValue
 } from './types';
 
 export function createTimeline(project: TProjectCompProps): TTimeline {
-	const actionMap: Record<string, TTimelineAction> = {};
-	const trackMap: Record<string, TTimelineTrack> = {};
-	const trackIds: string[] = [];
+	const timeline: TTimeline = {
+		_config: {
+			scale: { baseValue: 5, splitCount: 5, width: 500, startLeft: 20 },
+			trackHeight: 50
+		},
+		_actionMap: {},
+		_trackMap: {},
+		currentTime: createState(0),
+		playState: createState<TPlayState>('paused'),
+		trackIds: createState([] as string[]),
+		scrollLeft: createState(0),
+		getTrackAtIndex(this: TTimeline, index) {
+			const trackId = this.trackIds._value[index];
+			if (trackId == null) {
+				return null;
+			}
+			const track = this._trackMap[trackId];
+			if (track == null) {
+				return null;
+			}
+			return track;
+		},
+		width(this: TTimeline) {
+			return Math.max(
+				...Object.values(this._actionMap).map((action) => {
+					return action.x() + action.width();
+				})
+			);
+		},
+		height(this: TTimeline) {
+			return this.trackIds._value.length * this._config.trackHeight;
+		}
+	};
 
 	for (const projectTrack of project.timeline.tracks) {
 		const trackValue: TTimelineTrackValue = { id: nanoid(), actionIds: [] };
@@ -27,28 +56,11 @@ export function createTimeline(project: TProjectCompProps): TTimeline {
 				duration: projectAction.durationInFrames / project.fps
 			};
 			trackValue.actionIds.push(actionValue.id);
-			actionMap[actionValue.id] = createState(actionValue);
+			timeline._actionMap[actionValue.id] = createTimelineAction(timeline, actionValue);
 		}
-		trackIds.push(trackValue.id);
-		trackMap[trackValue.id] = createTimelineTrack(trackValue);
+		timeline.trackIds._value.push(trackValue.id);
+		timeline._trackMap[trackValue.id] = createTimelineTrack(timeline, trackValue);
 	}
 
-	return {
-		_currentTime: createState(0),
-		_playState: createState<TPlayState>('paused'),
-		_actionMap: actionMap,
-		_trackMap: trackMap,
-		_trackIds: createState(trackIds),
-		getTrackAtIndex(this: TTimeline, index) {
-			const trackId = this._trackIds._value[index];
-			if (trackId == null) {
-				return null;
-			}
-			const track = this._trackMap[trackId];
-			if (track == null) {
-				return null;
-			}
-			return track;
-		}
-	};
+	return timeline;
 }

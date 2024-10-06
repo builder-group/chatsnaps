@@ -2,23 +2,13 @@
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
-import { parsePixelToTime, parseTimeToXAndWidth } from './helper';
+import { parsePixelToTime } from './helper';
 import { type TTimelineAction } from './types';
 
 export const Action: React.FC<TActionProps> = (props) => {
-	const { action, scale, scaleWidth, startLeft } = props;
+	const { action } = props;
 	const { id, start, duration } = useGlobalState(action);
 	const [interaction, setInteraction] = React.useState<TInteraction>('none');
-
-	const { x, width } = React.useMemo(
-		() =>
-			parseTimeToXAndWidth(start, duration, {
-				startLeft,
-				scale,
-				scaleWidth
-			}),
-		[start, duration, startLeft, scale, scaleWidth]
-	);
 
 	const interactionStateRef = React.useRef<TInteractionState>({
 		startTime: start,
@@ -48,7 +38,10 @@ export const Action: React.FC<TActionProps> = (props) => {
 			const interactionState = interactionStateRef.current;
 			const deltaX = e.clientX - interactionState.startClientX;
 			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
-			const deltaTime = parsePixelToTime(deltaX, { scale, scaleWidth, startLeft: 0 });
+			const deltaTime = parsePixelToTime(deltaX, {
+				...action._timeline._config.scale,
+				startLeft: 0
+			});
 
 			switch (interaction) {
 				case 'drag': {
@@ -76,7 +69,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 				}
 			}
 		},
-		[interaction, action, scale, scaleWidth]
+		[interaction, action]
 	);
 
 	const handleMouseUp = React.useCallback(() => {
@@ -108,12 +101,14 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 	return (
 		<div
-			className={`absolute top-0 h-full border border-blue-300 bg-blue-500 ${
+			className={`absolute border border-blue-300 bg-blue-500 ${
 				interaction === 'drag' ? 'bg-blue-600' : ''
 			}`}
 			style={{
-				left: x,
-				width,
+				left: action.x(),
+				top: action.y(),
+				width: action.width(),
+				height: action.height(),
 				boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 				borderRadius: '4px',
 				cursor: interaction === 'drag' ? 'grabbing' : 'grab'
@@ -143,9 +138,6 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 interface TActionProps {
 	action: TTimelineAction;
-	scale: number;
-	scaleWidth: number;
-	startLeft: number;
 }
 
 type TInteraction = 'drag' | 'left' | 'right' | 'none';

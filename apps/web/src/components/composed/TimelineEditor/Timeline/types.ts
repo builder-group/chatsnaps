@@ -1,12 +1,32 @@
 import { type TState } from 'feature-state';
 
 export interface TTimeline {
-	_currentTime: TState<number, ['base']>;
-	_playState: TState<TPlayState, ['base']>;
+	_config: TTimelineConfig;
 	_actionMap: Record<string, TTimelineAction>;
 	_trackMap: Record<string, TTimelineTrack>;
-	_trackIds: TState<string[], ['base']>;
+	currentTime: TState<number, ['base']>;
+	playState: TState<TPlayState, ['base']>;
+	trackIds: TState<string[], ['base']>;
+	scrollLeft: TState<number, ['base']>;
 	getTrackAtIndex: (index: number) => TTimelineTrack | null;
+	width: () => number;
+	height: () => number;
+}
+
+export interface TTimelineConfig {
+	scale: TScale;
+	trackHeight: number;
+}
+
+export interface TScale {
+	// Single tick mark category
+	baseValue: number;
+	// The distance from the left side of the scale start
+	startLeft: number;
+	// Display width of a single scale
+	width: number;
+	// Number of single scale subdivison units
+	splitCount: number;
 }
 
 export type TPlayState = 'playing' | 'paused';
@@ -16,9 +36,9 @@ export interface TTimelineTrackValue {
 	id: string;
 	actionIds: string[];
 }
-
 export interface TTimelineTrackFeature {
-	getActionAtIndex: (timeline: TTimeline, index: number) => TTimelineAction | null;
+	_timeline: TTimeline; // TODO: Bad practice referencing parent? It makes things easier for now.
+	getActionAtIndex: (index: number) => TTimelineAction | null;
 }
 
 export type TTimelineAction = TState<TTimelineActionValue, ['base', 'timeline-action']>;
@@ -27,6 +47,13 @@ export interface TTimelineActionValue {
 	trackId: string;
 	start: number;
 	duration: number;
+}
+export interface TTimelineActionFeature {
+	_timeline: TTimeline; // TODO: Bad practice referencing parent? It makes things easier for now.
+	x: () => number;
+	y: () => number;
+	width: () => number;
+	height: () => number;
 }
 
 export interface TTransform {

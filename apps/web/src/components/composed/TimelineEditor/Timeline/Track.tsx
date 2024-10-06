@@ -3,28 +3,22 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
 import { Action } from './Action';
-import { parseTimeToXAndWidth } from './helper';
-import { type TTimeline, type TTimelineTrack } from './types';
+import { type TTimelineTrack } from './types';
 
 export const Track: React.FC<TTrackProps> = (props) => {
-	const { timeline, track, containerRef, trackHeight, startLeft, scale, scaleWidth, scrollLeft } =
-		props;
+	const { track, containerRef } = props;
 	const { actionIds } = useGlobalState(track);
+	const scrollLeft = useGlobalState(track._timeline.scrollLeft);
 
 	const actionVirtualizer = useVirtualizer({
 		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
 		estimateSize: (index) => {
-			const action = track.getActionAtIndex(timeline, index)?.get();
+			const action = track.getActionAtIndex(index);
 			if (action == null) {
 				return 0;
 			}
-			const { width } = parseTimeToXAndWidth(action.start, action.duration, {
-				startLeft,
-				scale,
-				scaleWidth
-			});
-			return width;
+			return action.width();
 		},
 		horizontal: true,
 		overscan: 5,
@@ -32,38 +26,19 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	});
 
 	return (
-		<div
-			className="relative bg-yellow-400"
-			style={{
-				height: trackHeight
-			}}
-		>
+		<>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
-				const action = track.getActionAtIndex(timeline, virtualAction.index);
+				const action = track.getActionAtIndex(virtualAction.index);
 				if (action == null) {
 					return null;
 				}
-				return (
-					<Action
-						key={virtualAction.key}
-						action={action}
-						scale={scale}
-						scaleWidth={scaleWidth}
-						startLeft={startLeft}
-					/>
-				);
+				return <Action key={virtualAction.key} action={action} />;
 			})}
-		</div>
+		</>
 	);
 };
 
 interface TTrackProps {
 	track: TTimelineTrack;
-	timeline: TTimeline;
 	containerRef: React.RefObject<HTMLDivElement>;
-	trackHeight: number;
-	startLeft: number;
-	scale: number;
-	scaleWidth: number;
-	scrollLeft: number;
 }

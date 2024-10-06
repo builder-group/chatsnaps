@@ -1,4 +1,4 @@
-import { type TTimelineTrackFeature } from './types';
+import { type TTimelineActionFeature, type TTimelineTrackFeature } from './types';
 
 export * from './create-timeline';
 export * from './TimeArea';
@@ -8,8 +8,6 @@ export * from './types';
 declare module 'feature-state' {
 	interface TThirdPartyFeatures<GValue> {
 		'timeline-track': TTimelineTrackFeature;
-		'timeline-action': {
-			// todo: () => void;
-		};
+		'timeline-action': TTimelineActionFeature;
 	}
 }

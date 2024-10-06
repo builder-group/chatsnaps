@@ -1,17 +1,26 @@
 import { createState } from 'feature-state';
 
-import { type TTimelineTrack, type TTimelineTrackFeature, type TTimelineTrackValue } from './types';
+import {
+	type TTimeline,
+	type TTimelineTrack,
+	type TTimelineTrackFeature,
+	type TTimelineTrackValue
+} from './types';
 
-export function createTimelineTrack(intialValue: TTimelineTrackValue): TTimelineTrack {
+export function createTimelineTrack(
+	timeline: TTimeline,
+	intialValue: TTimelineTrackValue
+): TTimelineTrack {
 	const timelineTrackState = createState<TTimelineTrackValue>(intialValue);
 
 	const timelineTrackFeature: TTimelineTrackFeature = {
-		getActionAtIndex(this: TTimelineTrack, timeline, index) {
+		_timeline: timeline,
+		getActionAtIndex(this: TTimelineTrack, index) {
 			const actionId = this._value.actionIds[index];
 			if (actionId == null) {
 				return null;
 			}
-			const action = timeline._actionMap[actionId];
+			const action = this._timeline._actionMap[actionId];
 			if (action == null) {
 				return null;
 			}
