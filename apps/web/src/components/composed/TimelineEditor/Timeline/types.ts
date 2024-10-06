@@ -6,6 +6,7 @@ export interface TTimeline {
 	_actionMap: Record<string, TTimelineAction>;
 	_trackMap: Record<string, TTimelineTrack>;
 	_trackIds: TState<string[], ['base']>;
+	getTrackAtIndex: (index: number) => TTimelineTrack | null;
 }
 
 export type TPlayState = 'playing' | 'paused';
@@ -15,8 +16,10 @@ export interface TTimelineTrackValue {
 	id: string;
 	actionIds: string[];
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- TEMP
-export interface TTimelineTrackFeature {}
+
+export interface TTimelineTrackFeature {
+	getActionAtIndex: (timeline: TTimeline, index: number) => TTimelineAction | null;
+}
 
 export type TTimelineAction = TState<TTimelineActionValue, ['base', 'timeline-action']>;
 export interface TTimelineActionValue {

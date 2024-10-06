@@ -38,6 +38,17 @@ export function createTimeline(project: TProjectCompProps): TTimeline {
 		_playState: createState<TPlayState>('paused'),
 		_actionMap: actionMap,
 		_trackMap: trackMap,
-		_trackIds: createState(trackIds)
+		_trackIds: createState(trackIds),
+		getTrackAtIndex(this: TTimeline, index) {
+			const trackId = this._trackIds._value[index];
+			if (trackId == null) {
+				return null;
+			}
+			const track = this._trackMap[trackId];
+			if (track == null) {
+				return null;
+			}
+			return track;
+		}
 	};
 }

@@ -22,7 +22,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 	const trackVirtualizer = useVirtualizer({
 		count: trackIds.length,
 		getScrollElement: () => containerRef.current,
-		estimateSize: () => trackHeight,
+		estimateSize: React.useCallback(() => trackHeight, [trackHeight]),
 		horizontal: false,
 		overscan: 10,
 		initialOffset: 0
@@ -42,18 +42,14 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 					height: trackVirtualizer.getTotalSize()
 				}}
 			>
-				{trackVirtualizer.getVirtualItems().map((virtualRow) => {
-					const trackId = timeline._trackIds._value[virtualRow.index];
-					if (trackId == null) {
-						return null;
-					}
-					const track = timeline._trackMap[trackId];
+				{trackVirtualizer.getVirtualItems().map((virtualTrack) => {
+					const track = timeline.getTrackAtIndex(virtualTrack.index);
 					if (track == null) {
 						return null;
 					}
 					return (
 						<Track
-							key={trackId}
+							key={virtualTrack.key}
 							track={track}
 							timeline={timeline}
 							containerRef={containerRef}

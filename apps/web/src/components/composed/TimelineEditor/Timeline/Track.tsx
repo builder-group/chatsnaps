@@ -12,16 +12,12 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	const actionVirtualizer = useVirtualizer({
 		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
-		estimateSize: (i) => {
-			const actionId = actionIds[i];
-			if (actionId == null) {
-				return 0;
-			}
-			const action = timeline._actionMap[actionId];
+		estimateSize: (index) => {
+			const action = track.getActionAtIndex(timeline, index)?.get();
 			if (action == null) {
 				return 0;
 			}
-			const { width } = parseTimeToXAndWidth(action._value.start, action._value.duration, {
+			const { width } = parseTimeToXAndWidth(action.start, action.duration, {
 				startLeft,
 				scale,
 				scaleWidth
@@ -41,15 +37,11 @@ export const Track: React.FC<TTrackProps> = (props) => {
 			}}
 		>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
-				const actionId = actionIds[virtualAction.index];
-				if (actionId == null) {
-					return;
-				}
-				const action = timeline._actionMap[actionId];
+				const action = track.getActionAtIndex(timeline, virtualAction.index)?.get();
 				if (action == null) {
 					return;
 				}
-				const { x } = parseTimeToXAndWidth(action._value.start, action._value.duration, {
+				const { x } = parseTimeToXAndWidth(action.start, action.duration, {
 					startLeft,
 					scale,
 					scaleWidth
@@ -58,7 +50,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 				return (
 					<div
 						key={virtualAction.key}
-						className="absolute top-0 h-full bg-blue-500"
+						className="absolute top-0 h-full border border-blue-100 bg-blue-500"
 						style={{
 							left: x, // TODO: We don't use 'virtualAction.start' because it doesn't account for spacing between items
 							width: virtualAction.size
