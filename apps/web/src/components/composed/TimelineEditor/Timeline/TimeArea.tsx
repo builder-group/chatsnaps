@@ -9,25 +9,22 @@ import { parsePixelToTime } from './helper';
 import { type TTimeline } from './types';
 
 export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
-	const { timeline, timeGridVirtualizer, onClickTimeArea, getScaleRender } = props;
+	const { timeline, timeGridVirtualizer } = props;
 	const { baseValue: scale, splitCount: scaleSplitCount, startLeft } = timeline._config.scale;
 	const scrollLeft = useGlobalState(timeline.scrollLeft);
 	const showUnit = scaleSplitCount > 0;
 
 	const handleClick = React.useCallback(
 		(e: React.MouseEvent<HTMLDivElement>): void => {
-			if (onClickTimeArea == null) {
-				return;
-			}
-
 			const rect = e.currentTarget.getBoundingClientRect();
 			const position = e.clientX - rect.x;
 			const left = Math.max(position + scrollLeft, startLeft);
 
 			const time = parsePixelToTime(left, timeline._config.scale);
-			onClickTimeArea(time, e);
+			timeline.playState.set('paused');
+			timeline.currentTime.set(time);
 		},
-		[onClickTimeArea, timeline, scrollLeft, startLeft]
+		[timeline, scrollLeft, startLeft]
 	);
 
 	return (
@@ -54,7 +51,7 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 					>
 						{isShowScale ? (
 							<div className="absolute right-0 top-0 -translate-y-full translate-x-1/2 text-xs text-white/60">
-								{getScaleRender != null ? getScaleRender(item) : item}
+								{item}
 							</div>
 						) : null}
 					</div>
@@ -67,6 +64,4 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 interface TTimeAreaProps {
 	timeline: TTimeline;
 	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
-	onClickTimeArea?: (time: number, event: React.MouseEvent) => void;
-	getScaleRender?: (item: number) => React.ReactNode;
 }

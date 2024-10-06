@@ -26,7 +26,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 			setInteraction(type);
 			timeline.playState.set('paused');
 		},
-		[currentTime]
+		[timeline, currentTime]
 	);
 
 	const handleMouseMove = React.useCallback(
