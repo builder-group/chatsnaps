@@ -4,12 +4,7 @@ import { ProjectComp, type TProjectCompProps } from '@repo/video';
 
 import '@repo/video/dist/style.css';
 
-import {
-	MediaPlayer,
-	MediaProvider,
-	useMediaState,
-	type MediaPlayerInstance
-} from '@vidstack/react';
+import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from '@vidstack/react';
 import { RemotionProviderLoader, type RemotionSrc } from '@vidstack/react/player/remotion';
 import React from 'react';
 // @ts-expect-error -- Not officially expoerted yet
@@ -21,13 +16,30 @@ import '@vidstack/react/player/styles/base.css';
 import './style.css';
 
 import { chatStoryProject } from './mock';
-import { TimelinePlayer } from './TimelinePlayer';
 
 export const TimelineEditor: React.FC = () => {
 	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
-	const autoScrollWhenPlay = React.useRef<boolean>(true);
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
-	const isPlaying = useMediaState('playing', mediaPlayerRef);
+	const timeline = React.useMemo(() => createTimeline(project), [project]);
+
+	React.useEffect(() => {
+		timeline.playState.listen(({ value }) => {
+			switch (value) {
+				case 'playing':
+					mediaPlayerRef.current?.remoteControl.play();
+					break;
+
+				case 'paused':
+					mediaPlayerRef.current?.remoteControl.pause();
+					break;
+			}
+		});
+		timeline.currentTime.listen(({ value, source }) => {
+			if (source !== 'media-player') {
+				mediaPlayerRef.current?.remoteControl.seek(value);
+			}
+		});
+	}, [timeline]);
 
 	return (
 		<div className="bg-gray-100 p-4">
@@ -62,13 +74,15 @@ export const TimelineEditor: React.FC = () => {
 					ref={mediaPlayerRef}
 					className="mb-5 max-w-[500px] overflow-hidden shadow-2xl"
 					playsInline
+					onTimeUpdate={({ currentTime }) => {
+						timeline.currentTime.set(currentTime, { additionalData: { source: 'media-player' } });
+					}}
 				>
 					<MediaProvider loaders={[RemotionProviderLoader]} />
 				</MediaPlayer>
 			</BufferingProvider>
 
-			<TimelinePlayer mediaPlayer={mediaPlayerRef} />
-			<Timeline timeline={createTimeline(project)} />
+			<Timeline timeline={timeline} />
 		</div>
 	);
 };
