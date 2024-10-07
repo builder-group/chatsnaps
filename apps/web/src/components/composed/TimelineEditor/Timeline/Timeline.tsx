@@ -11,6 +11,7 @@ import { type TTimeline } from './types';
 export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((props, ref) => {
 	const { timeline } = props;
 	const scrollLeft = useGlobalState(timeline.scrollLeft);
+	const timelineWidth = timeline.width();
 
 	const containerRef = React.useRef<HTMLDivElement>(null);
 	React.useImperativeHandle(ref, () => {
@@ -24,11 +25,11 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 	});
 
 	const totalScaleCount = React.useMemo(() => {
-		const scaleCount = Math.ceil(timeline.width() / timeline._config.scale.width);
+		const scaleCount = Math.ceil(timelineWidth / timeline._config.scale.width);
 		return timeline._config.scale.splitCount > 0
 			? scaleCount * timeline._config.scale.splitCount + 1
 			: scaleCount;
-	}, [timeline]);
+	}, [timeline, timelineWidth]);
 	const timeGridVirtualizer = useVirtualizer({
 		count: totalScaleCount,
 		getScrollElement: () => containerRef.current,

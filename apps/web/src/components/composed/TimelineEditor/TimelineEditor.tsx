@@ -15,12 +15,21 @@ import { createTimeline, Timeline } from './Timeline';
 import '@vidstack/react/player/styles/base.css';
 import './style.css';
 
+import { Button } from '../../input';
 import { chatStoryProject } from './mock';
 
 export const TimelineEditor: React.FC = () => {
-	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
-	const timeline = React.useMemo(() => createTimeline(project), [project]);
+
+	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
+	const timeline = React.useMemo(
+		() =>
+			createTimeline(project, () => {
+				// Reload player frame and thus changes to the project object
+				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime);
+			}),
+		[project]
+	);
 
 	React.useEffect(() => {
 		timeline.playState.listen(({ value }) => {
@@ -81,6 +90,45 @@ export const TimelineEditor: React.FC = () => {
 					<MediaProvider loaders={[RemotionProviderLoader]} />
 				</MediaPlayer>
 			</BufferingProvider>
+			<Button
+				onClick={() => {
+					project.timeline = {
+						...project.timeline,
+						tracks: [
+							{
+								type: 'Track',
+								id: 'test',
+								actions: [
+									{
+										type: 'Rectangle',
+										startFrame: 0,
+										durationInFrames: 300,
+										width: 100,
+										height: 100,
+										x: [
+											{ frame: 0, value: -200 },
+											{ frame: 300, value: 1080 }
+										],
+										y: 490,
+										opacity: [
+											{ frame: 0, value: 0 },
+											{ frame: 30, value: 1 },
+											{ frame: 270, value: 1 },
+											{ frame: 300, value: 0 }
+										],
+										fill: { type: 'Solid', color: '#ff0000' }
+									}
+								]
+							}
+							// ...project.timeline.tracks
+						]
+					};
+
+					mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime);
+				}}
+			>
+				Test
+			</Button>
 
 			<Timeline timeline={timeline} />
 		</div>

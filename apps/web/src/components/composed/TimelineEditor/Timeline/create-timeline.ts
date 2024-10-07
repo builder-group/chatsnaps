@@ -11,7 +11,7 @@ import {
 	type TTimelineTrackValue
 } from './types';
 
-export function createTimeline(project: TProjectCompProps): TTimeline {
+export function createTimeline(project: TProjectCompProps, onChange: () => void): TTimeline {
 	const timeline: TTimeline = {
 		_config: {
 			scale: { baseValue: 5, splitCount: 5, width: 500, startLeft: 20 },
@@ -46,6 +46,7 @@ export function createTimeline(project: TProjectCompProps): TTimeline {
 		}
 	};
 
+	// Load Project into Timeline
 	for (const projectTrack of project.timeline.tracks) {
 		const trackValue: TTimelineTrackValue = { id: nanoid(), actionIds: [] };
 		for (const projectAction of projectTrack.actions) {
@@ -56,11 +57,28 @@ export function createTimeline(project: TProjectCompProps): TTimeline {
 				duration: projectAction.durationInFrames / project.fps
 			};
 			trackValue.actionIds.push(actionValue.id);
-			timeline._actionMap[actionValue.id] = createTimelineAction(timeline, actionValue);
+			const action = createTimelineAction(timeline, actionValue);
+			action.listen(({ value }) => {
+				// TODO: Update project reference
+				onChange();
+			});
+			timeline._actionMap[actionValue.id] = action;
 		}
 		timeline.trackIds._value.push(trackValue.id);
-		timeline._trackMap[trackValue.id] = createTimelineTrack(timeline, trackValue);
+		const track = createTimelineTrack(timeline, trackValue);
+		track.listen(({ value }) => {
+			// TODO: Update project reference
+			onChange();
+		});
+		timeline._trackMap[trackValue.id] = track;
 	}
+
+	timeline.trackIds.listen(({ value }) => {
+		// TODO: Update project reference
+		onChange();
+	});
+
+	onChange();
 
 	return timeline;
 }
