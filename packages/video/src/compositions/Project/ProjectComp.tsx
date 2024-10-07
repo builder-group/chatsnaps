@@ -2,7 +2,7 @@ import { AbsoluteFill, useVideoConfig } from 'remotion';
 import { z } from 'zod';
 
 import { TRemotionFC } from '../../types';
-import { getMaxTracksDuration } from './helper';
+import { getDuration } from './helper';
 import { SProjectCompProps } from './schema';
 import { TimelineTrack } from './TimelineTrack';
 import { TimelineTrackPlugin } from './TimelineTrackPlugin';
@@ -13,7 +13,12 @@ export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (prop
 
 	return (
 		<AbsoluteFill className="bg-blue-500" style={{ width, height }}>
-			{timeline.tracks.map((track) => {
+			{timeline.trackIds.map((trackId) => {
+				const track = timeline.trackMap[trackId];
+				if (track == null) {
+					return null;
+				}
+
 				switch (track.type) {
 					case 'Track':
 						return <TimelineTrack timeline={track} key={track.id} />;
@@ -32,7 +37,7 @@ ProjectComp.calculateMetadata = async (metadata) => {
 		props: { timeline, width = 1080, height = 1920, fps = 30, durationInFrames }
 	} = metadata;
 	const totalDurationFrames =
-		durationInFrames != null ? durationInFrames : getMaxTracksDuration(timeline.tracks);
+		durationInFrames != null ? durationInFrames : getDuration(Object.values(timeline.actionMap));
 
 	return {
 		props: metadata.props,

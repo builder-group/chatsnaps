@@ -1,15 +1,9 @@
 import { type TProjectCompProps } from '@repo/video';
 import { createState } from 'feature-state';
-import { nanoid } from 'nanoid';
 
 import { createTimelineAction } from './create-timeline-action';
 import { createTimelineTrack } from './create-timeline-track';
-import {
-	type TPlayState,
-	type TTimeline,
-	type TTimelineActionValue,
-	type TTimelineTrackValue
-} from './types';
+import { type TPlayState, type TTimeline } from './types';
 
 export function createTimeline(project: TProjectCompProps, onChange: () => void): TTimeline {
 	const timeline: TTimeline = {
@@ -46,39 +40,38 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		}
 	};
 
-	// Load Project into Timeline
-	for (const projectTrack of project.timeline.tracks) {
-		const trackValue: TTimelineTrackValue = { id: nanoid(), actionIds: [] };
-		for (const projectAction of projectTrack.actions) {
-			const actionValue: TTimelineActionValue = {
-				id: nanoid(),
-				trackId: trackValue.id,
-				start: projectAction.startFrame / project.fps,
-				duration: projectAction.durationInFrames / project.fps
-			};
-			trackValue.actionIds.push(actionValue.id);
-			const action = createTimelineAction(timeline, actionValue);
-			action.listen(({ value }) => {
-				// TODO: Update project reference
-				onChange();
-			});
-			timeline._actionMap[actionValue.id] = action;
-		}
-		timeline.trackIds._value.push(trackValue.id);
-		const track = createTimelineTrack(timeline, trackValue);
+	// Load Tracks
+	for (const [id, projectTrack] of Object.entries(project.timeline.trackMap)) {
+		const track = createTimelineTrack(timeline, { id, actionIds: projectTrack.actionIds });
 		track.listen(({ value }) => {
 			// TODO: Update project reference
 			onChange();
 		});
-		timeline._trackMap[trackValue.id] = track;
+		timeline._trackMap[id] = track;
 	}
 
+	// Load Actions
+	for (const [id, projectAction] of Object.entries(project.timeline.actionMap)) {
+		const action = createTimelineAction(timeline, {
+			id,
+			trackId: projectAction.trackId,
+			start: projectAction.startFrame / project.fps,
+			duration: projectAction.durationInFrames / project.fps
+		});
+		action.listen(({ value }) => {
+			// TODO: Update project reference
+			onChange();
+		});
+		timeline._actionMap[id] = action;
+	}
+
+	// Load Track IDs
+	timeline.trackIds.set(project.timeline.trackIds);
 	timeline.trackIds.listen(({ value }) => {
 		// TODO: Update project reference
 		onChange();
 	});
 
 	onChange();
-
 	return timeline;
 }

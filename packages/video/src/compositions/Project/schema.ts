@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 export const SUrl = z.string(); // .url(); // TODO: static path is not really url
 export const SObjectFit = z.enum(['contain', 'cover', 'fill', 'none', 'scale-down']);
+export const SId = z.string();
 
 function createKeyframeSchema<T extends z.ZodTypeAny>(valueSchema: T) {
 	return z.object({
@@ -73,7 +74,8 @@ export const SFillMixin = z.object({
 export const STimelineActionMixin = z.object({
 	type: z.string(),
 	startFrame: z.number().int().min(0),
-	durationInFrames: z.number().int().min(0)
+	durationInFrames: z.number().int().min(0),
+	trackId: SId
 });
 export type TTimelineActionMixin = z.infer<typeof STimelineActionMixin>;
 
@@ -133,7 +135,7 @@ export type TTimelineAction = z.infer<typeof STimelineAction>;
 export const STimelineTrackMixin = z.object({
 	type: z.string(),
 	id: z.string(),
-	actions: z.array(STimelineActionMixin)
+	actionIds: z.array(SId)
 });
 export type TTimelineTrackMixin = z.infer<typeof STimelineTrackMixin>;
 
@@ -154,7 +156,9 @@ export const STimelineTrack = STimelineTrackMixin.extend({
 export type TTimelineTrack = z.infer<typeof STimelineTrack>;
 
 export const STimeline = z.object({
-	tracks: z.array(z.discriminatedUnion('type', [STimelineTrack, STimelineTrackPlugin]))
+	trackIds: z.array(SId),
+	trackMap: z.record(SId, z.discriminatedUnion('type', [STimelineTrack, STimelineTrackPlugin])),
+	actionMap: z.record(SId, STimelineActionMixin)
 });
 export type TTimeline = z.infer<typeof STimeline>;
 
