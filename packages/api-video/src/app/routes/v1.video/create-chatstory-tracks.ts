@@ -1,8 +1,13 @@
-import { getStaticAsset, type TChatStoryPlugin, type TTimelineTrack } from '@repo/video';
+import {
+	getStaticAsset,
+	type TChatStoryPlugin,
+	type TTimeline,
+	type TTimelineTrack
+} from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
-import { elevenLabsClient, elevenLabsConfig, s3Client, s3Config } from '@/environment';
+import { elevenLabsClient, elevenLabsConfig, pika, s3Client, s3Config } from '@/environment';
 import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
 import { logger } from '@/logger';
 
@@ -14,19 +19,10 @@ import {
 
 export function createChatStoryTracks(
 	script: TChatStoryScriptDto,
+	actionMap: TTimeline['actionMap'],
 	options: TChatStoryCreatorOptions = {}
-): Promise<
-	TResult<
-		{
-			messageTrack: TChatStoryPlugin;
-			voiceoverTrack: TTimelineTrack;
-			notificationTrack: TTimelineTrack;
-			creditsSpent: number;
-		},
-		AppError
-	>
-> {
-	const creator = new ChatStoryCreator(script, options);
+): Promise<TResult<TChatStoryCreatorCreateResponse, AppError>> {
+	const creator = new ChatStoryCreator(script, actionMap, options);
 	return creator.create();
 }
 
@@ -34,14 +30,13 @@ class ChatStoryCreator {
 	private messageTrack: TChatStoryPlugin;
 	private notificationTrack: TTimelineTrack = {
 		type: 'Track',
-		id: 'notification-timeline',
-		actions: []
+		actionIds: []
 	};
 	private voiceoverTrack: TTimelineTrack = {
 		type: 'Track',
-		id: 'voiceover-timeline',
-		actions: []
+		actionIds: []
 	};
+	private actionMap: TTimeline['actionMap'];
 
 	private currentTimeMs = 0;
 	private creditsSpent = 0;
@@ -57,7 +52,11 @@ class ChatStoryCreator {
 		}
 	> = {};
 
-	constructor(script: TChatStoryScriptDto, options: TChatStoryCreatorOptions = {}) {
+	constructor(
+		script: TChatStoryScriptDto,
+		actionMap: TTimeline['actionMap'],
+		options: TChatStoryCreatorOptions = {}
+	) {
 		this.script = script;
 		this.config = {
 			fps: options.fps ?? 30,
@@ -65,10 +64,10 @@ class ChatStoryCreator {
 			voiceover: options.voiceover ?? false,
 			useCached: options.useCached ?? true
 		};
+		this.actionMap = actionMap;
 		this.messageTrack = {
 			type: 'Plugin',
 			pluginId: 'chat-story',
-			id: 'chat-story-timeline',
 			props: {
 				messenger: this.script.messenger ?? {
 					type: 'IMessage',
@@ -85,21 +84,11 @@ class ChatStoryCreator {
 			height: 800,
 			x: 0,
 			y: 256,
-			actions: []
+			actionIds: []
 		};
 	}
 
-	public async create(): Promise<
-		TResult<
-			{
-				messageTrack: TChatStoryPlugin;
-				voiceoverTrack: TTimelineTrack;
-				notificationTrack: TTimelineTrack;
-				creditsSpent: number;
-			},
-			AppError
-		>
-	> {
+	public async create(): Promise<TResult<TChatStoryCreatorCreateResponse, AppError>> {
 		// Resolve voices
 		for (const participant of this.script.participants) {
 			if (participant.voice != null) {
@@ -185,13 +174,15 @@ class ChatStoryCreator {
 		const audio = participant.isSelf
 			? getStaticAsset('static/audio/sound/ios_sent.mp3')
 			: getStaticAsset('static/audio/sound/ios_received.mp3');
-		this.notificationTrack.actions.push({
+		const id = pika.gen('action');
+		this.actionMap[id] = {
 			type: 'Audio',
 			src: audio.path,
 			volume: 1,
 			startFrame,
 			durationInFrames: msToFrames(audio.durationMs, this.config.fps)
-		});
+		};
+		this.notificationTrack.actionIds.push(id);
 	}
 
 	private async processVoiceover(
@@ -317,13 +308,15 @@ class ChatStoryCreator {
 	}
 
 	private addVoiceoverToTimeline(src: string, startFrame: number, durationInFrames: number): void {
-		this.voiceoverTrack.actions.push({
+		const id = pika.gen('action');
+		this.actionMap[id] = {
 			type: 'Audio',
 			src,
 			volume: 1,
 			startFrame,
 			durationInFrames: durationInFrames + this.config.fps
-		});
+		};
+		this.voiceoverTrack.actionIds.push(id);
 	}
 
 	private addMessageToTimeline(
@@ -331,16 +324,22 @@ class ChatStoryCreator {
 		participant: TChatStoryVideoParticipant,
 		startFrame: number
 	): void {
-		this.messageTrack.actions.push({
-			type: 'Message',
-			content: { type: 'Text', text: item.content },
-			participant: {
-				displayName: participant.displayName
+		const id = pika.gen('action');
+		this.actionMap[id] = {
+			type: 'Plugin',
+			pluginId: 'chat-story',
+			props: {
+				type: 'Message',
+				content: { type: 'Text', text: item.content },
+				participant: {
+					displayName: participant.displayName
+				},
+				messageType: participant.isSelf ? 'sent' : 'received'
 			},
-			messageType: participant.isSelf ? 'sent' : 'received',
 			startFrame,
 			durationInFrames: this.config.fps / 2
-		});
+		};
+		this.messageTrack.actionIds.push(id);
 	}
 
 	private getFutureContentForParticipant(
@@ -466,3 +465,10 @@ interface TChatStoryCreatorConfig {
 }
 
 type TChatStoryCreatorOptions = Partial<TChatStoryCreatorConfig>;
+
+interface TChatStoryCreatorCreateResponse {
+	messageTrack: TChatStoryPlugin;
+	voiceoverTrack: TTimelineTrack;
+	notificationTrack: TTimelineTrack;
+	creditsSpent: number;
+}

@@ -58,9 +58,9 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					paddingTop: headerHeight + 16
 				}}
 			>
-				{actions.map(({ content, messageType, startFrame, durationInFrames }, i) => {
+				{actions.map(({ props: { content, messageType }, startFrame, durationInFrames }, i) => {
 					const isLast = i === actions.length - 1;
-					const noTail = !isLast && actions[i + 1]?.messageType === messageType;
+					const noTail = !isLast && actions[i + 1]?.props.messageType === messageType;
 
 					// Interpolate opacity and y position
 					const springAnimation = spring({

@@ -21,9 +21,9 @@ export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (prop
 
 				switch (track.type) {
 					case 'Track':
-						return <TimelineTrack key={track.id} track={track} timeline={timeline} />;
+						return <TimelineTrack key={trackId} track={track} timeline={timeline} />;
 					case 'Plugin':
-						return <TimelineTrackPlugin key={track.id} track={track} timeline={timeline} />;
+						return <TimelineTrackPlugin key={trackId} track={track} timeline={timeline} />;
 				}
 			})}
 		</AbsoluteFill>

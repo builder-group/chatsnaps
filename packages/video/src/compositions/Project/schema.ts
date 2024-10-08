@@ -133,7 +133,6 @@ export type TTimelineAction = z.infer<typeof STimelineAction>;
 
 export const STimelineTrackMixin = z.object({
 	type: z.string(),
-	id: z.string(),
 	actionIds: z.array(SId)
 });
 export type TTimelineTrackMixin = z.infer<typeof STimelineTrackMixin>;

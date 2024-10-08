@@ -1,4 +1,11 @@
-import { type TTikTokFollowPlugin, type TTimelineTrack, type TTkiTokLikePlugin } from '@repo/video';
+import {
+	type TTikTokFollowPlugin,
+	type TTimeline,
+	type TTimelineTrack,
+	type TTkiTokLikePlugin
+} from '@repo/video';
+
+import { pika } from '../../../environment';
 
 export function createFollowCTA(
 	text: string,
@@ -40,14 +47,17 @@ export function createLikeCTA(
 	};
 }
 
-export function createCTATrack(ctas: TCTA[], config: TAddCTAAnimationsConfig): TTimelineTrack {
+export function createCTATrack(
+	ctas: TCTA[],
+	actionMap: TTimeline['actionMap'],
+	config: TAddCTAAnimationsConfig
+): TTimelineTrack {
 	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even', totalDurationInFrames } = config;
 	const minSpacingFrames = minSpacingSeconds * fps;
 
 	const track: TTimelineTrack = {
 		type: 'Track',
-		id: 'cta-timeline',
-		actions: []
+		actionIds: []
 	};
 
 	const regularCTAs = ctas.filter((cta) => !cta.atEnd);
@@ -60,19 +70,21 @@ export function createCTATrack(ctas: TCTA[], config: TAddCTAAnimationsConfig): T
 	// Place CTAs
 	placeRegularCTAs(
 		regularCTAs,
-		track.actions,
+		track.actionIds,
+		actionMap,
 		availableDurationForRegularCTAs,
 		minSpacingFrames,
 		spreadType
 	);
-	placeEndCTAs(endCTAs, track.actions, totalDurationInFrames);
+	placeEndCTAs(endCTAs, track.actionIds, actionMap, totalDurationInFrames);
 
 	return track;
 }
 
 function placeEndCTAs(
 	ctas: TCTA[],
-	actions: TTimelineTrack['actions'],
+	actionIds: TTimelineTrack['actionIds'],
+	actionMap: TTimeline['actionMap'],
 	totalDurationInFrames: number
 ): void {
 	let endPosition = totalDurationInFrames;
@@ -80,17 +92,21 @@ function placeEndCTAs(
 		// Reverse to place from end to start
 		const durationInFrames = cta.durationInFrames;
 		endPosition -= durationInFrames;
-		actions.push({
+
+		const id = pika.gen('action');
+		actionMap[id] = {
 			...cta,
 			durationInFrames,
 			startFrame: endPosition
-		});
+		};
+		actionIds.push(id);
 	}
 }
 
 function placeRegularCTAs(
 	ctas: TCTA[],
-	actions: TTimelineTrack['actions'],
+	actionIds: TTimelineTrack['actionIds'],
+	actionMap: TTimeline['actionMap'],
 	availableDuration: number,
 	minSpacingFrames: number,
 	spreadType: 'even' | 'random'
@@ -107,11 +123,13 @@ function placeRegularCTAs(
 				const durationInFrames = cta.durationInFrames;
 				const startFrame = Math.round(currentPosition);
 
-				actions.push({
+				const id = pika.gen('action');
+				actionMap[id] = {
 					...cta,
 					durationInFrames,
 					startFrame
-				});
+				};
+				actionIds.push(id);
 
 				currentPosition += durationInFrames + spacing;
 			}
@@ -139,11 +157,13 @@ function placeRegularCTAs(
 
 				const startFrame = Math.floor(Math.random() * (maxStart - minStart + 1) + minStart);
 
-				actions.push({
+				const id = pika.gen('action');
+				actionMap[id] = {
 					...cta,
 					durationInFrames,
 					startFrame
-				});
+				};
+				actionIds.push(id);
 
 				lastAnimationEnd = startFrame + durationInFrames;
 			}

@@ -63,12 +63,10 @@ export const project1: TProjectCompProps = {
 		trackMap: {
 			t1: {
 				type: 'Track',
-				id: 'background-track',
 				actionIds: ['a1']
 			},
 			t2: {
 				type: 'Track',
-				id: 'cta-track',
 				actionIds: ['a2', 'a3']
 			}
 		}
