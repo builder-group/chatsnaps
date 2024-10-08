@@ -1,33 +1,44 @@
+import React from 'react';
 import { useCurrentFrame, useVideoConfig } from 'remotion';
 import { cn } from '@/lib';
 
 import { getInterpolatedValue } from '../../helper';
-import { registerTimelinePlugin } from '../plugin-registry';
+import { registerTimelineTrackPlugin } from '../plugin-registry';
 import { Messenger } from './Messenger';
-import { SChatStoryPlugin } from './schema';
+import {
+	isMessageChatStoryTimelineAction,
+	SChatStoryPlugin,
+	TMessageChatStoryTimelineAction
+} from './schema';
 
-registerTimelinePlugin({
+registerTimelineTrackPlugin({
 	id: 'chat-story',
 	schema: SChatStoryPlugin,
 	component: (props) => {
-		const { timeline } = props;
+		const { track, timeline } = props;
 		const frame = useCurrentFrame();
 		const { height } = useVideoConfig();
+		const actions = React.useMemo(
+			() =>
+				track.actionIds
+					.map((id) => timeline.actionMap[id])
+					.filter((action) => isMessageChatStoryTimelineAction(action))
+					.filter(Boolean) as TMessageChatStoryTimelineAction[],
+			[track.actionIds]
+		);
 
 		return (
 			<div
 				className={cn('flex h-full w-full flex-col items-center justify-start', {
-					'bg-green-400': timeline.props.debug
+					'bg-green-400': track.props.debug
 				})}
 			>
 				<Messenger
-					actions={timeline.actions.filter(
-						(item) => item.type === 'Message' && item.startFrame <= frame
+					actions={actions.filter(
+						(action) => action.type === 'Message' && action.startFrame <= frame
 					)}
-					messenger={timeline.props.messenger}
-					maxHeight={
-						timeline.height != null ? getInterpolatedValue(timeline.height, frame) : height
-					}
+					messenger={track.props.messenger}
+					maxHeight={track.height != null ? getInterpolatedValue(track.height, frame) : height}
 					className="origin-top scale-[.80] rounded-3xl shadow-2xl"
 				/>
 			</div>

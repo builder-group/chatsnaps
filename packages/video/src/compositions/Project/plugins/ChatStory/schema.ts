@@ -50,7 +50,12 @@ export const SChatStoryPlugin = STimelineTrackPlugin.extend({
 	props: z.object({
 		messenger: SChatStoryMessenger,
 		debug: z.boolean().optional()
-	}),
-	actions: z.array(SChatStoryTimelineAction)
+	})
 });
 export type TChatStoryPlugin = z.infer<typeof SChatStoryPlugin>;
+
+export function isMessageChatStoryTimelineAction(
+	value: unknown
+): value is z.infer<typeof SMessageChatStoryTimelineAction> {
+	return SMessageChatStoryTimelineAction.safeParse(value).success;
+}

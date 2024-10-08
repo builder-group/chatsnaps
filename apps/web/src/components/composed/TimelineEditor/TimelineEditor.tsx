@@ -15,12 +15,12 @@ import { createTimeline, Timeline } from './Timeline';
 import '@vidstack/react/player/styles/base.css';
 import './style.css';
 
-import { chatStoryProject } from './mock';
+import { project1 } from './mock';
 
 export const TimelineEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
+	const [project, setProject] = React.useState<TProjectCompProps>(project1);
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(project, () => {

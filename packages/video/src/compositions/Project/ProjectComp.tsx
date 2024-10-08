@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { TRemotionFC } from '../../types';
 import { getDuration } from './helper';
 import { SProjectCompProps } from './schema';
-import { TimelineTrack } from './TimelineTrack';
-import { TimelineTrackPlugin } from './TimelineTrackPlugin';
+import { TimelineTrack } from './tracks/TimelineTrack';
+import { TimelineTrackPlugin } from './tracks/TimelineTrackPlugin';
 
 export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (props) => {
 	const { timeline } = props;
@@ -21,9 +21,9 @@ export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (prop
 
 				switch (track.type) {
 					case 'Track':
-						return <TimelineTrack timeline={track} key={track.id} />;
+						return <TimelineTrack key={track.id} track={track} timeline={timeline} />;
 					case 'Plugin':
-						return <TimelineTrackPlugin timeline={track} key={track.id} />;
+						return <TimelineTrackPlugin key={track.id} track={track} timeline={timeline} />;
 				}
 			})}
 		</AbsoluteFill>

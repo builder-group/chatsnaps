@@ -40,35 +40,60 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		}
 	};
 
-	// Load Tracks
-	for (const [id, projectTrack] of Object.entries(project.timeline.trackMap)) {
-		const track = createTimelineTrack(timeline, { id, actionIds: projectTrack.actionIds });
+	// Load Tracks and Actions
+	for (const trackId of project.timeline.trackIds) {
+		const projectTrack = project.timeline.trackMap[trackId];
+
+		if (projectTrack == null) {
+			console.warn(`Track with ID ${trackId} not found in trackMap`);
+			continue;
+		}
+
+		timeline.trackIds._value.push(trackId);
+
+		// Create and register the track
+		const track = createTimelineTrack(timeline, { id: trackId, actionIds: [] });
 		track.listen(({ value }) => {
-			// TODO: Update project reference
-			onChange();
+			// console.log('[Track] OnChange', { value });
+			const pT = project.timeline.trackMap[value.id];
+			if (pT != null) {
+				pT.actionIds = value.actionIds;
+				onChange();
+			}
 		});
-		timeline._trackMap[id] = track;
+		timeline._trackMap[trackId] = track;
+
+		// Load and register actions for this track
+		for (const actionId of projectTrack.actionIds) {
+			const projectAction = project.timeline.actionMap[actionId];
+			if (projectAction != null) {
+				const action = createTimelineAction(timeline, {
+					id: actionId,
+					trackId,
+					start: projectAction.startFrame / project.fps,
+					duration: projectAction.durationInFrames / project.fps
+				});
+				action.listen(({ value }) => {
+					// console.log('[Action] OnChange', { value });
+					const pA = project.timeline.actionMap[value.id];
+					if (pA != null) {
+						pA.durationInFrames = Math.floor(value.duration * project.fps);
+						pA.startFrame = Math.floor(value.start * project.fps);
+						onChange();
+					}
+				});
+				timeline._actionMap[actionId] = action;
+				track._value.actionIds.push(actionId);
+			} else {
+				console.warn(`Action with ID ${actionId} not found in actionMap`);
+			}
+		}
 	}
 
-	// Load Actions
-	for (const [id, projectAction] of Object.entries(project.timeline.actionMap)) {
-		const action = createTimelineAction(timeline, {
-			id,
-			trackId: projectAction.trackId,
-			start: projectAction.startFrame / project.fps,
-			duration: projectAction.durationInFrames / project.fps
-		});
-		action.listen(({ value }) => {
-			// TODO: Update project reference
-			onChange();
-		});
-		timeline._actionMap[id] = action;
-	}
-
-	// Load Track IDs
-	timeline.trackIds.set(project.timeline.trackIds);
+	timeline.trackIds._notify();
 	timeline.trackIds.listen(({ value }) => {
-		// TODO: Update project reference
+		// console.log('[TrackIds] OnChange', { value });
+		project.timeline.trackIds = value as string[];
 		onChange();
 	});
 

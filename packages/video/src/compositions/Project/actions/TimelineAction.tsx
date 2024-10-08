@@ -1,6 +1,11 @@
 import React from 'react';
 
-import { TTimelineAction } from '../schema';
+import {
+	isAudioTimelineAction,
+	isShapeTimelineAction,
+	isTimelineActionPlugin,
+	TTimelineActionMixin
+} from '../schema';
 import { TimelineAudioAction } from './TimelineAudioAction';
 import { TimelinePluginAction } from './TimelinePluginAction';
 import { TimelineShapeAction } from './TimelineShapeAction';
@@ -10,15 +15,15 @@ export const TimelineAction: React.FC<TProps> = (props) => {
 
 	switch (action.type) {
 		case 'Plugin':
-			return <TimelinePluginAction action={action} />;
+			return isTimelineActionPlugin(action) && <TimelinePluginAction action={action} />;
 		case 'Audio':
-			return <TimelineAudioAction action={action} />;
+			return isAudioTimelineAction(action) && <TimelineAudioAction action={action} />;
 		case 'Rectangle':
 		case 'Ellipse':
-			return <TimelineShapeAction action={action} />;
+			return isShapeTimelineAction(action) && <TimelineShapeAction action={action} />;
 	}
 };
 
 interface TProps {
-	action: TTimelineAction;
+	action: TTimelineActionMixin;
 }

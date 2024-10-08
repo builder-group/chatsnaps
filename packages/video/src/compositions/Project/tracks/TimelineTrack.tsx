@@ -1,20 +1,27 @@
 import React from 'react';
 
 import { TimelineAction } from '../actions';
-import { TTimelineTrack } from '../schema';
+import { TTimeline, TTimelineActionMixin, TTimelineTrack } from '../schema';
 
 export const TimelineTrack: React.FC<TProps> = (props) => {
-	const { track } = props;
+	const { track, timeline } = props;
 
 	const sortedTimelineActions = React.useMemo(() => {
-		return [...track.actions].sort((a, b) => a.startFrame - b.startFrame);
-	}, [track]);
+		const actions: TTimelineActionMixin[] = track.actionIds
+			.map((id) => timeline.actionMap[id])
+			.filter(Boolean) as TTimelineActionMixin[];
+		return actions.sort((a, b) => a.startFrame - b.startFrame);
+	}, [track.actionIds]);
 
-	return sortedTimelineActions.map((item, index) => (
-		<TimelineAction key={`${index}-${item.startFrame}-${item.durationInFrames}`} action={item} />
+	return sortedTimelineActions.map((action, index) => (
+		<TimelineAction
+			key={`${index}-${action.startFrame}-${action.durationInFrames}`}
+			action={action}
+		/>
 	));
 };
 
 interface TProps {
 	track: TTimelineTrack;
+	timeline: TTimeline;
 }

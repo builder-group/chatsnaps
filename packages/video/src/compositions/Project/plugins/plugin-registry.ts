@@ -1,21 +1,21 @@
 import { z } from 'zod';
 
-import { TTimelineActionPlugin, TTimelineTrackPlugin } from '../schema';
+import { TTimeline, TTimelineActionPlugin, TTimelineTrackPlugin } from '../schema';
 
-const PLUGIN_TIMELINE_ITEM_REGISTRY: Record<string, TTimelineActionPluginFC<any>> = {};
-const PLUGIN_TIMELINE_REGISTRY: Record<string, TTimelinePluginFC<any>> = {};
+const PLUGIN_TIMELINE_ACTION_REGISTRY: Record<string, TTimelineActionPluginFC<any>> = {};
+const PLUGIN_TIMELINE_TRACK_REGISTRY: Record<string, TTimelineTrackPluginFC<any>> = {};
 
 export function registerTimelineActionPlugin<
 	GTimelineActionPlugin extends z.ZodType<TTimelineActionPlugin>
 >(plugin: TTimelineActionPluginFC<GTimelineActionPlugin>) {
-	if (PLUGIN_TIMELINE_ITEM_REGISTRY[plugin.id] != null) {
+	if (PLUGIN_TIMELINE_ACTION_REGISTRY[plugin.id] != null) {
 		console.warn(`Plugin with id ${plugin.id} already exists. Overwriting.`);
 	}
-	PLUGIN_TIMELINE_ITEM_REGISTRY[plugin.id] = plugin;
+	PLUGIN_TIMELINE_ACTION_REGISTRY[plugin.id] = plugin;
 }
 
 export function getTimelineActionPlugin(id: string): TTimelineActionPluginFC<any> | null {
-	return PLUGIN_TIMELINE_ITEM_REGISTRY[id] ?? null;
+	return PLUGIN_TIMELINE_ACTION_REGISTRY[id] ?? null;
 }
 
 export interface TTimelineActionPluginFC<
@@ -23,24 +23,26 @@ export interface TTimelineActionPluginFC<
 > {
 	id: string;
 	schema: GTimelineActionPlugin;
-	component: React.FC<{ item: z.infer<GTimelineActionPlugin> }>;
+	component: React.FC<{ action: z.infer<GTimelineActionPlugin> }>;
 }
 
-export function registerTimelinePlugin<GTimelinePlugin extends z.ZodType<TTimelineTrackPlugin>>(
-	plugin: TTimelinePluginFC<GTimelinePlugin>
-) {
-	if (PLUGIN_TIMELINE_REGISTRY[plugin.id] != null) {
+export function registerTimelineTrackPlugin<
+	GTimelinePlugin extends z.ZodType<TTimelineTrackPlugin>
+>(plugin: TTimelineTrackPluginFC<GTimelinePlugin>) {
+	if (PLUGIN_TIMELINE_TRACK_REGISTRY[plugin.id] != null) {
 		console.warn(`Plugin with id ${plugin.id} already exists. Overwriting.`);
 	}
-	PLUGIN_TIMELINE_REGISTRY[plugin.id] = plugin;
+	PLUGIN_TIMELINE_TRACK_REGISTRY[plugin.id] = plugin;
 }
 
-export function getTimelinePlugin(id: string): TTimelinePluginFC<any> | null {
-	return PLUGIN_TIMELINE_REGISTRY[id] ?? null;
+export function getTimelineTrackPlugin(id: string): TTimelineTrackPluginFC<any> | null {
+	return PLUGIN_TIMELINE_TRACK_REGISTRY[id] ?? null;
 }
 
-export interface TTimelinePluginFC<GTimelinePlugin extends z.ZodType<TTimelineTrackPlugin>> {
+export interface TTimelineTrackPluginFC<
+	GTimelineTrackPlugin extends z.ZodType<TTimelineTrackPlugin>
+> {
 	id: string;
-	schema: GTimelinePlugin;
-	component: React.FC<{ timeline: z.infer<GTimelinePlugin> }>;
+	schema: GTimelineTrackPlugin;
+	component: React.FC<{ track: z.infer<GTimelineTrackPlugin>; timeline: TTimeline }>;
 }
