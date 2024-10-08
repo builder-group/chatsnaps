@@ -26,8 +26,8 @@ export const TimelineEditor: React.FC = () => {
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(project, () => {
-				// Reload player frame and thus changes to the project object
-				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime);
+				// Force re-render to reflect project changes by slightly adjusting player time
+				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime + 1e-9);
 			}),
 		[project]
 	);

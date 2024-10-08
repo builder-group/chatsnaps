@@ -34,9 +34,9 @@ registerTimelineTrackPlugin({
 				})}
 			>
 				<Messenger
-					actions={actions.filter(
-						(action) => action.props.type === 'Message' && action.startFrame <= frame
-					)}
+					actions={actions
+						.filter((action) => action.props.type === 'Message' && action.startFrame <= frame)
+						.sort((a, b) => a.startFrame - b.startFrame)}
 					messenger={track.props.messenger}
 					maxHeight={track.height != null ? getInterpolatedValue(track.height, frame) : height}
 					className="origin-top scale-[.80] rounded-3xl shadow-2xl"

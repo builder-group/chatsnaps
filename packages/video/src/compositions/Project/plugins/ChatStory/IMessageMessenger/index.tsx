@@ -81,18 +81,20 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 							key={JSON.stringify(content)}
 							className={cn('relative mx-16', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
-							<div
-								className={cn(
-									'shared absolute',
-									messageType === 'sent' ? 'sent' : 'received',
-									noTail && 'noTail'
-								)}
-								style={{
-									opacity,
-									transform: `translateY(${yPosition}px)`
-								}}
-							>
-								{content.type === 'Text' ? content.text : ''}
+							<div className="absolute">
+								<div
+									className={cn(
+										'shared',
+										messageType === 'sent' ? 'sent' : 'received',
+										noTail && 'noTail'
+									)}
+									style={{
+										opacity,
+										transform: `translateY(${yPosition}px)`
+									}}
+								>
+									{content.type === 'Text' ? content.text : ''}
+								</div>
 							</div>
 							{/* Invisible static component to maintain consistent layout and thus to not influence the height calculations with e.g. spring animation */}
 							<div

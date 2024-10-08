@@ -80,8 +80,9 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 
 						// Only re-render canvas if action is visible
 						if (
-							timeline.currentTime._value > value.start &&
-							timeline.currentTime._value < value.start + value.duration
+							(pA.type === 'Plugin' && pA.pluginId === 'chat-story') ||
+							(timeline.currentTime._value > value.start &&
+								timeline.currentTime._value < value.start + value.duration)
 						) {
 							onChange();
 						}
