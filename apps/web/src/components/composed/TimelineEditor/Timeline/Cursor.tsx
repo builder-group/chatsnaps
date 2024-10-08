@@ -53,7 +53,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 		setInteraction('none');
 	}, []);
 
-	// TODO: Overwriting global cursor doens't really work
+	// TODO: Overwriting global cursor doens't really seem to work
 	React.useEffect(() => {
 		if (interaction !== 'none') {
 			document.body.style.userSelect = 'none';
@@ -75,7 +75,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 	return (
 		<div
 			ref={cursorRef}
-			className="absolute top-0 h-full w-0.5 cursor-ew-resize bg-blue-500"
+			className="absolute top-0 z-10 h-full w-0.5 cursor-ew-resize bg-yellow-500"
 			onMouseDown={(e) => {
 				handleMouseDown(e, 'drag');
 			}}
@@ -83,7 +83,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 				left: parseTimeToPixel(currentTime, timeline._config.scale)
 			}}
 		>
-			<div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full bg-blue-500" />
+			<div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full bg-yellow-500" />
 		</div>
 	);
 };

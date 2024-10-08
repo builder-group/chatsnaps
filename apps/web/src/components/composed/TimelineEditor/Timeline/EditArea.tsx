@@ -23,7 +23,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 	return (
 		<div
 			ref={containerRef}
-			className="relative overflow-hidden"
+			className="relative"
 			style={{
 				width: timeGridVirtualizer.getTotalSize(),
 				height: timeline.height()

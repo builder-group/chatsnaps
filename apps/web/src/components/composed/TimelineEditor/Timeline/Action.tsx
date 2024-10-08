@@ -2,6 +2,7 @@
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
+import { cn } from '../../../../lib';
 import { parsePixelToTime } from './helper';
 import { type TTimelineAction } from './types';
 
@@ -82,7 +83,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 		setDragPosition(null);
 	}, []);
 
-	// TODO: Overwriting global cursor doens't really work
+	// TODO: Overwriting global cursor doens't really seem to work
 	React.useEffect(() => {
 		if (interaction !== 'none') {
 			document.body.style.userSelect = 'none';
@@ -109,29 +110,24 @@ export const Action: React.FC<TActionProps> = (props) => {
 		<>
 			{interaction === 'drag' && (
 				<div
-					className="absolute border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
+					className="pointer-events-none absolute border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
 					style={{
 						left: action.x(),
 						top: action.y(),
 						width: action.width(),
-						height: action.height(),
-						pointerEvents: 'none'
+						height: action.height()
 					}}
 				/>
 			)}
 			<div
-				className={`border border-blue-300 bg-blue-500 ${
-					interaction === 'drag' ? 'bg-blue-600' : ''
-				}`}
+				className={cn('absolute rounded-sm border border-blue-300', {
+					'z-20 cursor-grabbing bg-blue-600 shadow-lg': interaction === 'drag',
+					'z-0 cursor-grab bg-blue-500': interaction !== 'drag'
+				})}
 				style={{
 					width: action.width(),
 					height: action.height(),
-					position: 'absolute' as const,
-					boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-					borderRadius: '4px',
-					cursor: interaction === 'drag' ? 'grabbing' : 'grab',
 					transition: interaction === 'none' ? 'all 0.3s ease-out' : 'none',
-					zIndex: interaction === 'drag' ? 10 : 1,
 					left: interaction === 'drag' && dragPosition ? dragPosition.x : action.x(),
 					top: interaction === 'drag' && dragPosition ? dragPosition.y : action.y()
 				}}
@@ -140,15 +136,13 @@ export const Action: React.FC<TActionProps> = (props) => {
 				}}
 			>
 				<div
-					className="resize-handle absolute left-0 top-0 h-full w-2 bg-blue-700 opacity-50 hover:opacity-100"
-					style={{ cursor: 'ew-resize' }}
+					className="resize-handle absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-blue-700 opacity-50 hover:opacity-100"
 					onMouseDown={(e) => {
 						handleMouseDown(e, 'left');
 					}}
 				/>
 				<div
-					className="resize-handle absolute right-0 top-0 h-full w-2 bg-blue-700 opacity-50 hover:opacity-100"
-					style={{ cursor: 'ew-resize' }}
+					className="resize-handle absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-blue-700 opacity-50 hover:opacity-100"
 					onMouseDown={(e) => {
 						handleMouseDown(e, 'right');
 					}}
