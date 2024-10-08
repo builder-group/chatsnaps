@@ -54,7 +54,6 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		// Create and register the track
 		const track = createTimelineTrack(timeline, { id: trackId, actionIds: [] });
 		track.listen(({ value }) => {
-			// console.log('[Track] OnChange', { value });
 			const pT = project.timeline.trackMap[value.id];
 			if (pT != null) {
 				pT.actionIds = value.actionIds;
@@ -74,12 +73,18 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 					duration: projectAction.durationInFrames / project.fps
 				});
 				action.listen(({ value }) => {
-					// console.log('[Action] OnChange', { value });
 					const pA = project.timeline.actionMap[value.id];
 					if (pA != null) {
 						pA.durationInFrames = Math.floor(value.duration * project.fps);
 						pA.startFrame = Math.floor(value.start * project.fps);
-						onChange();
+
+						// Only re-render canvas if action is visible
+						if (
+							timeline.currentTime._value > value.start &&
+							timeline.currentTime._value < value.start + value.duration
+						) {
+							onChange();
+						}
 					}
 				});
 				timeline._actionMap[actionId] = action;
@@ -92,7 +97,6 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 
 	timeline.trackIds._notify();
 	timeline.trackIds.listen(({ value }) => {
-		// console.log('[TrackIds] OnChange', { value });
 		project.timeline.trackIds = value as string[];
 		onChange();
 	});
