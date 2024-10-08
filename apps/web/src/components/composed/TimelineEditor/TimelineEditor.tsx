@@ -59,7 +59,7 @@ export const TimelineEditor: React.FC = () => {
 						{
 							type: 'video/remotion',
 							src: ProjectComp as any,
-							durationInFrames: 30 * project.fps,
+							durationInFrames: project.durationInFrames,
 							fps: project.fps,
 							initialFrame: 0,
 							compositionWidth: project.width,

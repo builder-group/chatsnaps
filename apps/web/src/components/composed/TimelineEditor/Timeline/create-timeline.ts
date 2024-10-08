@@ -16,7 +16,7 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		currentTime: createState(0),
 		playState: createState<TPlayState>('paused'),
 		trackIds: createState([] as string[]),
-		scrollLeft: createState(0),
+		// scrollLeft: createState(0),
 		getTrackAtIndex(this: TTimeline, index) {
 			const trackId = this.trackIds._value[index];
 			if (trackId == null) {
@@ -94,6 +94,14 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 				console.warn(`Action with ID ${actionId} not found in actionMap`);
 			}
 		}
+
+		// Sort actionIds
+		// Note: Required for virtualized list
+		track._value.actionIds = projectTrack.actionIds.sort((a, b) => {
+			const actionA = project.timeline.actionMap[a];
+			const actionB = project.timeline.actionMap[b];
+			return (actionA?.startFrame ?? 0) - (actionB?.startFrame ?? 0);
+		});
 	}
 
 	timeline.trackIds._notify();

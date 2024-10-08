@@ -1,5 +1,4 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
 import { Cursor } from './Cursor';
@@ -10,7 +9,6 @@ import { type TTimeline } from './types';
 
 export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((props, ref) => {
 	const { timeline } = props;
-	const scrollLeft = useGlobalState(timeline.scrollLeft);
 	const timelineWidth = timeline.width();
 
 	const containerRef = React.useRef<HTMLDivElement>(null);
@@ -46,28 +44,19 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 		),
 		horizontal: true,
 		overscan: 10,
-		initialOffset: scrollLeft
+		initialOffset: 0
 	});
-
-	const handleScroll = React.useCallback(
-		(newScrollLeft: number) => {
-			timeline.scrollLeft.set(newScrollLeft);
-		},
-		[timeline]
-	);
 
 	return (
 		<div>
 			<PlayerArea timeline={timeline} />
-			<div
-				ref={containerRef}
-				className="relative overflow-auto bg-red-400"
-				onScroll={(e) => {
-					handleScroll(e.currentTarget.scrollLeft);
-				}}
-			>
-				<TimeArea timeGridVirtualizer={timeGridVirtualizer} timeline={timeline} />
-				<EditArea timeline={timeline} timeGridVirtualizer={timeGridVirtualizer} />
+			<div ref={containerRef} className="relative overflow-auto bg-red-400">
+				<TimeArea timeline={timeline} timeGridVirtualizer={timeGridVirtualizer} />
+				<EditArea
+					timeline={timeline}
+					timeGridVirtualizer={timeGridVirtualizer}
+					containerRef={containerRef}
+				/>
 				<Cursor timeline={timeline} />
 			</div>
 		</div>

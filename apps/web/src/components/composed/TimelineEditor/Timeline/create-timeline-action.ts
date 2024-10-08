@@ -24,7 +24,10 @@ export function createTimelineAction(
 			return index * this._timeline._config.trackHeight;
 		},
 		width(this: TTimelineAction) {
-			return parseTimeToPixel(this._value.duration, this._timeline._config.scale);
+			return parseTimeToPixel(this._value.duration, {
+				...this._timeline._config.scale,
+				startLeft: 0
+			});
 		},
 		height(this: TTimelineAction) {
 			return this._timeline._config.trackHeight;

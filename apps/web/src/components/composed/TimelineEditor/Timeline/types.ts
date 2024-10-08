@@ -7,7 +7,7 @@ export interface TTimeline {
 	currentTime: TState<number, ['base']>;
 	playState: TState<TPlayState, ['base']>;
 	trackIds: TState<string[], ['base']>;
-	scrollLeft: TState<number, ['base']>;
+	// scrollLeft: TState<number, ['base']>;
 	getTrackAtIndex: (index: number) => TTimelineTrack | null;
 	width: () => number;
 	height: () => number;

@@ -2,6 +2,7 @@ import { type TProjectCompProps } from '@repo/video';
 
 export const project1: TProjectCompProps = {
 	name: 'Project 1',
+	durationInFrames: 300,
 	width: 1080,
 	height: 1920,
 	fps: 30,
@@ -38,8 +39,8 @@ export const project1: TProjectCompProps = {
 					text: 'Tap follow! 📲',
 					debug: true
 				},
-				startFrame: 0,
-				durationInFrames: 120,
+				startFrame: 10,
+				durationInFrames: 100,
 				width: 1080,
 				height: 500,
 				x: 0,

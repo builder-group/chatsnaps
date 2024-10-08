@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- WIP */
 /* eslint-disable jsx-a11y/click-events-have-key-events -- WIP */
 import { type Virtualizer } from '@tanstack/react-virtual';
-import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/lib';
 
@@ -11,20 +10,19 @@ import { type TTimeline } from './types';
 export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 	const { timeline, timeGridVirtualizer } = props;
 	const { baseValue: scale, splitCount: scaleSplitCount, startLeft } = timeline._config.scale;
-	const scrollLeft = useGlobalState(timeline.scrollLeft);
 	const showUnit = scaleSplitCount > 0;
 
 	const handleClick = React.useCallback(
 		(e: React.MouseEvent<HTMLDivElement>): void => {
 			const rect = e.currentTarget.getBoundingClientRect();
 			const position = e.clientX - rect.x;
-			const left = Math.max(position + scrollLeft, startLeft);
+			const left = Math.max(position, startLeft);
 
 			const time = parsePixelToTime(left, timeline._config.scale);
 			timeline.playState.set('paused');
-			timeline.currentTime.set(time);
+			timeline.currentTime.set(time, { deferred: false });
 		},
-		[timeline, scrollLeft, startLeft]
+		[timeline, startLeft]
 	);
 
 	return (
