@@ -64,7 +64,7 @@ export function createCTATrack(
 	const endCTAs = ctas.filter((cta) => cta.atEnd);
 
 	// Calculate total duration of end CTAs and adjust available duration for regular CTAs
-	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + cta.durationInFrames, 0);
+	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + cta.action.durationInFrames, 0);
 	const availableDurationForRegularCTAs = totalDurationInFrames - endCTAsDuration;
 
 	// Place CTAs
@@ -90,12 +90,12 @@ function placeEndCTAs(
 	let endPosition = totalDurationInFrames;
 	for (const cta of ctas.reverse()) {
 		// Reverse to place from end to start
-		const durationInFrames = cta.durationInFrames;
+		const durationInFrames = cta.action.durationInFrames;
 		endPosition -= durationInFrames;
 
 		const id = pika.gen('action');
 		actionMap[id] = {
-			...cta,
+			...cta.action,
 			durationInFrames,
 			startFrame: endPosition
 		};
@@ -111,7 +111,7 @@ function placeRegularCTAs(
 	minSpacingFrames: number,
 	spreadType: 'even' | 'random'
 ): void {
-	const totalCTAsDuration = ctas.reduce((sum, cta) => sum + cta.durationInFrames, 0);
+	const totalCTAsDuration = ctas.reduce((sum, cta) => sum + cta.action.durationInFrames, 0);
 	const availableSpace = availableDuration - totalCTAsDuration;
 
 	switch (spreadType) {
@@ -120,12 +120,12 @@ function placeRegularCTAs(
 			let currentPosition = spacing;
 
 			for (const cta of ctas) {
-				const durationInFrames = cta.durationInFrames;
+				const durationInFrames = cta.action.durationInFrames;
 				const startFrame = Math.round(currentPosition);
 
 				const id = pika.gen('action');
 				actionMap[id] = {
-					...cta,
+					...cta.action,
 					durationInFrames,
 					startFrame
 				};
@@ -144,10 +144,10 @@ function placeRegularCTAs(
 					continue;
 				}
 
-				const durationInFrames = cta.durationInFrames;
+				const durationInFrames = cta.action.durationInFrames;
 				const remainingCTAsDuration = ctas
 					.slice(i + 1)
-					.reduce((sum, item) => sum + item.durationInFrames, 0);
+					.reduce((sum, item) => sum + item.action.durationInFrames, 0);
 
 				const maxStart = availableDuration - remainingCTAsDuration - durationInFrames;
 				const minStart = Math.max(
@@ -159,7 +159,7 @@ function placeRegularCTAs(
 
 				const id = pika.gen('action');
 				actionMap[id] = {
-					...cta,
+					...cta.action,
 					durationInFrames,
 					startFrame
 				};
@@ -172,9 +172,10 @@ function placeRegularCTAs(
 	}
 }
 
-type TCTA = (Omit<TTikTokFollowPlugin, 'startFrame'> | Omit<TTkiTokLikePlugin, 'startFrame'>) & {
+interface TCTA {
+	action: Omit<TTikTokFollowPlugin, 'startFrame'> | Omit<TTkiTokLikePlugin, 'startFrame'>;
 	atEnd?: boolean;
-};
+}
 
 interface TAddCTAAnimationsConfig {
 	totalDurationInFrames: number;

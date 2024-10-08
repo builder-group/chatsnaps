@@ -78,13 +78,23 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	];
 	const ctaTrack = createCTATrack(
 		[
-			createLikeCTA(likeText[Math.floor(Math.random() * likeText.length)] as unknown as string),
-			createFollowCTA(
-				followText[Math.floor(Math.random() * followText.length)] as unknown as string
-			),
-			createLikeCTA(likeText[Math.floor(Math.random() * likeText.length)] as unknown as string),
 			{
-				...createFollowCTA(
+				action: createLikeCTA(
+					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
+				)
+			},
+			{
+				action: createFollowCTA(
+					followText[Math.floor(Math.random() * followText.length)] as unknown as string
+				)
+			},
+			{
+				action: createLikeCTA(
+					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
+				)
+			},
+			{
+				action: createFollowCTA(
 					followText[Math.floor(Math.random() * followText.length)] as unknown as string
 				),
 				atEnd: true
