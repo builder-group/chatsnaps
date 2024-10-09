@@ -13,13 +13,15 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	const actionVirtualizer = useVirtualizer({
 		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
+		// TODO: Figure out how to cache.
+		// Right now called for every not visible action items when manually resizing via "actionVirtualizer.resizeItem"
 		estimateSize: (index) => {
 			const action = track.getActionAtIndex(index);
 			if (action == null) {
 				return 0;
 			}
 
-			console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
+			// console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
 
 			return calculateVirtualTimelineActionSize(action, track.getActionAtIndex(index - 1));
 		},
