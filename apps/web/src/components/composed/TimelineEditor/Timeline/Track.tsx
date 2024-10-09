@@ -3,21 +3,13 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
 import { Action } from './Action';
-import { parseTimeToPixel } from './helper';
+import { calculateVirtualTimelineActionSize } from './helper';
 import { type TTimelineTrack } from './types';
 
 export const Track: React.FC<TTrackProps> = (props) => {
 	const { track, containerRef } = props;
 	const { actionIds } = useGlobalState(track);
 
-	// TODO: Does a virtual list makes sense if its very dynamic (action duration, action start)
-	// How to update the list if e.g. duration or start of action xyz changes
-	// We can do so by making use of 'actionVirtualizer.resizeItem?'
-	// But how do we update actionIds which have to be sorted to make that work
-	// Should we make a link listed? Whats the best apprach
-	// Gap options:
-	// 1. Add gap width to each item like "item+gap, item+gap, .."
-	// 2. Have a shared list with gaps and items like "item, gap, item, gap, .."
 	const actionVirtualizer = useVirtualizer({
 		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
@@ -29,21 +21,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 
 			console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
 
-			const prevAction = track.getActionAtIndex(index - 1);
-			const preGap = prevAction
-				? parseTimeToPixel(
-						action._value.start - prevAction._value.start - prevAction._value.duration,
-						{
-							...action._timeline._config.scale,
-							startLeft: 0
-						}
-					)
-				: parseTimeToPixel(action._value.start, {
-						...action._timeline._config.scale,
-						startLeft: 0
-					});
-
-			return preGap + action.width();
+			return calculateVirtualTimelineActionSize(action, track.getActionAtIndex(index - 1));
 		},
 		horizontal: true,
 		overscan: 5,

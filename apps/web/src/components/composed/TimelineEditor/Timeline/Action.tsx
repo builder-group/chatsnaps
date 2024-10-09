@@ -4,88 +4,8 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/lib';
 
-import { parsePixelToTime, parseTimeToPixel } from './helper';
+import { calculateVirtualTimelineActionSize, parsePixelToTime, swapArrayElements } from './helper';
 import { type TTimelineAction, type TTimelineInteraction, type TTimelineTrack } from './types';
-
-function calculateItemSize(config: TCalculateItemSizeConfig): { index: number; size: number }[] {
-	const {
-		current: { action: currentAction, index: currentIndex },
-		prev: { action: prevAction },
-		next: { action: nextAction, index: nextIndex }
-	} = config;
-	const sizes: { index: number; size: number }[] = [];
-
-	if (prevAction != null) {
-		sizes.push({
-			index: currentIndex,
-			size:
-				currentAction.width() +
-				parseTimeToPixel(
-					currentAction._value.start - prevAction._value.start - prevAction._value.duration,
-					{ ...currentAction._timeline._config.scale, startLeft: 0 }
-				)
-		});
-	} else {
-		sizes.push({
-			index: currentIndex,
-			size:
-				currentAction.width() +
-				parseTimeToPixel(currentAction._value.start, {
-					...currentAction._timeline._config.scale,
-					startLeft: 0
-				})
-		});
-	}
-
-	if (nextAction != null) {
-		sizes.push({
-			index: nextIndex,
-			size:
-				nextAction.width() +
-				parseTimeToPixel(
-					nextAction._value.start - currentAction._value.start - currentAction._value.duration,
-					{ ...nextAction._timeline._config.scale, startLeft: 0 }
-				)
-		});
-	}
-
-	return sizes;
-}
-
-interface TCalculateItemSizeConfig {
-	current: { action: TTimelineAction; index: number };
-	prev: { action: TTimelineAction | null; index: number };
-	next: { action: TTimelineAction | null; index: number };
-}
-
-function checkAndSwap(config: TCheckAndSwapConfig): boolean {
-	const { comparisonAction, currentAction, comparisonFn, track } = config;
-	if (
-		comparisonAction != null &&
-		comparisonFn(currentAction._value.start, comparisonAction._value.start)
-	) {
-		const currentIndex = track._value.actionIds.indexOf(currentAction._value.id);
-		const comparisonIndex = track._value.actionIds.indexOf(comparisonAction._value.id);
-
-		// Swap actions
-		// @ts-expect-error -- We know that those indexes have to exist
-		[track._value.actionIds[currentIndex], track._value.actionIds[comparisonIndex]] = [
-			track._value.actionIds[comparisonIndex],
-			track._value.actionIds[currentIndex]
-		];
-
-		return true;
-	}
-
-	return false;
-}
-
-interface TCheckAndSwapConfig {
-	currentAction: TTimelineAction;
-	comparisonAction: TTimelineAction | null;
-	comparisonFn: (a: number, b: number) => boolean;
-	track: TTimelineTrack;
-}
 
 export const Action: React.FC<TActionProps> = (props) => {
 	const { action, index, actionVirtualizer, track } = props;
@@ -102,67 +22,129 @@ export const Action: React.FC<TActionProps> = (props) => {
 		startDuration: duration
 	});
 
+	// Helper function to update affected items in the virtual list
+	const updateAffectedItems = React.useCallback(
+		(indices: number[]) => {
+			for (const affectedIndex of indices) {
+				const affectedAction = track.getActionAtIndex(affectedIndex);
+				if (affectedAction != null) {
+					const newSize = calculateVirtualTimelineActionSize(
+						affectedAction,
+						track.getActionAtIndex(affectedIndex - 1)
+					);
+					actionVirtualizer.resizeItem(affectedIndex, newSize);
+				}
+			}
+		},
+		[track, actionVirtualizer]
+	);
+
+	// Helper function to update current item and the next item if exists
+	const updateCurrentAndNextItem = React.useCallback(
+		(currentAction: TTimelineAction) => {
+			const prevAction = track.getActionAtIndex(index - 1);
+			const currentSize = calculateVirtualTimelineActionSize(currentAction, prevAction);
+			actionVirtualizer.resizeItem(index, currentSize);
+
+			const nextAction = track.getActionAtIndex(index + 1);
+			if (nextAction != null) {
+				const nextSize = calculateVirtualTimelineActionSize(nextAction, currentAction);
+				actionVirtualizer.resizeItem(index + 1, nextSize);
+			}
+		},
+		[track, actionVirtualizer, index]
+	);
+
+	const checkAndSwap = React.useCallback(
+		(
+			currentAction: TTimelineAction,
+			config: {
+				comparisonFn: (a: number, b: number) => boolean;
+				indexStep: number;
+			}
+		): number[] => {
+			const { comparisonFn, indexStep } = config;
+			const affectedIndices = new Set<number>();
+			let currAction = currentAction;
+			let currIndex = track._value.actionIds.indexOf(currAction._value.id);
+
+			if (currIndex === -1) {
+				return [];
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition -- Yes
+			while (true) {
+				const nextIndex = currIndex + indexStep;
+				const nextAction = track.getActionAtIndex(nextIndex);
+
+				if (nextAction == null || !comparisonFn(currAction._value.start, nextAction._value.start)) {
+					break;
+				}
+
+				swapArrayElements(track._value.actionIds, currIndex, nextIndex);
+				affectedIndices.add(currIndex).add(nextIndex);
+
+				currAction = nextAction;
+				currIndex = nextIndex;
+			}
+
+			return Array.from(affectedIndices);
+		},
+		[track]
+	);
+
 	React.useEffect(() => {
 		const unsubscribe = action.interaction.listen(() => {
 			if (action.interaction._value !== 'NONE') {
 				return;
 			}
 
-			const prevAction = track.getActionAtIndex(index - 1);
-			const nextAction = track.getActionAtIndex(index + 1);
+			let affectedIndexes: number[] = [];
+			const currentAction = action;
 
-			// If swapped with the previous action
-			const swappedWithPrev = checkAndSwap({
-				currentAction: action,
-				comparisonAction: prevAction,
+			// Check and swap actions backwards (earlier in timeline)
+			affectedIndexes = checkAndSwap(currentAction, {
 				comparisonFn: (current, prev) => current < prev,
-				track
+				indexStep: -1
 			});
-			if (swappedWithPrev && prevAction != null) {
-				const resizes = calculateItemSize({
-					current: { index, action: prevAction },
-					next: { index: index + 1, action: nextAction },
-					prev: { index: index - 1, action }
+
+			// If no backward swaps, check and swap actions forwards (later in timeline)
+			if (affectedIndexes.length === 0) {
+				affectedIndexes = checkAndSwap(currentAction, {
+					comparisonFn: (current, next) => current > next,
+					indexStep: 1
 				});
-				resizes.forEach((resize) => {
-					actionVirtualizer.resizeItem(resize.index, resize.size);
-				});
-				return;
+
+				// Include the next action after the last affected action for update.
+				// This is necessary due to changes in prepended space of that action.
+				const lastIndex = affectedIndexes[affectedIndexes.length - 1];
+				if (lastIndex != null) {
+					affectedIndexes.push(lastIndex + 1);
+				}
+
+				console.log({ affectedIndexes, lastIndex });
 			}
 
-			// If swapped with the next action
-			const swappedWithNext = checkAndSwap({
-				currentAction: action,
-				comparisonAction: nextAction,
-				comparisonFn: (current, next) => current > next,
-				track
-			});
-			if (swappedWithNext && nextAction != null) {
-				const resizes = calculateItemSize({
-					current: { index, action: nextAction },
-					next: { index: index + 1, action },
-					prev: { index: index - 1, action: prevAction }
-				});
-				resizes.forEach((resize) => {
-					actionVirtualizer.resizeItem(resize.index, resize.size);
-				});
-				return;
+			// Update virtual list items based on affected indexes
+			if (affectedIndexes.length > 0) {
+				updateAffectedItems(affectedIndexes);
+			} else {
+				updateCurrentAndNextItem(currentAction);
 			}
-
-			const resizes = calculateItemSize({
-				current: { index, action },
-				next: { index: index + 1, action: nextAction },
-				prev: { index: index - 1, action: prevAction }
-			});
-			resizes.forEach((resize) => {
-				actionVirtualizer.resizeItem(resize.index, resize.size);
-			});
 		});
 
 		return () => {
 			unsubscribe();
 		};
-	}, [index, actionVirtualizer, action, track]);
+	}, [
+		index,
+		actionVirtualizer,
+		action,
+		track,
+		checkAndSwap,
+		updateAffectedItems,
+		updateCurrentAndNextItem
+	]);
 
 	const handleMouseDown = React.useCallback(
 		(e: React.MouseEvent, type: TTimelineInteraction) => {
@@ -270,7 +252,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 				style={{
 					width: action.width(),
 					height: action.height(),
-					transition: interaction === 'NONE' ? 'all 0.3s ease-out' : 'none',
+					// transition: interaction === 'NONE' ? 'all 0.3s ease-out' : 'none',
 					left: interaction === 'DRAGGING' && dragPosition ? dragPosition.x : action.x(),
 					top: interaction === 'DRAGGING' && dragPosition ? dragPosition.y : action.y()
 				}}
