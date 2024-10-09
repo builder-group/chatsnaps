@@ -17,10 +17,11 @@ export function calculateVirtualTimelineActionSize(
 	}
 	// If there's no previous action, we use the gap from the start
 	else {
-		size += parseTimeToPixel(action._value.start, {
-			...timelineConfig,
-			startLeft: 0
-		});
+		size +=
+			parseTimeToPixel(action._value.start, {
+				...timelineConfig,
+				startLeft: 0
+			}) + action._timeline._config.scale.startLeft;
 	}
 
 	return size;

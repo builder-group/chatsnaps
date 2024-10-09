@@ -4,7 +4,7 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/lib';
 
-import { calculateVirtualTimelineActionSize, parsePixelToTime, swapArrayElements } from './helper';
+import { calculateVirtualTimelineActionSize, parsePixelToTime } from './helper';
 import { type TTimelineAction, type TTimelineInteraction, type TTimelineTrack } from './types';
 
 export const Action: React.FC<TActionProps> = (props) => {
@@ -55,7 +55,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 		[track, actionVirtualizer, index]
 	);
 
-	const checkAndSwap = React.useCallback(
+	const checkAndMove = React.useCallback(
 		(
 			currentAction: TTimelineAction,
 			config: {
@@ -64,70 +64,92 @@ export const Action: React.FC<TActionProps> = (props) => {
 			}
 		): number[] => {
 			const { comparisonFn, indexStep } = config;
-			const affectedIndices = new Set<number>();
-			let currAction = currentAction;
-			let currIndex = track._value.actionIds.indexOf(currAction._value.id);
+			const affectedIndices: number[] = [];
 
+			const currAction = currentAction;
+			const currIndex = track._value.actionIds.indexOf(currAction._value.id);
 			if (currIndex === -1) {
 				return [];
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition -- Yes
-			while (true) {
-				const nextIndex = currIndex + indexStep;
-				const nextAction = track.getActionAtIndex(nextIndex);
+			let targetIndex = currIndex;
+			let compareIndex = currIndex + indexStep;
+			let compareAction = track.getActionAtIndex(compareIndex);
 
-				if (nextAction == null || !comparisonFn(currAction._value.start, nextAction._value.start)) {
-					break;
-				}
-
-				swapArrayElements(track._value.actionIds, currIndex, nextIndex);
-				affectedIndices.add(currIndex).add(nextIndex);
-
-				currAction = nextAction;
-				currIndex = nextIndex;
+			// Find the correct position to insert the action
+			while (
+				compareAction != null &&
+				comparisonFn(currAction._value.start, compareAction._value.start)
+			) {
+				targetIndex = compareIndex;
+				compareIndex += indexStep;
+				compareAction = track.getActionAtIndex(compareIndex);
 			}
 
-			return Array.from(affectedIndices);
+			// If the action needs to be moved
+			if (targetIndex !== currIndex) {
+				// Remove the current action and insert it at the new position
+				const [movedActionId] = track._value.actionIds.splice(currIndex, 1);
+				if (movedActionId != null) {
+					track._value.actionIds.splice(targetIndex, 0, movedActionId);
+				}
+
+				// Determine the range of affected indices
+				const affectStart = Math.min(currIndex, targetIndex);
+				const affectEnd = Math.max(currIndex, targetIndex);
+
+				// Add all indices in the affected range
+				for (let i = affectStart; i <= affectEnd; i++) {
+					affectedIndices.push(i);
+				}
+			}
+
+			return affectedIndices;
 		},
 		[track]
 	);
 
+	// TODO: Can be improved quite a bit, but good enough for the start
+	// 1. Right now all "affected" action items (affected === index changed) are recalculated, although not all need to be recalculated.
+	//    Their index has changed but that doesn't mean that their visual "order" has changed.
+	// 2. Don't always include the next action item. e.g. when moving item to the end or start
 	React.useEffect(() => {
 		const unsubscribe = action.interaction.listen(() => {
 			if (action.interaction._value !== 'NONE') {
 				return;
 			}
 
-			let affectedIndexes: number[] = [];
+			// console.log('Before: ', { actionIds: [...track._value.actionIds] });
+
+			let affectedIndices: number[] = [];
 			const currentAction = action;
 
 			// Check and swap actions backwards (earlier in timeline)
-			affectedIndexes = checkAndSwap(currentAction, {
+			affectedIndices = checkAndMove(currentAction, {
 				comparisonFn: (current, prev) => current < prev,
 				indexStep: -1
 			});
 
 			// If no backward swaps, check and swap actions forwards (later in timeline)
-			if (affectedIndexes.length === 0) {
-				affectedIndexes = checkAndSwap(currentAction, {
+			if (affectedIndices.length === 0) {
+				affectedIndices = checkAndMove(currentAction, {
 					comparisonFn: (current, next) => current > next,
 					indexStep: 1
 				});
-
-				// Include the next action after the last affected action for update.
-				// This is necessary due to changes in prepended space of that action.
-				const lastIndex = affectedIndexes[affectedIndexes.length - 1];
-				if (lastIndex != null) {
-					affectedIndexes.push(lastIndex + 1);
-				}
-
-				console.log({ affectedIndexes, lastIndex });
 			}
 
+			// Include the next action after the last affected action for update.
+			// This is necessary due to the prepended space approach.
+			const lastIndex = affectedIndices[affectedIndices.length - 1];
+			if (lastIndex != null) {
+				affectedIndices.push(lastIndex + 1);
+			}
+
+			// console.log('After: ', { affectedIndices, actionIds: [...track._value.actionIds] });
+
 			// Update virtual list items based on affected indexes
-			if (affectedIndexes.length > 0) {
-				updateAffectedItems(affectedIndexes);
+			if (affectedIndices.length > 0) {
+				updateAffectedItems(affectedIndices);
 			} else {
 				updateCurrentAndNextItem(currentAction);
 			}
@@ -141,7 +163,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 		actionVirtualizer,
 		action,
 		track,
-		checkAndSwap,
+		checkAndMove,
 		updateAffectedItems,
 		updateCurrentAndNextItem
 	]);
