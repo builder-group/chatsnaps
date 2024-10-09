@@ -58,9 +58,9 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 					paddingTop: headerHeight + 16
 				}}
 			>
-				{actions.map(({ content, messageType, startFrame, durationInFrames }, i) => {
+				{actions.map(({ props: { content, messageType }, startFrame, durationInFrames }, i) => {
 					const isLast = i === actions.length - 1;
-					const noTail = !isLast && actions[i + 1]?.messageType === messageType;
+					const noTail = !isLast && actions[i + 1]?.props.messageType === messageType;
 
 					// Interpolate opacity and y position
 					const springAnimation = spring({
@@ -81,18 +81,20 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 							key={JSON.stringify(content)}
 							className={cn('relative mx-16', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
-							<div
-								className={cn(
-									'shared absolute',
-									messageType === 'sent' ? 'sent' : 'received',
-									noTail && 'noTail'
-								)}
-								style={{
-									opacity,
-									transform: `translateY(${yPosition}px)`
-								}}
-							>
-								{content.type === 'Text' ? content.text : ''}
+							<div className="absolute">
+								<div
+									className={cn(
+										'shared',
+										messageType === 'sent' ? 'sent' : 'received',
+										noTail && 'noTail'
+									)}
+									style={{
+										opacity,
+										transform: `translateY(${yPosition}px)`
+									}}
+								>
+									{content.type === 'Text' ? content.text : ''}
+								</div>
 							</div>
 							{/* Invisible static component to maintain consistent layout and thus to not influence the height calculations with e.g. spring animation */}
 							<div

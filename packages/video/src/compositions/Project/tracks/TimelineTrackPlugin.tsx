@@ -2,15 +2,15 @@ import React from 'react';
 import { useCurrentFrame, useVideoConfig } from 'remotion';
 
 import { getInterpolatedValue } from '../helper';
-import { getTimelinePlugin } from '../plugins';
-import { TTimelineTrackPlugin } from '../schema';
+import { getTimelineTrackPlugin } from '../plugins';
+import { TTimeline, TTimelineTrackPlugin } from '../schema';
 
 export const TimelineTrackPlugin: React.FC<TProps> = (props) => {
-	const { track } = props;
+	const { track, timeline } = props;
 	const frame = useCurrentFrame();
 	const { width, height } = useVideoConfig();
 
-	const plugin = getTimelinePlugin(track.pluginId);
+	const plugin = getTimelineTrackPlugin(track.pluginId);
 	if (plugin != null) {
 		const validationResult = plugin.schema.safeParse(track);
 		if (validationResult.success) {
@@ -26,7 +26,7 @@ export const TimelineTrackPlugin: React.FC<TProps> = (props) => {
 						overflow: 'hidden'
 					}}
 				>
-					<plugin.component timeline={track} />
+					<plugin.component track={track} timeline={timeline} />
 				</div>
 			);
 		} else {
@@ -39,4 +39,5 @@ export const TimelineTrackPlugin: React.FC<TProps> = (props) => {
 
 interface TProps {
 	track: TTimelineTrackPlugin;
+	timeline: TTimeline;
 }

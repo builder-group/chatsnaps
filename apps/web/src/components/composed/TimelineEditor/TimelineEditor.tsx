@@ -1,83 +1,98 @@
 'use client';
 
-import { Player, type PlayerRef } from '@remotion/player';
 import { ProjectComp, type TProjectCompProps } from '@repo/video';
 
 import '@repo/video/dist/style.css';
 
-import { Timeline, type TimelineRow, type TimelineState } from '@xzdarcy/react-timeline-editor';
+import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from '@vidstack/react';
+import { RemotionProviderLoader, type RemotionSrc } from '@vidstack/react/player/remotion';
 import React from 'react';
 
-import { chatStoryProject } from './mock';
-import { TimelinePlayer } from './TimelinePlayer';
+import { createTimeline, Timeline } from './Timeline';
+
+import '@vidstack/react/player/styles/base.css';
+import './style.css';
+
+// @ts-expect-error -- Temporary workaround
+// https://github.com/vidstack/player/issues/1464
+import { BufferingProvider } from 'remotion';
+
+import { chatstory } from './mock';
 
 export const TimelineEditor: React.FC = () => {
-	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
-	const playerRef = React.useRef<PlayerRef>(null);
-	const timelineStateRef = React.useRef<TimelineState>(null);
-	const autoScrollWhenPlay = React.useRef<boolean>(true);
+	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const handleTimelineChange = React.useCallback((newData: TimelineRow[]) => {
-		console.log({ newData });
-	}, []);
+	const [project, setProject] = React.useState<TProjectCompProps>(chatstory);
+	const timeline = React.useMemo(
+		() =>
+			createTimeline(project, () => {
+				// Force re-render to reflect project changes by slightly adjusting player time
+				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime + 1e-9);
+			}),
+		[project]
+	);
 
 	React.useEffect(() => {
-		if (timelineStateRef.current != null && playerRef.current != null) {
-			timelineStateRef.current.listener.on('afterSetTime', ({ time }) => {
-				playerRef.current?.seekTo(time * project.fps);
-			});
-			timelineStateRef.current.listener.on('setTimeByTick', ({ time }) => {
-				playerRef.current?.seekTo(time * project.fps);
-			});
-		}
-	}, [project.fps]);
+		timeline.playState.listen(({ value }) => {
+			switch (value) {
+				case 'playing':
+					mediaPlayerRef.current?.remoteControl.play();
+					break;
 
-	const editorData: TimelineRow[] = React.useMemo(
-		() =>
-			project.timeline.tracks.map((track) => ({
-				id: track.id,
-				actions: track.actions.map((item) => ({
-					id: `${item.type}-${item.startFrame.toString()}`,
-					start: item.startFrame / project.fps,
-					end: (item.startFrame + item.durationInFrames) / project.fps,
-					effectId: item.type
-				})),
-				rowHeight: 32,
-				selected: false,
-				classNames: []
-			})),
-		[project.timeline.tracks, project.fps]
-	);
+				case 'paused':
+					mediaPlayerRef.current?.remoteControl.pause();
+					break;
+			}
+		});
+		timeline.currentTime.listen(({ value, source }) => {
+			if (source !== 'media-player') {
+				mediaPlayerRef.current?.remoteControl.seek(value);
+			}
+		});
+	}, [timeline]);
 
 	return (
 		<div className="bg-gray-100 p-4">
-			<div className="m-auto mb-5 max-w-[500px] overflow-hidden shadow-2xl">
-				<Player
-					ref={playerRef}
-					component={ProjectComp}
-					inputProps={project}
-					durationInFrames={300}
-					fps={project.fps}
-					compositionWidth={project.width}
-					compositionHeight={project.height}
-					numberOfSharedAudioTags={0}
-					style={{ width: '100%' }}
-				/>
-			</div>
+			<BufferingProvider>
+				<MediaPlayer
+					src={
+						{
+							type: 'video/remotion',
+							src: ProjectComp as any,
+							durationInFrames: project.durationInFrames,
+							fps: project.fps,
+							initialFrame: 0,
+							compositionWidth: project.width,
+							compositionHeight: project.height,
+							inputProps: project,
+							renderLoading: () => {
+								console.log('RenderLoading');
+								return null;
+							},
+							errorFallback: () => {
+								console.log('Error Fallback');
+								return null;
+							},
+							onError(e) {
+								console.log('Error', { e });
+							},
+							numberOfSharedAudioTags: 0
+						} as RemotionSrc
+					}
+					title="Hello World"
+					aspectRatio="9/16"
+					ref={mediaPlayerRef}
+					className="mb-5 max-w-[500px] overflow-hidden shadow-2xl"
+					playsInline
+					onTimeUpdate={({ currentTime }) => {
+						timeline.currentTime.set(currentTime, { additionalData: { source: 'media-player' } });
+					}}
+				>
+					<MediaProvider loaders={[RemotionProviderLoader]} />
+				</MediaPlayer>
+			</BufferingProvider>
 
-			<TimelinePlayer timelineState={timelineStateRef} autoScrollWhenPlay={autoScrollWhenPlay} />
-			<Timeline
-				ref={timelineStateRef}
-				onChange={handleTimelineChange}
-				editorData={editorData}
-				effects={{}}
-				hideCursor={false}
-				dragLine
-				style={{ width: '100%' }}
-				// getActionRender={(action, row) => {
-				// 	return <Timeline
-				// }}
-			/>
+			<Timeline timeline={timeline} />
 		</div>
 	);
 };

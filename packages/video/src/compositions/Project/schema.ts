@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 export const SUrl = z.string(); // .url(); // TODO: static path is not really url
 export const SObjectFit = z.enum(['contain', 'cover', 'fill', 'none', 'scale-down']);
+export const SId = z.string();
 
 function createKeyframeSchema<T extends z.ZodTypeAny>(valueSchema: T) {
 	return z.object({
@@ -132,8 +133,7 @@ export type TTimelineAction = z.infer<typeof STimelineAction>;
 
 export const STimelineTrackMixin = z.object({
 	type: z.string(),
-	id: z.string(),
-	actions: z.array(STimelineActionMixin)
+	actionIds: z.array(SId)
 });
 export type TTimelineTrackMixin = z.infer<typeof STimelineTrackMixin>;
 
@@ -148,13 +148,14 @@ export const STimelineTrackPlugin = STimelineTrackMixin.merge(SSizeMixin.partial
 export type TTimelineTrackPlugin = z.infer<typeof STimelineTrackPlugin>;
 
 export const STimelineTrack = STimelineTrackMixin.extend({
-	type: z.literal('Track'),
-	actions: z.array(STimelineAction)
+	type: z.literal('Track')
 });
 export type TTimelineTrack = z.infer<typeof STimelineTrack>;
 
 export const STimeline = z.object({
-	tracks: z.array(z.discriminatedUnion('type', [STimelineTrack, STimelineTrackPlugin]))
+	trackIds: z.array(SId),
+	trackMap: z.record(SId, z.discriminatedUnion('type', [STimelineTrack, STimelineTrackPlugin])),
+	actionMap: z.record(SId, STimelineAction)
 });
 export type TTimeline = z.infer<typeof STimeline>;
 
@@ -178,18 +179,36 @@ export function hasTimelineActionMixin(
 	return STimelineActionMixin.safeParse(item).success;
 }
 
-export function hasSizeMixin(item: unknown): item is z.infer<typeof SSizeMixin> {
-	return SSizeMixin.safeParse(item).success;
+export function hasSizeMixin(value: unknown): value is z.infer<typeof SSizeMixin> {
+	return SSizeMixin.safeParse(value).success;
 }
 
-export function hasTransformMixin(item: unknown): item is z.infer<typeof STransformMixin> {
-	return STransformMixin.safeParse(item).success;
+export function hasTransformMixin(value: unknown): value is z.infer<typeof STransformMixin> {
+	return STransformMixin.safeParse(value).success;
 }
 
-export function hasOpacityMixin(item: unknown): item is z.infer<typeof SOpacityMixin> {
-	return SOpacityMixin.safeParse(item).success;
+export function hasOpacityMixin(value: unknown): value is z.infer<typeof SOpacityMixin> {
+	return SOpacityMixin.safeParse(value).success;
 }
 
-export function hasFillMixin(item: unknown): item is z.infer<typeof SFillMixin> {
-	return SFillMixin.safeParse(item).success;
+export function hasFillMixin(value: unknown): value is z.infer<typeof SFillMixin> {
+	return SFillMixin.safeParse(value).success;
+}
+
+export function isShapeTimelineAction(
+	value: unknown
+): value is z.infer<typeof SShapeTimelineAction> {
+	return SShapeTimelineAction.safeParse(value).success;
+}
+
+export function isAudioTimelineAction(
+	value: unknown
+): value is z.infer<typeof SAudioTimelineAction> {
+	return SAudioTimelineAction.safeParse(value).success;
+}
+
+export function isTimelineActionPlugin(
+	value: unknown
+): value is z.infer<typeof STimelineActionPlugin> {
+	return STimelineActionPlugin.safeParse(value).success;
 }
