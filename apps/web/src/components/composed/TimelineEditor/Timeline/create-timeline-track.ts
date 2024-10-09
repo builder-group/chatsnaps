@@ -16,6 +16,9 @@ export function createTimelineTrack(
 	const timelineTrackFeature: TTimelineTrackFeature = {
 		_timeline: timeline,
 		getActionAtIndex(this: TTimelineTrack, index) {
+			if (index < 0) {
+				return null;
+			}
 			const actionId = this._value.actionIds[index];
 			if (actionId == null) {
 				return null;
@@ -25,6 +28,13 @@ export function createTimelineTrack(
 				return null;
 			}
 			return action;
+		},
+		sort(this: TTimelineTrack) {
+			this._value.actionIds = this._value.actionIds.sort((a, b) => {
+				const actionA = this._timeline._actionMap[a];
+				const actionB = this._timeline._actionMap[b];
+				return (actionA?._value.start ?? 0) - (actionB?._value.start ?? 0);
+			});
 		}
 	};
 

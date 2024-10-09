@@ -1,17 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { Anthropic } from '@anthropic-ai/sdk';
 import { zValidator } from '@hono/zod-validator';
 import { renderMedia, selectComposition } from '@remotion/renderer';
-import {
-	getMaxTracksDuration,
-	getStaticAsset,
-	ProjectComp,
-	type TTimeline,
-	type TTimelineTrack
-} from '@repo/video';
+import { getDuration, getStaticAsset, ProjectComp, type TTimeline } from '@repo/video';
 import * as z from 'zod';
 import { AppError } from '@blgc/openapi-router';
 import { mapErr } from '@blgc/utils';
-import { anthropicClient, remotionConfig, s3Client, s3Config } from '@/environment';
+import { anthropicClient, pika, remotionConfig, s3Client, s3Config } from '@/environment';
 import { getResource, selectRandomVideo } from '@/lib';
 import { logger } from '@/logger';
 
@@ -32,22 +26,31 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	const useCached = useCachedString === 'true';
 	const fps = 30;
 
-	const timeline: TTimeline = { tracks: [] };
+	const timeline: TTimeline = { trackIds: [], actionMap: {}, trackMap: {} };
 
 	const { messageTrack, voiceoverTrack, notificationTrack, creditsSpent } = (
-		await createChatStoryTracks(data, {
+		await createChatStoryTracks(data, timeline.actionMap, {
 			voiceover: includeVoiceover,
 			fps,
 			messageDelayMs: 500,
 			useCached
 		})
 	).unwrap();
-	const durationInFrames = getMaxTracksDuration([messageTrack, voiceoverTrack, notificationTrack]);
-	timeline.tracks.push(messageTrack);
-	if (voiceoverTrack.actions.length > 0) {
-		timeline.tracks.push(voiceoverTrack);
+	const durationInFrames = getDuration(Object.values(timeline.actionMap));
+
+	const messageTrackId = pika.gen('track');
+	timeline.trackMap[messageTrackId] = messageTrack;
+	timeline.trackIds.push(messageTrackId);
+
+	if (voiceoverTrack.actionIds.length > 0) {
+		const voiceoverTrackId = pika.gen('track');
+		timeline.trackMap[voiceoverTrackId] = voiceoverTrack;
+		timeline.trackIds.push(voiceoverTrackId);
 	}
-	timeline.tracks.push(notificationTrack);
+
+	const notificationTrackId = pika.gen('track');
+	timeline.trackMap[notificationTrackId] = notificationTrack;
+	timeline.trackIds.push(notificationTrackId);
 
 	const likeText = [
 		'Like this! ❤️',
@@ -75,21 +78,35 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	];
 	const ctaTrack = createCTATrack(
 		[
-			createLikeCTA(likeText[Math.floor(Math.random() * likeText.length)] as unknown as string),
-			createFollowCTA(
-				followText[Math.floor(Math.random() * followText.length)] as unknown as string
-			),
-			createLikeCTA(likeText[Math.floor(Math.random() * likeText.length)] as unknown as string),
 			{
-				...createFollowCTA(
+				action: createLikeCTA(
+					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
+				)
+			},
+			{
+				action: createFollowCTA(
+					followText[Math.floor(Math.random() * followText.length)] as unknown as string
+				)
+			},
+			{
+				action: createLikeCTA(
+					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
+				)
+			},
+			{
+				action: createFollowCTA(
 					followText[Math.floor(Math.random() * followText.length)] as unknown as string
 				),
 				atEnd: true
 			}
 		],
+		timeline.actionMap,
 		{ fps, totalDurationInFrames: durationInFrames }
 	);
-	timeline.tracks.push(ctaTrack);
+
+	const ctaTrackId = pika.gen('track');
+	timeline.trackMap[ctaTrackId] = ctaTrack;
+	timeline.trackIds.push(ctaTrackId);
 
 	const backgroundVideo = includeBackgroundVideo
 		? selectRandomVideo(
@@ -114,31 +131,33 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 				}
 			)
 		: null;
-	const backgroundVideoTrack: TTimelineTrack = {
-		type: 'Track',
-		id: 'background-video-timeline',
-		actions: [
-			{
-				type: 'Rectangle',
-				width: 1080,
-				height: 1920,
-				startFrame: 0,
-				durationInFrames,
-				fill:
-					backgroundVideo != null
-						? {
-								type: 'Video',
-								width: 1080,
-								height: 1920,
-								objectFit: 'cover',
-								src: backgroundVideo.src,
-								startFrom: backgroundVideo.startFrom
-							}
-						: { type: 'Solid', color: '#00b140' }
-			}
-		]
+
+	const backgroundVideoActionId = pika.gen('action');
+	timeline.actionMap[backgroundVideoActionId] = {
+		type: 'Rectangle',
+		width: 1080,
+		height: 1920,
+		startFrame: 0,
+		durationInFrames,
+		fill:
+			backgroundVideo != null
+				? {
+						type: 'Video',
+						width: 1080,
+						height: 1920,
+						objectFit: 'cover',
+						src: backgroundVideo.src,
+						startFrom: backgroundVideo.startFrom
+					}
+				: { type: 'Solid', color: '#00b140' }
 	};
-	timeline.tracks.unshift(backgroundVideoTrack);
+
+	const backgroundVideoTrackId = pika.gen('track');
+	timeline.trackMap[backgroundVideoTrackId] = {
+		type: 'Track',
+		actionIds: [backgroundVideoActionId]
+	};
+	timeline.trackIds.unshift(backgroundVideoTrackId);
 
 	logger.info(`Total credits spent: ${creditsSpent.toString()}`);
 

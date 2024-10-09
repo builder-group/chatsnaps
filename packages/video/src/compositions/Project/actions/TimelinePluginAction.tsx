@@ -31,7 +31,7 @@ export const TimelinePluginAction: React.FC<TProps> = (props) => {
 							overflow: 'hidden'
 						}}
 					>
-						<plugin.component item={action} />
+						<plugin.component action={action} />
 					</div>
 				</Sequence>
 			);

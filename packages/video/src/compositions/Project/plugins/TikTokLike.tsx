@@ -31,7 +31,7 @@ registerTimelineActionPlugin({
 	id: 'tiktok-like',
 	schema: STikTokLikePlugin,
 	component: (props) => {
-		const { item } = props;
+		const { action } = props;
 		const frame = useCurrentFrame();
 		const { fps, durationInFrames } = useVideoConfig();
 
@@ -90,7 +90,7 @@ registerTimelineActionPlugin({
 			<>
 				<div
 					className={cn('flex h-full w-full flex-col items-center justify-center', {
-						'bg-green-400': item.props.debug
+						'bg-green-400': action.props.debug
 					})}
 				>
 					<div
@@ -134,7 +134,7 @@ registerTimelineActionPlugin({
 							}}
 						/>
 					</div>
-					{item.props.text != null && (
+					{action.props.text != null && (
 						<div
 							className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
 							style={{
@@ -142,7 +142,7 @@ registerTimelineActionPlugin({
 								transform: `scale(${scale})`
 							}}
 						>
-							<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
+							<h3 className="text-4xl font-bold text-white">{action.props.text}</h3>
 						</div>
 					)}
 				</div>

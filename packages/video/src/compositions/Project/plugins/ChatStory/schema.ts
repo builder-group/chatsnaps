@@ -1,23 +1,26 @@
 import { z } from 'zod';
 import { SVisualMedia } from '@/components';
 
-import { STimelineActionMixin, STimelineTrackPlugin } from '../../schema';
+import { STimelineActionPlugin, STimelineTrackPlugin } from '../../schema';
 
 export { SImageMedia, SVisualMedia } from '@/components';
 
-export const SMessageChatStoryTimelineAction = STimelineActionMixin.extend({
-	type: z.literal('Message'),
-	messageType: z.enum(['sent', 'received']),
-	participant: z.object({
-		displayName: z.string(),
-		avatarSrc: z.string().optional()
-	}),
-	content: z.discriminatedUnion('type', [
-		z.object({
-			type: z.literal('Text'),
-			text: z.string()
-		})
-	])
+export const SMessageChatStoryTimelineAction = STimelineActionPlugin.extend({
+	pluginId: z.literal('chat-story'),
+	props: z.object({
+		type: z.literal('Message'),
+		messageType: z.enum(['sent', 'received']),
+		participant: z.object({
+			displayName: z.string(),
+			avatarSrc: z.string().optional()
+		}),
+		content: z.discriminatedUnion('type', [
+			z.object({
+				type: z.literal('Text'),
+				text: z.string()
+			})
+		])
+	})
 });
 export type TMessageChatStoryTimelineAction = z.infer<typeof SMessageChatStoryTimelineAction>;
 
@@ -50,7 +53,12 @@ export const SChatStoryPlugin = STimelineTrackPlugin.extend({
 	props: z.object({
 		messenger: SChatStoryMessenger,
 		debug: z.boolean().optional()
-	}),
-	actions: z.array(SChatStoryTimelineAction)
+	})
 });
 export type TChatStoryPlugin = z.infer<typeof SChatStoryPlugin>;
+
+export function isMessageChatStoryTimelineAction(
+	value: unknown
+): value is z.infer<typeof SMessageChatStoryTimelineAction> {
+	return SMessageChatStoryTimelineAction.safeParse(value).success;
+}

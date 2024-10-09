@@ -7,20 +7,30 @@ import '@repo/video/dist/style.css';
 import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from '@vidstack/react';
 import { RemotionProviderLoader, type RemotionSrc } from '@vidstack/react/player/remotion';
 import React from 'react';
-// @ts-expect-error -- Not officially expoerted yet
-import { BufferingProvider } from 'remotion';
 
 import { createTimeline, Timeline } from './Timeline';
 
 import '@vidstack/react/player/styles/base.css';
 import './style.css';
 
-import { chatStoryProject } from './mock';
+// @ts-expect-error -- Temporary workaround
+// https://github.com/vidstack/player/issues/1464
+import { BufferingProvider } from 'remotion';
+
+import { chatstory } from './mock';
 
 export const TimelineEditor: React.FC = () => {
-	const [project, setProject] = React.useState<TProjectCompProps>(chatStoryProject);
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
-	const timeline = React.useMemo(() => createTimeline(project), [project]);
+
+	const [project, setProject] = React.useState<TProjectCompProps>(chatstory);
+	const timeline = React.useMemo(
+		() =>
+			createTimeline(project, () => {
+				// Force re-render to reflect project changes by slightly adjusting player time
+				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime + 1e-9);
+			}),
+		[project]
+	);
 
 	React.useEffect(() => {
 		timeline.playState.listen(({ value }) => {
@@ -49,7 +59,7 @@ export const TimelineEditor: React.FC = () => {
 						{
 							type: 'video/remotion',
 							src: ProjectComp as any,
-							durationInFrames: 30 * project.fps,
+							durationInFrames: project.durationInFrames,
 							fps: project.fps,
 							initialFrame: 0,
 							compositionWidth: project.width,

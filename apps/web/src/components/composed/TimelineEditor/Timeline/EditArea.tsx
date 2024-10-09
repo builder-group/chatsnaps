@@ -6,8 +6,7 @@ import { Track } from './Track';
 import { type TTimeline } from './types';
 
 export const EditArea: React.FC<EditAreaProps> = (props) => {
-	const { timeline, timeGridVirtualizer } = props;
-	const containerRef = React.useRef<HTMLDivElement>(null);
+	const { timeline, timeGridVirtualizer, containerRef } = props;
 	const trackIds = useGlobalState(timeline.trackIds);
 	const trackHeight = 50;
 
@@ -22,8 +21,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 
 	return (
 		<div
-			ref={containerRef}
-			className="relative overflow-hidden"
+			className="relative"
 			style={{
 				width: timeGridVirtualizer.getTotalSize(),
 				height: timeline.height()
@@ -59,4 +57,5 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 interface EditAreaProps {
 	timeline: TTimeline;
 	timeGridVirtualizer: Virtualizer<HTMLDivElement, Element>;
+	containerRef: React.RefObject<HTMLDivElement>;
 }

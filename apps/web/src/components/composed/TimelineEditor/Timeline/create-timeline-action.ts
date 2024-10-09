@@ -5,6 +5,7 @@ import {
 	type TTimeline,
 	type TTimelineAction,
 	type TTimelineActionFeature,
+	type TTimelineInteraction as TTimelineActionInteraction,
 	type TTimelineActionValue
 } from './types';
 
@@ -16,6 +17,7 @@ export function createTimelineAction(
 
 	const timelineActionFeature: TTimelineActionFeature = {
 		_timeline: timeline,
+		interaction: createState('NONE' as TTimelineActionInteraction),
 		x(this: TTimelineAction) {
 			return parseTimeToPixel(this._value.start, this._timeline._config.scale);
 		},
@@ -24,7 +26,10 @@ export function createTimelineAction(
 			return index * this._timeline._config.trackHeight;
 		},
 		width(this: TTimelineAction) {
-			return parseTimeToPixel(this._value.duration, this._timeline._config.scale);
+			return parseTimeToPixel(this._value.duration, {
+				...this._timeline._config.scale,
+				startLeft: 0
+			});
 		},
 		height(this: TTimelineAction) {
 			return this._timeline._config.trackHeight;

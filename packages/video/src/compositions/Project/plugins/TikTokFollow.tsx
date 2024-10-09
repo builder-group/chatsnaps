@@ -28,7 +28,7 @@ registerTimelineActionPlugin({
 	id: 'tiktok-follow',
 	schema: STikTokFollowPlugin,
 	component: (props) => {
-		const { item } = props;
+		const { action } = props;
 		const frame = useCurrentFrame();
 		const { fps } = useVideoConfig();
 
@@ -46,7 +46,7 @@ registerTimelineActionPlugin({
 			durationInFrames: enterDuration
 		});
 
-		const exitStart = item.durationInFrames - exitDuration;
+		const exitStart = action.durationInFrames - exitDuration;
 		const exitProgress = spring({
 			fps,
 			frame: frame - exitStart,
@@ -61,7 +61,7 @@ registerTimelineActionPlugin({
 		const exitOpacity = interpolate(exitProgress, [0, 1], [1, 0]);
 
 		const scale =
-			frame < item.durationInFrames - exitDuration ? enterProgress : enterProgress * exitScale;
+			frame < action.durationInFrames - exitDuration ? enterProgress : enterProgress * exitScale;
 
 		const pulseFrequency = 2;
 		const pulseAmplitude = 0.05;
@@ -88,18 +88,18 @@ registerTimelineActionPlugin({
 			<>
 				<div
 					className={cn('flex h-full w-full flex-col items-center justify-center', {
-						'bg-green-400': item.props.debug
+						'bg-green-400': action.props.debug
 					})}
 				>
 					<div
 						className="relative"
 						style={{
 							transform: `scale(${scaleWithPulse})`,
-							opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity
+							opacity: frame < action.durationInFrames - exitDuration ? 1 : exitOpacity
 						}}
 					>
 						<Media
-							media={item.props.media}
+							media={action.props.media}
 							className="h-64 w-64 rounded-full border-4 border-white shadow-lg"
 						/>
 						<div
@@ -127,15 +127,15 @@ registerTimelineActionPlugin({
 							</div>
 						</div>
 					</div>
-					{item.props.text != null && (
+					{action.props.text != null && (
 						<div
 							className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
 							style={{
-								opacity: frame < item.durationInFrames - exitDuration ? 1 : exitOpacity,
+								opacity: frame < action.durationInFrames - exitDuration ? 1 : exitOpacity,
 								transform: `scale(${scale})`
 							}}
 						>
-							<h3 className="text-4xl font-bold text-white">{item.props.text}</h3>
+							<h3 className="text-4xl font-bold text-white">{action.props.text}</h3>
 						</div>
 					)}
 				</div>

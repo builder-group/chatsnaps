@@ -3,38 +3,57 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
 import { Action } from './Action';
+import { calculateVirtualTimelineActionSize } from './helper';
 import { type TTimelineTrack } from './types';
 
 export const Track: React.FC<TTrackProps> = (props) => {
 	const { track, containerRef } = props;
 	const { actionIds } = useGlobalState(track);
-	const scrollLeft = useGlobalState(track._timeline.scrollLeft);
 
 	const actionVirtualizer = useVirtualizer({
 		count: actionIds.length,
 		getScrollElement: () => containerRef.current,
+		// TODO: Figure out how to cache.
+		// Right now called for every not visible action items when manually resizing via "actionVirtualizer.resizeItem"
 		estimateSize: (index) => {
 			const action = track.getActionAtIndex(index);
 			if (action == null) {
 				return 0;
 			}
-			return action.width();
+
+			// console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
+
+			return calculateVirtualTimelineActionSize(action, track.getActionAtIndex(index - 1));
 		},
 		horizontal: true,
 		overscan: 5,
-		initialOffset: scrollLeft
+		initialOffset: 0
 	});
 
 	return (
-		<>
+		<div
+			className="bg-green-400"
+			style={{
+				width: actionVirtualizer.getTotalSize(),
+				height: track._timeline._config.trackHeight
+			}}
+		>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
 				const action = track.getActionAtIndex(virtualAction.index);
 				if (action == null) {
 					return null;
 				}
-				return <Action key={virtualAction.key} action={action} />;
+				return (
+					<Action
+						key={virtualAction.key}
+						action={action}
+						index={virtualAction.index}
+						actionVirtualizer={actionVirtualizer}
+						track={track}
+					/>
+				);
 			})}
-		</>
+		</div>
 	);
 };
 
