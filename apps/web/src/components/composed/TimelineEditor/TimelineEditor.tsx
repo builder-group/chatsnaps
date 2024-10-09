@@ -17,12 +17,12 @@ import './style.css';
 // https://github.com/vidstack/player/issues/1464
 import { BufferingProvider } from 'remotion';
 
-import { chatstory } from './mock';
+import { project1 } from './mock';
 
 export const TimelineEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [project, setProject] = React.useState<TProjectCompProps>(chatstory);
+	const [project, setProject] = React.useState<TProjectCompProps>(project1);
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(project, () => {

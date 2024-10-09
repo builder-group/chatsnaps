@@ -12,6 +12,9 @@ export const Track: React.FC<TTrackProps> = (props) => {
 
 	// TODO: Does a virtual list makes sense if its very dynamic (action duration, action start)
 	// How to update the list if e.g. duration or start of action xyz changes
+	// We can do so by making use of 'actionVirtualizer.resizeItem?'
+	// But how do we update actionIds which have to be sorted to make that work
+	// Should we make a link listed? Whats the best apprach
 	// Gap options:
 	// 1. Add gap width to each item like "item+gap, item+gap, .."
 	// 2. Have a shared list with gaps and items like "item, gap, item, gap, .."
@@ -24,9 +27,9 @@ export const Track: React.FC<TTrackProps> = (props) => {
 				return 0;
 			}
 
-			const prevAction = index > 0 ? track.getActionAtIndex(index - 1) : null;
+			console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
 
-			// Calculate the gap before the current action
+			const prevAction = track.getActionAtIndex(index - 1);
 			const preGap = prevAction
 				? parseTimeToPixel(
 						action._value.start - prevAction._value.start - prevAction._value.duration,
@@ -40,13 +43,10 @@ export const Track: React.FC<TTrackProps> = (props) => {
 						startLeft: 0
 					});
 
-			// Calculate the visible width of the current action
-			const visibleWidth = action.width();
-
-			return preGap + visibleWidth;
+			return preGap + action.width();
 		},
 		horizontal: true,
-		overscan: 10,
+		overscan: 5,
 		initialOffset: 0
 	});
 
@@ -63,7 +63,15 @@ export const Track: React.FC<TTrackProps> = (props) => {
 				if (action == null) {
 					return null;
 				}
-				return <Action key={virtualAction.key} action={action} />;
+				return (
+					<Action
+						key={virtualAction.key}
+						action={action}
+						index={virtualAction.index}
+						actionVirtualizer={actionVirtualizer}
+						track={track}
+					/>
+				);
 			})}
 		</div>
 	);

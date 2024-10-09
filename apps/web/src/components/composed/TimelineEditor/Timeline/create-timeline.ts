@@ -95,13 +95,8 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 			}
 		}
 
-		// Sort actionIds
-		// Note: Required for virtualized list
-		track._value.actionIds = projectTrack.actionIds.sort((a, b) => {
-			const actionA = project.timeline.actionMap[a];
-			const actionB = project.timeline.actionMap[b];
-			return (actionA?.startFrame ?? 0) - (actionB?.startFrame ?? 0);
-		});
+		// Sort actionIds (required for virtualized list)
+		track.sort();
 	}
 
 	timeline.trackIds._notify();

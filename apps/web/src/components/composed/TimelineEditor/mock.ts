@@ -39,8 +39,8 @@ export const project1: TProjectCompProps = {
 					text: 'Tap follow! 📲',
 					debug: true
 				},
-				startFrame: 10,
-				durationInFrames: 100,
+				startFrame: 60,
+				durationInFrames: 60,
 				width: 1080,
 				height: 500,
 				x: 0,
@@ -54,7 +54,21 @@ export const project1: TProjectCompProps = {
 					debug: true
 				},
 				startFrame: 120,
-				durationInFrames: 120,
+				durationInFrames: 60,
+				width: 1080,
+				height: 500,
+				x: 0,
+				y: 1000
+			},
+			a4: {
+				type: 'Plugin',
+				pluginId: 'tiktok-like',
+				props: {
+					text: 'Like now!',
+					debug: true
+				},
+				startFrame: 180,
+				durationInFrames: 60,
 				width: 1080,
 				height: 500,
 				x: 0,
@@ -68,7 +82,7 @@ export const project1: TProjectCompProps = {
 			},
 			t2: {
 				type: 'Track',
-				actionIds: ['a2', 'a3']
+				actionIds: ['a2', 'a3', 'a4']
 			}
 		}
 	}

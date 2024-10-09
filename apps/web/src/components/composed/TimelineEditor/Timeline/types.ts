@@ -7,6 +7,7 @@ export interface TTimeline {
 	currentTime: TState<number, ['base']>;
 	playState: TState<TPlayState, ['base']>;
 	trackIds: TState<string[], ['base']>;
+
 	// scrollLeft: TState<number, ['base']>;
 	getTrackAtIndex: (index: number) => TTimelineTrack | null;
 	width: () => number;
@@ -39,6 +40,7 @@ export interface TTimelineTrackValue {
 export interface TTimelineTrackFeature {
 	_timeline: TTimeline; // TODO: Bad practice referencing parent? It makes things easier for now.
 	getActionAtIndex: (index: number) => TTimelineAction | null;
+	sort: () => void;
 }
 
 export type TTimelineAction = TState<TTimelineActionValue, ['base', 'timeline-action']>;
@@ -50,11 +52,14 @@ export interface TTimelineActionValue {
 }
 export interface TTimelineActionFeature {
 	_timeline: TTimeline; // TODO: Bad practice referencing parent? It makes things easier for now.
+	interaction: TState<TTimelineInteraction, ['base']>;
 	x: () => number;
 	y: () => number;
 	width: () => number;
 	height: () => number;
 }
+
+export type TTimelineInteraction = 'DRAGGING' | 'RESIZEING_LEFT' | 'RESIZEING_RIGHT' | 'NONE';
 
 export interface TTransform {
 	x: number;
