@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- WIP */
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
+import { cn } from '@/lib';
 
-import { cn } from '../../../../lib';
-import { parsePixelToTime, parseTimeToPixel } from './helper';
+import { getDisplayTime, parsePixelToTime, parseTimeToPixel } from './helper';
 import { type TTimeline } from './types';
 
 export const Cursor: React.FC<TCursorProps> = (props) => {
@@ -80,7 +80,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 
 	return (
 		<div
-			className="absolute top-4 z-10 cursor-move"
+			className="absolute top-4 z-10 cursor-move overflow-visible"
 			onMouseDown={(e) => {
 				handleMouseDown(e, 'DRAGGING');
 			}}
@@ -89,7 +89,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 				height: 'calc(100% - 16px)'
 			}}
 		>
-			<div className="absolute -left-2 top-0 flex h-full flex-col items-center">
+			<div className="absolute left-0 right-0 top-0 flex h-full flex-col items-center">
 				<svg className="h-4 w-4" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M0 1C0 0.447715 0.447715 0 1 0H7C7.55228 0 8 0.447715 8 1V9.38197C8 9.76074 7.786 10.107 7.44721 10.2764L4.44721 11.7764C4.16569 11.9172 3.83431 11.9172 3.55279 11.7764L0.552786 10.2764C0.214002 10.107 0 9.76074 0 9.38197V1Z"
@@ -100,6 +100,11 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 						strokeWidth="1"
 					/>
 				</svg>
+				{interaction === 'DRAGGING' && (
+					<div className="rounded-full bg-yellow-500 px-1 text-xs text-white">
+						{getDisplayTime(currentTime)}
+					</div>
+				)}
 				<div className="h-full w-0.5 bg-yellow-500" />
 			</div>
 		</div>

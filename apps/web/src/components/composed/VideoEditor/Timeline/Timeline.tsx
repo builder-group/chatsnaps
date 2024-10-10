@@ -58,6 +58,11 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 		}
 	});
 
+	// TODO: TimeGridVirtualizer doesn't automatically remeasure items sizes
+	React.useEffect(() => {
+		timeGridVirtualizer.measure();
+	}, [scaleStartLeft, scaleSplitCount, scaleWidth]);
+
 	return (
 		<div className={cn('flex h-full flex-col', className)}>
 			<PlayerArea timeline={timeline} />
