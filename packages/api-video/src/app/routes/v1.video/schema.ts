@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { SChatStoryCompProps } from '@repo/video';
+import { SChatStoryMessenger, SProjectCompProps } from '@repo/video';
 
 import {
 	BadRequestResponse,
@@ -8,7 +8,7 @@ import {
 	JsonSuccessResponse
 } from '../../schema';
 
-const SChatStoryVideoEvent = z.union([
+const SChatStoryScriptEvent = z.union([
 	z.object({
 		type: z.literal('Message'),
 		content: z.string(),
@@ -24,44 +24,61 @@ const SChatStoryVideoEvent = z.union([
 		passedTimeMin: z.number()
 	})
 ]);
-export type TChatStoryVideoEvent = z.infer<typeof SChatStoryVideoEvent>;
+export type TChatStoryScriptEvent = z.infer<typeof SChatStoryScriptEvent>;
 
-const SChatStoryVideoParticipant = z.object({
+const SChatStoryScriptParticipant = z.object({
 	id: z.number(),
 	displayName: z.string(),
 	isSelf: z.boolean(),
 	voice: z.string().optional()
 });
-export type TChatStoryVideoParticipant = z.infer<typeof SChatStoryVideoParticipant>;
+export type TChatStoryVideoParticipant = z.infer<typeof SChatStoryScriptParticipant>;
 
-export const SChatStoryVideoDto = z.object({
+export const SChatStoryScriptDto = z.object({
 	title: z.string(),
-	participants: z.array(SChatStoryVideoParticipant),
-	events: z.array(SChatStoryVideoEvent),
-	messenger: SChatStoryCompProps.shape.messenger.optional(),
-	background: SChatStoryCompProps.shape.background,
-	overlay: SChatStoryCompProps.shape.overlay
+	participants: z.array(SChatStoryScriptParticipant),
+	events: z.array(SChatStoryScriptEvent),
+	messenger: SChatStoryMessenger.optional()
 });
-export type TChatStoryVideoDto = z.infer<typeof SChatStoryVideoDto>;
+export type TChatStoryScriptDto = z.infer<typeof SChatStoryScriptDto>;
 
-export const RenderChatStoryVideoRoute = createRoute({
+export const ChatStoryScriptToVideoProjectRoute = createRoute({
 	method: 'post',
-	path: '/v1/video/chatstory/render',
+	path: '/v1/video/chatstory',
 	tags: ['video'],
-	operationId: 'renderChatStoryVideo',
+	operationId: 'chatstoryScriptToVideoProject',
 	request: {
-		body: JsonRequestBody(SChatStoryVideoDto),
+		body: JsonRequestBody(SChatStoryScriptDto),
 		query: z.object({
-			voiceover: z.enum(['true', 'false']).optional(),
-			renderVideo: z.enum(['true', 'false']).optional()
+			includeVoiceover: z.enum(['true', 'false']).optional(),
+			includeBackgroundVideo: z.enum(['true', 'false']).optional(),
+			useCached: z.enum(['true', 'false']).optional()
 		})
 	},
 	responses: {
 		200: JsonSuccessResponse(
 			z.object({
-				url: z.string().nullable(),
-				props: SChatStoryCompProps.nullable(),
+				project: SProjectCompProps,
 				creditsSpent: z.number()
+			})
+		),
+		400: BadRequestResponse,
+		500: InternalServerErrorResponse
+	}
+});
+
+export const RenderVideoProjectRoute = createRoute({
+	method: 'post',
+	path: '/v1/video/render',
+	tags: ['video'],
+	operationId: 'renderVideoProject',
+	request: {
+		body: JsonRequestBody(SProjectCompProps)
+	},
+	responses: {
+		200: JsonSuccessResponse(
+			z.object({
+				url: z.string().nullable()
 			})
 		),
 		400: BadRequestResponse,

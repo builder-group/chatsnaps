@@ -28,6 +28,10 @@ export const assetMap = {
   },
   "static/audio/sound/ios_received.mp3": {
     "type": "MP3",
+    "durationMs": 2040
+  },
+  "static/audio/sound/ios_received_original.mp3": {
+    "type": "MP3",
     "durationMs": 6384
   },
   "static/audio/sound/ios_sent.mp3": {
@@ -51,6 +55,9 @@ export const assetMap = {
     "durationMs": 4205
   },
   "static/image/.local/under-water.png": {
+    "type": "PNG"
+  },
+  "static/image/chatsnap.png": {
     "type": "PNG"
   },
   "static/image/imessage.png": {
