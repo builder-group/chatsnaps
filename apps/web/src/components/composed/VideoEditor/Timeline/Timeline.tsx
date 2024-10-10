@@ -26,8 +26,8 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 			<PlayerArea timeline={timeline} />
 			<div ref={containerRef} className="relative h-full overflow-auto bg-red-400">
 				<Cursor timeline={timeline} />
-				<EditArea timeline={timeline} containerRef={containerRef} />
 				<TimeArea timeline={timeline} containerRef={containerRef} />
+				<EditArea timeline={timeline} containerRef={containerRef} />
 			</div>
 		</div>
 	);
