@@ -1,0 +1,5 @@
+apis:
+  video@v1:
+    root: http://localhost:8787/v1/doc
+    x-openapi-ts:
+      output: ../.openapi/video-api-v1.ts

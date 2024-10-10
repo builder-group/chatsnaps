@@ -2,7 +2,7 @@ import { Anthropic } from '@anthropic-ai/sdk';
 import { getDuration, getStaticAsset, type TTimeline } from '@repo/video';
 import { AppError } from '@blgc/openapi-router';
 import { extractErrorData, mapErr } from '@blgc/utils';
-import { anthropicClient, pika } from '@/environment';
+import { anthropicClient, pika, tokbackupClient } from '@/environment';
 import {
 	calculateAnthropicPrice,
 	calculateElevenLabsPrice,
@@ -189,10 +189,25 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 
 router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	const {
-		originalStory,
+		originalStory: bodyOrginalStory,
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
 		targetLength = '60-90 second conversation with approximately 70-110 messages (4-5k tokens)'
 	} = c.req.valid('json');
+
+	let originalStory = bodyOrginalStory;
+	if (originalStory.startsWith('http') && originalStory.includes('tiktok.com')) {
+		const tokbackupResult = await tokbackupClient.get('/fetchTikTokData', {
+			queryParams: {
+				video: originalStory,
+				get_transcript: true
+			}
+		});
+		const { data, subtitles } = tokbackupResult.unwrap().data;
+		if (subtitles == null || data?.desc == null) {
+			throw new AppError('#ERR_SUBTITLES', 500);
+		}
+		originalStory = `${data.desc}: ${subtitles}`;
+	}
 
 	const prompt = mapErr(
 		await getResource('prompts/chat-story-prompt.txt'),
@@ -203,7 +218,7 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 		.replace('{{TARGET_AUDIENCE}}', targetAudience)
 		.replace('{{TARGET_LENGTH}}', targetLength);
 
-	const response = await anthropicClient.messages
+	const anthropicResponse = await anthropicClient.messages
 		.create({
 			model: 'claude-3-5-sonnet-20240620',
 			max_tokens: 8190,
@@ -228,13 +243,13 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 			}
 		});
 
-	const content = response.content[0];
+	const content = anthropicResponse.content[0];
 	const usage: TAnthropicUsage = {
-		inputTokens: response.usage.input_tokens,
-		outputTokens: response.usage.output_tokens,
+		inputTokens: anthropicResponse.usage.input_tokens,
+		outputTokens: anthropicResponse.usage.output_tokens,
 		usd: calculateAnthropicPrice({
-			inputTokens: response.usage.input_tokens,
-			outputTokens: response.usage.output_tokens
+			inputTokens: anthropicResponse.usage.input_tokens,
+			outputTokens: anthropicResponse.usage.output_tokens
 		})
 	};
 

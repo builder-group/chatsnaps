@@ -1,0 +1,56 @@
+{
+	"name": "@repo/types",
+	"version": "0.0.1",
+	"description": "Shared Typescript types",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && pnpm run openapi:generate && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle -b typesonly",
+		"openapi:generate": "pnpm run openapi:generate:api && pnpm run openapi:generate:tokbackup",
+		"openapi:generate:api": "npx openapi-typescript --redocly ./src/api/resources/redocly.yaml",
+		"openapi:generate:tokbackup": "npx openapi-typescript --redocly ./src/tokbackup/resources/redocly.yaml",
+		"redocly": "npx @redocly/cli",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install"
+	},
+	"exports": {
+		"./api": {
+			"source": "./src/api/index.ts",
+			"types": "./dist/api/index.d.ts"
+		},
+		"./tokbackup": {
+			"source": "./src/tokbackup/index.ts",
+			"types": "./dist/tokbackup/index.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"api": [
+				"./dist/api/index.d.ts"
+			],
+			"tokbackup": [
+				"./dist/tokbackup/index.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/shortify.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/builder-group/shortify/issues"
+	},
+	"homepage": "",
+	"devDependencies": {
+		"@blgc/config": "^0.0.24",
+		"@redocly/cli": "^1.25.5",
+		"openapi-typescript": "^7.4.1"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

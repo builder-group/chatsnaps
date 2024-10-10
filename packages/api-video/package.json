@@ -49,6 +49,7 @@
 	"devDependencies": {
 		"@blgc/config": "^0.0.24",
 		"@hono/node-server": "^1.13.0",
+		"@repo/types": "workspace:*",
 		"@types/node": "^22.7.5",
 		"dotenv": "^16.4.5"
 	},
