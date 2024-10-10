@@ -254,7 +254,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 			case 'RESIZEING_RIGHT':
 				style.innerHTML = `
 			* {
-			  cursor: ew-resize !important;
+			  cursor: col-resize !important;
 			  user-select: none !important;
 			}
 		  `;
@@ -303,13 +303,13 @@ export const Action: React.FC<TActionProps> = (props) => {
 				}}
 			>
 				<div
-					className="resize-handle absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-blue-700 opacity-50 hover:opacity-100"
+					className="resize-handle absolute left-0 top-0 h-full w-2 cursor-col-resize bg-blue-700 opacity-50 hover:opacity-100"
 					onMouseDown={(e) => {
 						handleMouseDown(e, 'RESIZEING_LEFT');
 					}}
 				/>
 				<div
-					className="resize-handle absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-blue-700 opacity-50 hover:opacity-100"
+					className="resize-handle absolute right-0 top-0 h-full w-2 cursor-col-resize bg-blue-700 opacity-50 hover:opacity-100"
 					onMouseDown={(e) => {
 						handleMouseDown(e, 'RESIZEING_RIGHT');
 					}}
