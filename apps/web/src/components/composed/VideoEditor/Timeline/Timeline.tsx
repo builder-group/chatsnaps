@@ -1,5 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useGlobalState } from 'feature-react/state';
 import React from 'react';
+import { cn } from '@/lib';
 
 import { Cursor } from './Cursor';
 import { EditArea } from './EditArea';
@@ -8,8 +10,13 @@ import { TimeArea } from './TimeArea';
 import { type TTimeline } from './types';
 
 export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((props, ref) => {
-	const { timeline } = props;
+	const { timeline, className } = props;
 	const timelineWidth = timeline.width();
+	const {
+		splitCount: scaleSplitCount,
+		width: scaleWidth,
+		startLeft: scaleStartLeft
+	} = useGlobalState(timeline.scale);
 
 	const containerRef = React.useRef<HTMLDivElement>(null);
 	React.useImperativeHandle(ref, () => {
@@ -23,34 +30,35 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 	});
 
 	const totalScaleCount = React.useMemo(() => {
-		const scaleCount = Math.ceil(timelineWidth / timeline._config.scale.width);
-		return timeline._config.scale.splitCount > 0
-			? scaleCount * timeline._config.scale.splitCount + 1
-			: scaleCount;
-	}, [timeline, timelineWidth]);
+		const scaleCount = Math.ceil(timelineWidth / scaleWidth);
+		return scaleSplitCount > 0 ? scaleCount * scaleSplitCount + 1 : scaleCount;
+	}, [timelineWidth, scaleSplitCount, scaleWidth]);
 	const timeGridVirtualizer = useVirtualizer({
 		count: totalScaleCount,
 		getScrollElement: () => containerRef.current,
 		estimateSize: React.useCallback(
 			(index) => {
 				if (index === 0) {
-					return timeline._config.scale.startLeft;
+					return scaleStartLeft;
 				}
-				return timeline._config.scale.splitCount > 0
-					? timeline._config.scale.width / timeline._config.scale.splitCount
-					: timeline._config.scale.width;
+				return scaleSplitCount > 0 ? scaleWidth / scaleSplitCount : scaleWidth;
 			},
-			[timeline]
+			[scaleStartLeft, scaleSplitCount, scaleWidth]
 		),
 		horizontal: true,
 		overscan: 10,
-		initialOffset: 0
+		initialOffset: 0,
+		onChange: (instance) => {
+			if (instance.scrollOffset != null) {
+				timeline.scrollLeft.set(instance.scrollOffset);
+			}
+		}
 	});
 
 	return (
-		<div>
+		<div className={cn('flex flex-col', className)}>
 			<PlayerArea timeline={timeline} />
-			<div ref={containerRef} className="relative overflow-auto bg-red-400">
+			<div ref={containerRef} className="relative bg-red-400">
 				<TimeArea timeline={timeline} timeGridVirtualizer={timeGridVirtualizer} />
 				<EditArea
 					timeline={timeline}
@@ -66,6 +74,7 @@ Timeline.displayName = 'Timeline';
 
 interface TTimelineProps {
 	timeline: TTimeline;
+	className?: string;
 }
 
 interface TTimelineRef extends HTMLDivElement {

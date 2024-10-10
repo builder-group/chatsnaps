@@ -1,10 +1,10 @@
 import React from 'react';
-import { TimelineEditor } from '@/components';
+import { VideoEditor } from '@/components';
 
 const Page: React.FC = () => {
 	return (
 		<main>
-			<TimelineEditor />
+			<VideoEditor />
 		</main>
 	);
 };

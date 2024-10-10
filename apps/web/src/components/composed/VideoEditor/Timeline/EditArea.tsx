@@ -8,12 +8,12 @@ import { type TTimeline } from './types';
 export const EditArea: React.FC<EditAreaProps> = (props) => {
 	const { timeline, timeGridVirtualizer, containerRef } = props;
 	const trackIds = useGlobalState(timeline.trackIds);
-	const trackHeight = 50;
+	const { splitCount: scaleSplitCount } = useGlobalState(timeline.scale);
 
 	const trackVirtualizer = useVirtualizer({
 		count: trackIds.length,
 		getScrollElement: () => containerRef.current,
-		estimateSize: React.useCallback(() => trackHeight, [trackHeight]),
+		estimateSize: React.useCallback(() => timeline._config.trackHeight, [timeline]),
 		horizontal: false,
 		overscan: 5,
 		initialOffset: 0
@@ -28,7 +28,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 			}}
 		>
 			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
-				const isShowScale = virtualItem.index % timeline._config.scale.splitCount === 0;
+				const isShowScale = virtualItem.index % scaleSplitCount === 0;
 				if (isShowScale) {
 					return (
 						<div

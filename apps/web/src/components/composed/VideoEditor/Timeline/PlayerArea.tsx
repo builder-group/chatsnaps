@@ -12,11 +12,11 @@ export const PlayerArea: React.FC<TPlayerAreaProps> = (props) => {
 
 	const handlePlayOrPause = React.useCallback((): void => {
 		switch (playState) {
-			case 'playing':
-				timeline.playState.set('paused');
+			case 'PLAYING':
+				timeline.playState.set('PAUSED');
 				break;
-			case 'paused':
-				timeline.playState.set('playing');
+			case 'PAUSED':
+				timeline.playState.set('PLAYING');
 				break;
 		}
 	}, [timeline, playState]);
@@ -35,7 +35,7 @@ export const PlayerArea: React.FC<TPlayerAreaProps> = (props) => {
 				className="flex h-6 w-6 items-center justify-center rounded-sm bg-[#666]"
 				onClick={handlePlayOrPause}
 			>
-				{playState === 'playing' ? <PauseIcon /> : <PlayIcon />}
+				{playState === 'PLAYING' ? <PauseIcon /> : <PlayIcon />}
 			</Button>
 			<div className="mx-5 w-16 text-sm">{getDisplayTime(currentTime)}</div>
 		</div>

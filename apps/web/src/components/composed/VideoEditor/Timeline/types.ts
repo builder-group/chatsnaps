@@ -7,30 +7,19 @@ export interface TTimeline {
 	currentTime: TState<number, ['base']>;
 	playState: TState<TPlayState, ['base']>;
 	trackIds: TState<string[], ['base']>;
-
-	// scrollLeft: TState<number, ['base']>;
+	scrollLeft: TState<number, ['base']>;
+	cursor: TTimelineCursor;
+	scale: TTimelineScale;
 	getTrackAtIndex: (index: number) => TTimelineTrack | null;
 	width: () => number;
 	height: () => number;
 }
 
 export interface TTimelineConfig {
-	scale: TScale;
 	trackHeight: number;
 }
 
-export interface TScale {
-	// Single tick mark category
-	baseValue: number;
-	// The distance from the left side of the scale start
-	startLeft: number;
-	// Display width of a single scale
-	width: number;
-	// Number of single scale subdivison units
-	splitCount: number;
-}
-
-export type TPlayState = 'playing' | 'paused';
+export type TPlayState = 'PLAYING' | 'PAUSED';
 
 export type TTimelineTrack = TState<TTimelineTrackValue, ['base', 'timeline-track']>;
 export interface TTimelineTrackValue {
@@ -52,14 +41,30 @@ export interface TTimelineActionValue {
 }
 export interface TTimelineActionFeature {
 	_timeline: TTimeline; // TODO: Bad practice referencing parent? It makes things easier for now.
-	interaction: TState<TTimelineInteraction, ['base']>;
+	interaction: TState<TTimelineActionInteraction, ['base']>;
 	x: () => number;
 	y: () => number;
 	width: () => number;
 	height: () => number;
 }
+export type TTimelineActionInteraction = 'DRAGGING' | 'RESIZEING_LEFT' | 'RESIZEING_RIGHT' | 'NONE';
 
-export type TTimelineInteraction = 'DRAGGING' | 'RESIZEING_LEFT' | 'RESIZEING_RIGHT' | 'NONE';
+interface TTimelineCursor {
+	interaction: TState<TTimelineCursorInteraction, ['base']>;
+}
+export type TTimelineCursorInteraction = 'DRAGGING' | 'NONE';
+
+export type TTimelineScale = TState<TTimelineScaleValue, ['base']>;
+export interface TTimelineScaleValue {
+	// Single tick mark category
+	baseValue: number;
+	// The distance from the left side of the scale start
+	startLeft: number;
+	// Display width of a single scale
+	width: number;
+	// Number of single scale subdivison units
+	splitCount: number;
+}
 
 export interface TTransform {
 	x: number;

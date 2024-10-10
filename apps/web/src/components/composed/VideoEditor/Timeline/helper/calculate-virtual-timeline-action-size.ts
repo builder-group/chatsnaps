@@ -5,7 +5,7 @@ export function calculateVirtualTimelineActionSize(
 	action: TTimelineAction,
 	prevAction: TTimelineAction | null
 ): number {
-	const timelineConfig = action._timeline._config.scale;
+	const timelineConfig = action._timeline.scale._value;
 	let size = action.width();
 
 	// Add the gap between this action and the previous one (if it exists)
@@ -21,7 +21,7 @@ export function calculateVirtualTimelineActionSize(
 			parseTimeToPixel(action._value.start, {
 				...timelineConfig,
 				startLeft: 0
-			}) + action._timeline._config.scale.startLeft;
+			}) + action._timeline.scale._value.startLeft;
 	}
 
 	return size;

@@ -26,7 +26,7 @@ router.openapi(ChatStoryScriptToVideoProjectRoute, async (c) => {
 	const useCached = useCachedString === 'true';
 	const fps = 30;
 
-	const timeline: TTimeline = { trackIds: [], actionMap: {}, trackMap: {} };
+	const timeline: TTimeline = { trackIds: [], trackMap: {}, actionMap: {} };
 
 	const { messageTrack, voiceoverTrack, notificationTrack, creditsSpent } = (
 		await createChatStoryTracks(data, timeline.actionMap, {

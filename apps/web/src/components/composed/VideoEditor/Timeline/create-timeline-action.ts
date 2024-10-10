@@ -5,7 +5,7 @@ import {
 	type TTimeline,
 	type TTimelineAction,
 	type TTimelineActionFeature,
-	type TTimelineInteraction as TTimelineActionInteraction,
+	type TTimelineActionInteraction,
 	type TTimelineActionValue
 } from './types';
 
@@ -19,7 +19,7 @@ export function createTimelineAction(
 		_timeline: timeline,
 		interaction: createState('NONE' as TTimelineActionInteraction),
 		x(this: TTimelineAction) {
-			return parseTimeToPixel(this._value.start, this._timeline._config.scale);
+			return parseTimeToPixel(this._value.start, this._timeline.scale._value);
 		},
 		y(this: TTimelineAction) {
 			const index = this._timeline.trackIds._value.findIndex((id) => id === this._value.trackId);
@@ -27,7 +27,7 @@ export function createTimelineAction(
 		},
 		width(this: TTimelineAction) {
 			return parseTimeToPixel(this._value.duration, {
-				...this._timeline._config.scale,
+				...this._timeline.scale._value,
 				startLeft: 0
 			});
 		},

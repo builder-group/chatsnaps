@@ -3,20 +3,23 @@ import { createState } from 'feature-state';
 
 import { createTimelineAction } from './create-timeline-action';
 import { createTimelineTrack } from './create-timeline-track';
-import { type TPlayState, type TTimeline } from './types';
+import { type TPlayState, type TTimeline, type TTimelineCursorInteraction } from './types';
 
 export function createTimeline(project: TProjectCompProps, onChange: () => void): TTimeline {
 	const timeline: TTimeline = {
 		_config: {
-			scale: { baseValue: 5, splitCount: 5, width: 500, startLeft: 20 },
 			trackHeight: 50
 		},
 		_actionMap: {},
 		_trackMap: {},
 		currentTime: createState(0),
-		playState: createState<TPlayState>('paused'),
+		playState: createState<TPlayState>('PAUSED'),
 		trackIds: createState([] as string[]),
-		// scrollLeft: createState(0),
+		scrollLeft: createState(0),
+		scale: createState({ baseValue: 5, splitCount: 5, width: 500, startLeft: 20 }),
+		cursor: {
+			interaction: createState<TTimelineCursorInteraction>('NONE')
+		},
 		getTrackAtIndex(this: TTimeline, index) {
 			const trackId = this.trackIds._value[index];
 			if (trackId == null) {

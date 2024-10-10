@@ -2,14 +2,15 @@
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
+import { cn } from '../../../../lib';
 import { parsePixelToTime, parseTimeToPixel } from './helper';
 import { type TTimeline } from './types';
 
 export const Cursor: React.FC<TCursorProps> = (props) => {
 	const { timeline } = props;
 	const currentTime = useGlobalState(timeline.currentTime);
-	const [interaction, setInteraction] = React.useState<TInteraction>('none');
-	const cursorRef = React.useRef<HTMLDivElement>(null);
+	const interaction = useGlobalState(timeline.cursor.interaction);
+	useGlobalState(timeline.scale);
 
 	const interactionStateRef = React.useRef<TInteractionState>({
 		startClientX: 0,
@@ -23,24 +24,22 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 				startClientX: e.clientX,
 				startTime: currentTime
 			};
-			setInteraction(type);
-			timeline.playState.set('paused');
+			timeline.cursor.interaction.set(type);
+			timeline.playState.set('PAUSED');
 		},
 		[timeline, currentTime]
 	);
 
 	const handleMouseMove = React.useCallback(
 		(e: MouseEvent) => {
-			if (interaction === 'none') {
+			if (interaction === 'NONE') {
 				return;
 			}
 
 			const { startClientX, startTime } = interactionStateRef.current;
 			const deltaX = e.clientX - startClientX;
-
-			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
 			const deltaTime = parsePixelToTime(deltaX, {
-				...timeline._config.scale,
+				...timeline.scale._value,
 				startLeft: 0
 			});
 
@@ -50,23 +49,28 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 	);
 
 	const handleMouseUp = React.useCallback(() => {
-		setInteraction('none');
-	}, []);
+		timeline.cursor.interaction.set('NONE');
+	}, [timeline]);
 
-	// TODO: Overwriting global cursor doens't really seem to work
 	React.useEffect(() => {
-		if (interaction !== 'none') {
-			document.body.style.userSelect = 'none';
-			// document.body.style.pointerEvents = 'none'; // Disables custom set cursor
-			document.body.style.cursor = 'ew-resize !important';
-			document.addEventListener('mousemove', handleMouseMove);
-			document.addEventListener('mouseup', handleMouseUp);
+		if (interaction === 'NONE') {
+			return;
 		}
 
+		const style = document.createElement('style');
+		style.innerHTML = `
+			* {
+			  cursor: move !important;
+			  user-select: none !important;
+			}
+		  `;
+		document.head.appendChild(style);
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+
 		return () => {
-			// document.body.style.pointerEvents = '';
-			document.body.style.userSelect = '';
-			document.body.style.cursor = '';
+			document.head.removeChild(style);
 			document.removeEventListener('mousemove', handleMouseMove);
 			document.removeEventListener('mouseup', handleMouseUp);
 		};
@@ -74,16 +78,27 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 
 	return (
 		<div
-			ref={cursorRef}
-			className="absolute top-0 z-10 h-full w-0.5 cursor-ew-resize bg-yellow-500"
+			className="absolute top-4 z-10 h-full cursor-move"
 			onMouseDown={(e) => {
-				handleMouseDown(e, 'drag');
+				handleMouseDown(e, 'DRAGGING');
 			}}
 			style={{
-				left: parseTimeToPixel(currentTime, timeline._config.scale)
+				left: parseTimeToPixel(currentTime, timeline.scale._value)
 			}}
 		>
-			<div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full bg-yellow-500" />
+			<div className="absolute -left-2 top-0 flex h-full flex-col items-center">
+				<svg className="h-4 w-4" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M0 1C0 0.447715 0.447715 0 1 0H7C7.55228 0 8 0.447715 8 1V9.38197C8 9.76074 7.786 10.107 7.44721 10.2764L4.44721 11.7764C4.16569 11.9172 3.83431 11.9172 3.55279 11.7764L0.552786 10.2764C0.214002 10.107 0 9.76074 0 9.38197V1Z"
+						className={cn('stroke-yellow-500 stroke-[2px]', {
+							'fill-yellow-500': interaction === 'DRAGGING',
+							'fill-white': interaction !== 'DRAGGING'
+						})}
+						strokeWidth="1"
+					/>
+				</svg>
+				<div className="h-full w-0.5 bg-yellow-500" />
+			</div>
 		</div>
 	);
 };
@@ -92,7 +107,7 @@ interface TCursorProps {
 	timeline: TTimeline;
 }
 
-type TInteraction = 'drag' | 'none';
+type TInteraction = 'DRAGGING' | 'NONE';
 
 interface TInteractionState {
 	startClientX: number;

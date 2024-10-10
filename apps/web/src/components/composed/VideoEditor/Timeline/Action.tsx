@@ -5,7 +5,11 @@ import React from 'react';
 import { cn } from '@/lib';
 
 import { calculateVirtualTimelineActionSize, parsePixelToTime } from './helper';
-import { type TTimelineAction, type TTimelineInteraction, type TTimelineTrack } from './types';
+import {
+	type TTimelineAction,
+	type TTimelineActionInteraction,
+	type TTimelineTrack
+} from './types';
 
 export const Action: React.FC<TActionProps> = (props) => {
 	const { action, index, actionVirtualizer, track } = props;
@@ -169,7 +173,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 	]);
 
 	const handleMouseDown = React.useCallback(
-		(e: React.MouseEvent, type: TTimelineInteraction) => {
+		(e: React.MouseEvent, type: TTimelineActionInteraction) => {
 			e.stopPropagation();
 			interactionStateRef.current = {
 				startX: action.x(),
@@ -196,7 +200,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
 			const deltaTime = parsePixelToTime(deltaX, {
-				...action._timeline._config.scale,
+				...action._timeline.scale._value,
 				startLeft: 0
 			});
 
@@ -230,24 +234,39 @@ export const Action: React.FC<TActionProps> = (props) => {
 		setDragPosition(null);
 	}, [action]);
 
-	// TODO: Overwriting global cursor doens't really seem to work
 	React.useEffect(() => {
-		if (interaction !== 'NONE') {
-			document.body.style.userSelect = 'none';
-			// document.body.style.pointerEvents = 'none'; // Disables custom set cursor
-			if (interaction === 'DRAGGING') {
-				document.body.style.cursor = 'grabbing !important';
-			} else {
-				document.body.style.cursor = 'ew-resize !important';
-			}
-			document.addEventListener('mousemove', handleMouseMove);
-			document.addEventListener('mouseup', handleMouseUp);
+		if (interaction === 'NONE') {
+			return;
 		}
 
+		const style = document.createElement('style');
+		switch (interaction) {
+			case 'DRAGGING':
+				style.innerHTML = `
+			* {
+			  cursor: grabbing !important;
+			  user-select: none !important;
+			}
+		  `;
+				break;
+			case 'RESIZEING_LEFT':
+			case 'RESIZEING_RIGHT':
+				style.innerHTML = `
+			* {
+			  cursor: ew-resize !important;
+			  user-select: none !important;
+			}
+		  `;
+				break;
+		}
+
+		document.head.appendChild(style);
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+
 		return () => {
-			// document.body.style.pointerEvents = '';
-			document.body.style.userSelect = '';
-			document.body.style.cursor = '';
+			document.head.removeChild(style);
 			document.removeEventListener('mousemove', handleMouseMove);
 			document.removeEventListener('mouseup', handleMouseUp);
 		};
