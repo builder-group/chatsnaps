@@ -1,7 +1,7 @@
-import { type TProjectCompProps } from '@repo/video';
+import { type TVideoComp } from '@repo/video';
 
-export const project1: TProjectCompProps = {
-	name: 'Project 1',
+export const video1: TVideoComp = {
+	name: 'Video 1',
 	durationInFrames: 300,
 	width: 1080,
 	height: 1920,
@@ -88,7 +88,7 @@ export const project1: TProjectCompProps = {
 	}
 };
 
-export const chatstory: TProjectCompProps = {
+export const chatstory: TVideoComp = {
 	name: 'I MADE MY SON SWIM ACROSS THE OCEAN?! 😱🌊',
 	timeline: {
 		trackIds: [

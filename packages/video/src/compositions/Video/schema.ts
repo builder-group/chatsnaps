@@ -160,10 +160,10 @@ export const STimeline = z.object({
 export type TTimeline = z.infer<typeof STimeline>;
 
 // =============================================================================
-// Project
+// Video
 // =============================================================================
 
-export const SProjectCompProps = z.object({
+export const SVideoComp = z.object({
 	name: z.string(),
 	width: z.number().int().positive(),
 	height: z.number().int().positive(),
@@ -171,7 +171,7 @@ export const SProjectCompProps = z.object({
 	durationInFrames: z.number().int().positive().optional(),
 	timeline: STimeline
 });
-export type TProjectCompProps = z.infer<typeof SProjectCompProps>;
+export type TVideoComp = z.infer<typeof SVideoComp>;
 
 export function hasTimelineActionMixin(
 	item: unknown

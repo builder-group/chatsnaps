@@ -3,11 +3,11 @@ import { z } from 'zod';
 
 import { TRemotionFC } from '../../types';
 import { getDuration } from './helper';
-import { SProjectCompProps } from './schema';
+import { SVideoComp } from './schema';
 import { TimelineTrack } from './tracks/TimelineTrack';
 import { TimelineTrackPlugin } from './tracks/TimelineTrackPlugin';
 
-export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (props) => {
+export const VideoComp: TRemotionFC<z.infer<typeof SVideoComp>> = (props) => {
 	const { timeline } = props;
 	const { width, height } = useVideoConfig();
 
@@ -30,9 +30,9 @@ export const ProjectComp: TRemotionFC<z.infer<typeof SProjectCompProps>> = (prop
 	);
 };
 
-ProjectComp.schema = SProjectCompProps;
-ProjectComp.id = 'Project';
-ProjectComp.calculateMetadata = async (metadata) => {
+VideoComp.schema = SVideoComp;
+VideoComp.id = 'Video';
+VideoComp.calculateMetadata = async (metadata) => {
 	const {
 		props: { timeline, width = 1080, height = 1920, fps = 30, durationInFrames }
 	} = metadata;

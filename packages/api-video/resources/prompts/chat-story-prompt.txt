@@ -90,17 +90,9 @@ Output your adapted viral chat story using the following JSON format:
             "participantId": 1
         },
         {
-            "type": "Pause",
-            "durationMs": 300
-        },
-        {
             "type": "Message",
             "content": "Escalating response to build tension",
             "participantId": 2
-        },
-        {
-            "type": "Time",
-            "passedTimeMin": 30
         }
     ]
 }

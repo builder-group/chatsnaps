@@ -4,8 +4,7 @@ import {
 	type TTimelineTrack,
 	type TTkiTokLikePlugin
 } from '@repo/video';
-
-import { pika } from '../../../environment';
+import { pika } from '@/environment';
 
 export function createFollowCTA(
 	text: string,

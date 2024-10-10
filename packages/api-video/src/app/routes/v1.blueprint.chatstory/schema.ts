@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { SChatStoryMessenger, SProjectCompProps } from '@repo/video';
+import { SChatStoryMessenger, SVideoComp } from '@repo/video';
 
 import {
 	BadRequestResponse,
@@ -18,11 +18,11 @@ const SChatStoryScriptEvent = z.union([
 	z.object({
 		type: z.literal('Pause'),
 		durationMs: z.number()
-	}),
-	z.object({
-		type: z.literal('Time'),
-		passedTimeMin: z.number()
 	})
+	// z.object({
+	// 	type: z.literal('Time'),
+	// 	passedTimeMin: z.number()
+	// })
 ]);
 export type TChatStoryScriptEvent = z.infer<typeof SChatStoryScriptEvent>;
 
@@ -42,11 +42,24 @@ export const SChatStoryScriptDto = z.object({
 });
 export type TChatStoryScriptDto = z.infer<typeof SChatStoryScriptDto>;
 
-export const ChatStoryScriptToVideoProjectRoute = createRoute({
+export const SAnthropicUsage = z.object({
+	inputTokens: z.number(),
+	outputTokens: z.number(),
+	usd: z.number()
+});
+export type TAnthropicUsage = z.infer<typeof SAnthropicUsage>;
+
+export const SElevenLabsUsage = z.object({
+	credits: z.number(),
+	usd: z.number()
+});
+export type TElevenLabsUsage = z.infer<typeof SElevenLabsUsage>;
+
+export const ChatStoryBlueprintVideoRoute = createRoute({
 	method: 'post',
-	path: '/v1/video/chatstory',
-	tags: ['video'],
-	operationId: 'chatstoryScriptToVideoProject',
+	path: '/v1/blueprint/chatstory/video',
+	tags: ['blueprint'],
+	operationId: 'chatStoryBlueprintVideo',
 	request: {
 		body: JsonRequestBody(SChatStoryScriptDto),
 		query: z.object({
@@ -58,8 +71,8 @@ export const ChatStoryScriptToVideoProjectRoute = createRoute({
 	responses: {
 		200: JsonSuccessResponse(
 			z.object({
-				project: SProjectCompProps,
-				creditsSpent: z.number()
+				video: SVideoComp,
+				usage: SElevenLabsUsage
 			})
 		),
 		400: BadRequestResponse,
@@ -67,21 +80,32 @@ export const ChatStoryScriptToVideoProjectRoute = createRoute({
 	}
 });
 
-export const RenderVideoProjectRoute = createRoute({
+export const ChatStoryBlueprintPromptRoute = createRoute({
 	method: 'post',
-	path: '/v1/video/render',
-	tags: ['video'],
-	operationId: 'renderVideoProject',
+	path: '/v1/blueprint/chatstory/prompt',
+	tags: ['blueprint'],
+	operationId: 'chatStoryBlueprintPrompt',
 	request: {
-		body: JsonRequestBody(SProjectCompProps)
+		body: JsonRequestBody(
+			z.object({
+				originalStory: z.string(),
+				targetAudience: z.string().optional(),
+				targetLength: z.string().optional()
+			})
+		)
 	},
 	responses: {
 		200: JsonSuccessResponse(
 			z.object({
-				url: z.string().nullable()
+				script: SChatStoryScriptDto,
+				usage: SAnthropicUsage
 			})
 		),
 		400: BadRequestResponse,
 		500: InternalServerErrorResponse
 	}
 });
+
+export function isChatStoryScriptDto(value: unknown): value is z.infer<typeof SChatStoryScriptDto> {
+	return SChatStoryScriptDto.safeParse(value).success;
+}

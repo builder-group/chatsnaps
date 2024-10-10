@@ -1,6 +1,6 @@
 {
-	"project1": {
-		"name": "Project 1",
+	"video1": {
+		"name": "Video 1",
 		"width": 1080,
 		"height": 1920,
 		"fps": 30,
