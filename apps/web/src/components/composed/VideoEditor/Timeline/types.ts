@@ -5,6 +5,7 @@ export interface TTimeline {
 	_actionMap: Record<string, TTimelineAction>;
 	_trackMap: Record<string, TTimelineTrack>;
 	currentTime: TState<number, ['base']>;
+	duration: TState<number, ['base']>;
 	playState: TState<TPlayState, ['base']>;
 	trackIds: TState<string[], ['base']>;
 	scrollLeft: TState<number, ['base']>;

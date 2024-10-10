@@ -1,2 +1,6 @@
+const MillionLint = require('@million/lint');
+
 /** @type {import('next').NextConfig} */
-module.exports = {};
+const nextConfig = {};
+
+module.exports = MillionLint.next({ rsc: true })(nextConfig);

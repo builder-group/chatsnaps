@@ -24,7 +24,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 			className="relative"
 			style={{
 				width: timeGridVirtualizer.getTotalSize(),
-				height: timeline.height()
+				minHeight: timeline.height()
 			}}
 		>
 			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {

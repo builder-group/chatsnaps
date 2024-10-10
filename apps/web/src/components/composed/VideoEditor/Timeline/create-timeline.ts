@@ -3,6 +3,7 @@ import { createState } from 'feature-state';
 
 import { createTimelineAction } from './create-timeline-action';
 import { createTimelineTrack } from './create-timeline-track';
+import { parseTimeToPixel } from './helper';
 import { type TPlayState, type TTimeline, type TTimelineCursorInteraction } from './types';
 
 export function createTimeline(project: TProjectCompProps, onChange: () => void): TTimeline {
@@ -13,6 +14,7 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		_actionMap: {},
 		_trackMap: {},
 		currentTime: createState(0),
+		duration: createState(0),
 		playState: createState<TPlayState>('PAUSED'),
 		trackIds: createState([] as string[]),
 		scrollLeft: createState(0),
@@ -32,11 +34,10 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 			return track;
 		},
 		width(this: TTimeline) {
-			return Math.max(
-				...Object.values(this._actionMap).map((action) => {
-					return action.x() + action.width();
-				})
-			);
+			return parseTimeToPixel(this.duration._value, {
+				...timeline.scale._value,
+				startLeft: 0
+			});
 		},
 		height(this: TTimeline) {
 			return this.trackIds._value.length * this._config.trackHeight;
@@ -90,6 +91,12 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 							onChange();
 						}
 					}
+
+					// TODO: Figure out performant way to recompute duration
+					// and introduce fixed and dynamic duration mode
+					// if (value.start + value.duration > timeline.duration._value) {
+					// 	timeline.duration.set(value.start + value.duration);
+					// }
 				});
 				timeline._actionMap[actionId] = action;
 				track._value.actionIds.push(actionId);
@@ -102,6 +109,20 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		track.sort();
 	}
 
+	// Calculate initial duration
+	if (project.durationInFrames != null) {
+		timeline.duration.set(project.durationInFrames / project.fps);
+	} else {
+		timeline.duration.set(
+			Math.max(
+				...Object.values(timeline._actionMap).map((action) => {
+					return action._value.start + action._value.duration;
+				})
+			)
+		);
+	}
+
+	// Setup track listener
 	timeline.trackIds._notify();
 	timeline.trackIds.listen(({ value }) => {
 		project.timeline.trackIds = value as string[];

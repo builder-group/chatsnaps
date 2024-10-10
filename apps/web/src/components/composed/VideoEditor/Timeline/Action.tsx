@@ -16,6 +16,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 	const { id, start, duration } = useGlobalState(action);
 	const interaction = useGlobalState(action.interaction);
 	const [dragPosition, setDragPosition] = React.useState<{ x: number; y: number } | null>(null);
+	const timelineDuration = useGlobalState(action._timeline.duration);
 
 	const interactionStateRef = React.useRef<TInteractionState>({
 		startX: action.x(),
@@ -209,7 +210,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 			switch (interaction) {
 				case 'DRAGGING':
-					newStart = Math.max(startTime + deltaTime, 0);
+					newStart = Math.min(Math.max(startTime + deltaTime, 0), timelineDuration - duration);
 					setDragPosition({
 						x: e.clientX - startClientX + startX,
 						y: e.clientY - startClientY + startY
@@ -220,13 +221,13 @@ export const Action: React.FC<TActionProps> = (props) => {
 					newDuration = startDuration - (newStart - startTime);
 					break;
 				case 'RESIZEING_RIGHT':
-					newDuration = Math.max(startDuration + deltaTime, 0);
+					newDuration = Math.min(startDuration + deltaTime, timelineDuration - startTime);
 					break;
 			}
 
 			action.set((v) => ({ ...v, start: newStart, duration: newDuration }));
 		},
-		[interaction, action]
+		[interaction, action, timelineDuration, duration]
 	);
 
 	const handleMouseUp = React.useCallback(() => {

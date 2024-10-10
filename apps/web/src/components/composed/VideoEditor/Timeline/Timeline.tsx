@@ -11,12 +11,15 @@ import { type TTimeline } from './types';
 
 export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((props, ref) => {
 	const { timeline, className } = props;
-	const timelineWidth = timeline.width();
+
 	const {
 		splitCount: scaleSplitCount,
 		width: scaleWidth,
 		startLeft: scaleStartLeft
 	} = useGlobalState(timeline.scale);
+
+	const timelineWidth = timeline.width();
+	useGlobalState(timeline.duration); // Timeline width is based on duration
 
 	const containerRef = React.useRef<HTMLDivElement>(null);
 	React.useImperativeHandle(ref, () => {
@@ -56,9 +59,9 @@ export const Timeline = React.forwardRef<TTimelineRef | null, TTimelineProps>((p
 	});
 
 	return (
-		<div className={cn('flex flex-col', className)}>
+		<div className={cn('flex h-full flex-col', className)}>
 			<PlayerArea timeline={timeline} />
-			<div ref={containerRef} className="relative bg-red-400">
+			<div ref={containerRef} className="relative h-full overflow-auto bg-red-400">
 				<TimeArea timeline={timeline} timeGridVirtualizer={timeGridVirtualizer} />
 				<EditArea
 					timeline={timeline}

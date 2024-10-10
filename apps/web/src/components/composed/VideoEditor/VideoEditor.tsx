@@ -18,12 +18,12 @@ import './style.css';
 import { BufferingProvider } from 'remotion';
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../layout';
-import { project1 } from './mock';
+import { chatstory } from './mock';
 
 export const VideoEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [project, setProject] = React.useState<TProjectCompProps>(project1);
+	const [project, setProject] = React.useState<TProjectCompProps>(chatstory);
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(project, () => {
@@ -55,10 +55,14 @@ export const VideoEditor: React.FC = () => {
 	return (
 		<ResizablePanelGroup
 			direction="vertical"
-			className="min-h-screen min-w-full max-w-md rounded-lg border bg-gray-100"
+			className="min-h-screen min-w-full border bg-gray-100"
 		>
-			<ResizablePanel defaultSize={60} className="flex items-center justify-center bg-red-300">
-				<div className="flex h-full overflow-hidden">
+			<ResizablePanel
+				defaultSize={60}
+				minSize={30}
+				className="flex items-center justify-center bg-red-300"
+			>
+				<div className="flex h-full overflow-hidden p-4">
 					<BufferingProvider>
 						<MediaPlayer
 							src={
@@ -103,7 +107,7 @@ export const VideoEditor: React.FC = () => {
 				</div>
 			</ResizablePanel>
 			<ResizableHandle />
-			<ResizablePanel defaultSize={40}>
+			<ResizablePanel defaultSize={40} minSize={30}>
 				<Timeline timeline={timeline} />
 			</ResizablePanel>
 		</ResizablePanelGroup>

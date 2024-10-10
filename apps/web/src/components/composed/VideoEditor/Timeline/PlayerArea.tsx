@@ -9,6 +9,7 @@ export const PlayerArea: React.FC<TPlayerAreaProps> = (props) => {
 	const { timeline } = props;
 	const playState = useGlobalState(timeline.playState);
 	const currentTime = useGlobalState(timeline.currentTime);
+	const duration = useGlobalState(timeline.duration);
 
 	const handlePlayOrPause = React.useCallback((): void => {
 		switch (playState) {
@@ -27,6 +28,12 @@ export const PlayerArea: React.FC<TPlayerAreaProps> = (props) => {
 		return `${min}:${second}`;
 	}, []);
 
+	React.useEffect(() => {
+		if (currentTime >= duration) {
+			timeline.playState.set('PAUSED');
+		}
+	}, [currentTime, duration, timeline]);
+
 	return (
 		<div className="flex h-8 w-full flex-row items-center bg-[#3a3a3a] px-2 text-[#ddd]">
 			<Button
@@ -37,7 +44,10 @@ export const PlayerArea: React.FC<TPlayerAreaProps> = (props) => {
 			>
 				{playState === 'PLAYING' ? <PauseIcon /> : <PlayIcon />}
 			</Button>
-			<div className="mx-5 w-16 text-sm">{getDisplayTime(currentTime)}</div>
+			<div className="ml-4 text-sm">
+				{getDisplayTime(currentTime)}{' '}
+				<span className="text-gray-500">| {getDisplayTime(duration)}</span>
+			</div>
 		</div>
 	);
 };

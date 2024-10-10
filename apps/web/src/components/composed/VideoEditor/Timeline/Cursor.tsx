@@ -43,7 +43,9 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 				startLeft: 0
 			});
 
-			timeline.currentTime.set(Math.max(startTime + deltaTime, 0));
+			timeline.currentTime.set(
+				Math.min(Math.max(startTime + deltaTime, 0), timeline.duration._value)
+			);
 		},
 		[interaction, timeline]
 	);
@@ -78,12 +80,13 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 
 	return (
 		<div
-			className="absolute top-4 z-10 h-full cursor-move"
+			className="absolute top-4 z-10 cursor-move"
 			onMouseDown={(e) => {
 				handleMouseDown(e, 'DRAGGING');
 			}}
 			style={{
-				left: parseTimeToPixel(currentTime, timeline.scale._value)
+				left: parseTimeToPixel(currentTime, timeline.scale._value),
+				height: 'calc(100% - 16px)'
 			}}
 		>
 			<div className="absolute -left-2 top-0 flex h-full flex-col items-center">
