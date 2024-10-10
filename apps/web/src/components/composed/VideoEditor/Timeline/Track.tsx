@@ -30,6 +30,16 @@ export const Track: React.FC<TTrackProps> = (props) => {
 		initialOffset: 0
 	});
 
+	// Remeasure all item sizes for the actionVirtualizer on scale change
+	React.useEffect(() => {
+		const unsubscribe = track._timeline.scale.listen(() => {
+			actionVirtualizer.measure();
+		});
+		return () => {
+			unsubscribe();
+		};
+	}, [actionVirtualizer, track]);
+
 	return (
 		<div
 			className="bg-green-400"
