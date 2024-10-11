@@ -19,10 +19,6 @@ const SChatStoryScriptEvent = z.union([
 		type: z.literal('Pause'),
 		durationMs: z.number()
 	})
-	// z.object({
-	// 	type: z.literal('Time'),
-	// 	passedTimeMin: z.number()
-	// })
 ]);
 export type TChatStoryScriptEvent = z.infer<typeof SChatStoryScriptEvent>;
 

@@ -33,6 +33,7 @@
 		"@vidstack/react": "^1.12.11",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
+		"feature-fetch": "^0.0.30",
 		"feature-logger": "^0.0.23",
 		"feature-react": "^0.0.27",
 		"feature-state": "^0.0.29",
@@ -43,10 +44,12 @@
 		"react-resizable-panels": "^2.1.4",
 		"remotion": "4.0.217",
 		"tailwind-merge": "^2.5.3",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwindcss-animate": "^1.0.7",
+		"valibot": "^0.42.1"
 	},
 	"devDependencies": {
 		"@blgc/config": "^0.0.24",
+		"@repo/types": "workspace:*",
 		"@types/node": "^22.7.5",
 		"@types/react": "^18.3.11",
 		"@types/react-dom": "^18.3.0",
