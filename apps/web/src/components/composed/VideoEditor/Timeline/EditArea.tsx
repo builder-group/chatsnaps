@@ -18,6 +18,13 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 		initialOffset: 0
 	});
 
+	// https://github.com/TanStack/virtual/discussions/852
+	React.useEffect(() => {
+		if (containerRef.current != null) {
+			trackVirtualizer.measure();
+		}
+	}, [containerRef, trackVirtualizer]);
+
 	return (
 		<div className="absolute left-0 top-8">
 			{trackVirtualizer.getVirtualItems().map((virtualTrack) => {

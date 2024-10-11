@@ -30,6 +30,13 @@ export const Track: React.FC<TTrackProps> = (props) => {
 		initialOffset: 0
 	});
 
+	// https://github.com/TanStack/virtual/discussions/852
+	React.useEffect(() => {
+		if (containerRef.current != null) {
+			actionVirtualizer.measure();
+		}
+	}, [containerRef, actionVirtualizer]);
+
 	// Remeasure all item sizes for the actionVirtualizer on scale change
 	React.useEffect(() => {
 		const unsubscribe = track._timeline.scale.listen(() => {

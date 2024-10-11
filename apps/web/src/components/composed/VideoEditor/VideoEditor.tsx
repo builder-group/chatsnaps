@@ -18,12 +18,12 @@ import './style.css';
 import { BufferingProvider } from 'remotion';
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../layout';
-import { video1 } from './mock';
+import { chatstory } from './mock';
 
 export const VideoEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [video, setVideo] = React.useState<TVideoComp>(video1);
+	const [video, setVideo] = React.useState<TVideoComp>(chatstory);
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(video, () => {

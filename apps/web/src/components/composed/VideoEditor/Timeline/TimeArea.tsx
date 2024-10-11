@@ -47,6 +47,13 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 		}
 	});
 
+	// https://github.com/TanStack/virtual/discussions/852
+	React.useEffect(() => {
+		if (containerRef.current != null) {
+			timeGridVirtualizer.measure();
+		}
+	}, [containerRef, timeGridVirtualizer]);
+
 	// Remeasure all item sizes for the timeGridVirtualizer on scale change
 	React.useEffect(() => {
 		const unsubscribe = timeline.scale.listen(() => {
