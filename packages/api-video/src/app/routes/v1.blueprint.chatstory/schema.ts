@@ -85,6 +85,7 @@ export const ChatStoryBlueprintPromptRoute = createRoute({
 		body: JsonRequestBody(
 			z.object({
 				originalStory: z.string(),
+				storyDirection: z.string().optional(),
 				targetAudience: z.string().optional(),
 				targetLength: z.string().optional()
 			})

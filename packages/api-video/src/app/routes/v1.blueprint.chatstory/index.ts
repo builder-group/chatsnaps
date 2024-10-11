@@ -14,6 +14,7 @@ import { logger } from '@/logger';
 import { router } from '../../router';
 import { createChatStoryTracks } from './create-chatstory-tracks';
 import { createCTATrack, createFollowCTA, createLikeCTA } from './create-cta-track';
+import { formatSubtitles } from './format-subtitles';
 import {
 	ChatStoryBlueprintPromptRoute,
 	ChatStoryBlueprintVideoRoute,
@@ -190,6 +191,7 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	const {
 		originalStory: bodyOrginalStory,
+		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
 		targetLength = '60-90 second conversation with approximately 70-110 messages (4-5k tokens)'
 	} = c.req.valid('json');
@@ -203,10 +205,15 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 			}
 		});
 		const { data, subtitles } = tokbackupResult.unwrap().data;
-		if (subtitles == null || data?.desc == null) {
+		if (subtitles == null || !subtitles || data?.desc == null || data.textExtra == null) {
 			throw new AppError('#ERR_SUBTITLES', 500);
 		}
-		originalStory = `${data.desc}: ${subtitles}`;
+		// Note:
+		// - Not including description because its often like "The end [emoji]", ..
+		// - Not including hashtags (textExtra) because its often like "#minecraftparkour", "#text"
+		originalStory = `Script:\n${formatSubtitles(subtitles)}`;
+
+		logger.info('Orginal Story: ', originalStory);
 	}
 
 	const prompt = mapErr(
@@ -215,6 +222,7 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	)
 		.unwrap()
 		.replace('{{ORIGINAL_STORY}}', originalStory)
+		.replace('{{STORY_DIRECTION}}', storyDirection)
 		.replace('{{TARGET_AUDIENCE}}', targetAudience)
 		.replace('{{TARGET_LENGTH}}', targetLength);
 
