@@ -10,7 +10,7 @@ export const SId = z.string();
 
 function createKeyframeSchema<T extends z.ZodTypeAny>(valueSchema: T) {
 	return z.object({
-		frame: z.number().int().min(0),
+		frame: z.number().int().min(0), // TODO: Also offer option between 0 - 1 to interpolate so that when chagning the duration the animation is update accordingly
 		value: valueSchema
 	});
 }

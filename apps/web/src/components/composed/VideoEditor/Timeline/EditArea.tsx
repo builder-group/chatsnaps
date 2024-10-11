@@ -19,13 +19,7 @@ export const EditArea: React.FC<EditAreaProps> = (props) => {
 	});
 
 	return (
-		<div
-			className="relative mt-8"
-			style={{
-				width: trackVirtualizer.getTotalSize(),
-				minHeight: timeline.height()
-			}}
-		>
+		<div className="absolute left-0 top-8">
 			{trackVirtualizer.getVirtualItems().map((virtualTrack) => {
 				const track = timeline.getTrackAtIndex(virtualTrack.index);
 				if (track == null) {

@@ -41,13 +41,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	}, [actionVirtualizer, track]);
 
 	return (
-		<div
-			className="bg-green-400"
-			style={{
-				width: actionVirtualizer.getTotalSize(),
-				height: track._timeline._config.trackHeight
-			}}
-		>
+		<>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
 				const action = track.getActionAtIndex(virtualAction.index);
 				if (action == null) {
@@ -63,7 +57,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 					/>
 				);
 			})}
-		</div>
+		</>
 	);
 };
 

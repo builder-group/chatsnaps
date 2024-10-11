@@ -277,26 +277,23 @@ export const Action: React.FC<TActionProps> = (props) => {
 		<>
 			{interaction === 'DRAGGING' && (
 				<div
-					className="pointer-events-none absolute border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
+					className="pointer-events-none absolute left-0 top-0 border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
 					style={{
-						left: action.x(),
-						top: action.y(),
+						transform: `translate(${action.x().toString()}px, ${action.y().toString()}px)`,
 						width: action.width(),
 						height: action.height()
 					}}
 				/>
 			)}
 			<div
-				className={cn('absolute rounded-sm border border-blue-300', {
+				className={cn('absolute left-0 top-0 rounded-sm border border-blue-300', {
 					'z-20 cursor-grabbing bg-blue-600 shadow-lg': interaction === 'DRAGGING',
 					'z-0 cursor-grab bg-blue-500': interaction !== 'DRAGGING'
 				})}
 				style={{
+					transform: `translate(${(interaction === 'DRAGGING' && dragPosition ? dragPosition.x : action.x()).toString()}px, ${(interaction === 'DRAGGING' && dragPosition ? dragPosition.y : action.y()).toString()}px)`,
 					width: action.width(),
-					height: action.height(),
-					// transition: interaction === 'NONE' ? 'all 0.3s ease-out' : 'none',
-					left: interaction === 'DRAGGING' && dragPosition ? dragPosition.x : action.x(),
-					top: interaction === 'DRAGGING' && dragPosition ? dragPosition.y : action.y()
+					height: action.height()
 				}}
 				onMouseDown={(e) => {
 					handleMouseDown(e, 'DRAGGING');

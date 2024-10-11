@@ -18,12 +18,12 @@ import './style.css';
 import { BufferingProvider } from 'remotion';
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../layout';
-import { chatstory } from './mock';
+import { video1 } from './mock';
 
 export const VideoEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [video, setVideo] = React.useState<TVideoComp>(chatstory);
+	const [video, setVideo] = React.useState<TVideoComp>(video1);
 	const timeline = React.useMemo(
 		() =>
 			createTimeline(video, () => {
@@ -94,7 +94,7 @@ export const VideoEditor: React.FC = () => {
 							ref={mediaPlayerRef}
 							playsInline
 							onTimeUpdate={({ currentTime }) => {
-								if (timeline.cursor.interaction._value === 'NONE') {
+								if (timeline.playState._value === 'PLAYING') {
 									timeline.currentTime.set(currentTime, {
 										additionalData: { source: 'media-player' }
 									});
