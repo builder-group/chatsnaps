@@ -22,11 +22,9 @@ const Page: TPageFC = (props) => {
 
 	const currentStep = parsedBlueprintParam.currentStep;
 
-	console.log({ currentStep });
-
 	switch (currentStep.type) {
 		case 'Step1':
-			return <Step1 />;
+			return <Step1 step={currentStep} />;
 		case 'Step2':
 			return <Step2 />;
 	}

@@ -53,12 +53,15 @@ importers:
       '@million/lint':
         specifier: ^1.0.9
         version: 1.0.9(rollup@4.24.0)(webpack-sources@3.2.3)
-      '@msgpack/msgpack':
-        specifier: 3.0.0-beta2
-        version: 3.0.0-beta2
+      '@radix-ui/react-compose-refs':
+        specifier: ^1.1.0
+        version: 1.1.0(@types/react@18.3.11)(react@18.3.1)
       '@radix-ui/react-icons':
         specifier: ^1.3.0
         version: 1.3.0(react@18.3.1)
+      '@radix-ui/react-label':
+        specifier: ^2.1.0
+        version: 2.1.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-scroll-area':
         specifier: ^1.2.0
         version: 1.2.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -89,6 +92,9 @@ importers:
       feature-fetch:
         specifier: ^0.0.30
         version: 0.0.30
+      feature-form:
+        specifier: ^0.0.28
+        version: 0.0.28
       feature-logger:
         specifier: ^0.0.23
         version: 0.0.23
@@ -128,6 +134,9 @@ importers:
       valibot:
         specifier: ^0.42.1
         version: 0.42.1(typescript@5.6.3)
+      validation-adapters:
+        specifier: ^0.0.11
+        version: 0.0.11
     devDependencies:
       '@blgc/config':
         specifier: ^0.0.24
@@ -1735,10 +1744,6 @@ packages:
     resolution: {integrity: sha512-sKqdKUb0zfF2DUXAWuhbxIm+0j7CqG+689azpcSVEdW3zn9ezj3AoL7ne229Q9ElJAmr8Z0zCM73tH5QtyfXzA==}
     hasBin: true
 
-  '@msgpack/msgpack@3.0.0-beta2':
-    resolution: {integrity: sha512-y+l1PNV0XDyY8sM3YtuMLK5vE3/hkfId+Do8pLo/OPxfxuFAUwcGz3oiiUuV46/aBpwTzZ+mRWVMtlSKbradhw==}
-    engines: {node: '>= 14'}
-
   '@napi-rs/nice-android-arm-eabi@1.0.1':
     resolution: {integrity: sha512-5qpvOu5IGwDo7MEKVqqyAxF90I6aLj4n07OzpARdgDRfz8UbBztTByBp0RC59r3J1Ij8uzYi6jI7r5Lws7nn6w==}
     engines: {node: '>= 10'}
@@ -2057,6 +2062,19 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
+        optional: true
+
+  '@radix-ui/react-label@2.1.0':
+    resolution: {integrity: sha512-peLblDlFw/ngk3UWq0VnYaOLy6agTZZ+MUO/WhVfm14vJGML+xH4FAl2XQGLqdefjNb7ApRg6Yn7U42ZhmYXdw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-popper@1.2.0':
@@ -4315,6 +4333,9 @@ packages:
 
   feature-fetch@0.0.30:
     resolution: {integrity: sha512-OiK/LvC8bHdKW0CCDlFFU80QMCMF+TMceOwHgR82KoR9Sy9WCwzjOZ8o6zkKlLReWcVXuVbHUtVwHL933QWodw==}
+
+  feature-form@0.0.28:
+    resolution: {integrity: sha512-FdAh/he4kyl1OC6Ys+fjQzD1xX817c3EqTKreWlzILvGK8kW5fM5j7qC3lDq101xxGyYA3dkMfotIZ8ahokSFw==}
 
   feature-logger@0.0.23:
     resolution: {integrity: sha512-5OfwQr3fvFp+gay/DNWVwXcGaVK0aM9tXswjI+EXS7RJUAUv3fOdzMhoP+uq7Hee0qH+IDTYql8IQALB8RfhbQ==}
@@ -7280,6 +7301,9 @@ packages:
   validation-adapter@0.0.12:
     resolution: {integrity: sha512-Koea7CqE8Pi3ycxG+euYlv3EskpMVmx3+nDAEuCPhoM0dTQ47n0Z8+Kvxwr/LVDxJJk1OtQdTdL14WbUMla8OA==}
 
+  validation-adapters@0.0.11:
+    resolution: {integrity: sha512-1Dr+ESgKURKiTW4Fm9oSBohSrdKpECwsjxw/HqCgwcKlZeuSS6QgGOY2rvKZhB6iKoI8qoVT+fMllS+zc1h2gg==}
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -9155,8 +9179,6 @@ snapshots:
       - utf-8-validate
       - webpack-sources
 
-  '@msgpack/msgpack@3.0.0-beta2': {}
-
   '@napi-rs/nice-android-arm-eabi@1.0.1':
     optional: true
 
@@ -9413,6 +9435,15 @@ snapshots:
       react: 18.3.1
     optionalDependencies:
       '@types/react': 18.3.11
+
+  '@radix-ui/react-label@2.1.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@radix-ui/react-primitive': 2.0.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.11
+      '@types/react-dom': 18.3.0
 
   '@radix-ui/react-popper@1.2.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -12748,6 +12779,13 @@ snapshots:
     transitivePeerDependencies:
       - graphql
 
+  feature-form@0.0.28:
+    dependencies:
+      '@blgc/types': 0.0.7
+      '@blgc/utils': 0.0.19
+      feature-state: 0.0.29
+      validation-adapter: 0.0.12
+
   feature-logger@0.0.23:
     dependencies:
       '@blgc/types': 0.0.7
@@ -13790,7 +13828,7 @@ snapshots:
       oas-kit-common: 1.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
 
   oas-schema-walker@1.1.5: {}
 
@@ -15760,6 +15798,8 @@ snapshots:
   validation-adapter@0.0.12:
     dependencies:
       '@blgc/utils': 0.0.19
+
+  validation-adapters@0.0.11: {}
 
   vary@1.1.2: {}
 

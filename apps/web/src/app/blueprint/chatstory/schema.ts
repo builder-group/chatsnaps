@@ -30,11 +30,13 @@ const SChatStoryBlueprintStep1 = v.object({
 	originalStory: v.string(),
 	targetAudience: v.optional(v.string())
 });
+export type TChatStoryBlueprintStep1 = v.InferInput<typeof SChatStoryBlueprintStep1>;
 
 const SChatStoryBlueprintStep2 = v.object({
 	type: v.literal('Step2'),
 	script: SChatStoryScript
 });
+export type TChatStoryBlueprintStep2 = v.InferInput<typeof SChatStoryBlueprintStep2>;
 
 const SChatStoryBlueprintStep = v.union([SChatStoryBlueprintStep1, SChatStoryBlueprintStep2]);
 export type TChatStoryBlueprintStep = v.InferInput<typeof SChatStoryBlueprintStep>;
