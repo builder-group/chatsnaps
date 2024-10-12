@@ -25,16 +25,27 @@ export const SChatStoryScript = v.object({
 	events: v.array(SChatStoryScriptEvent)
 });
 
-export const SChatStoryBlueprintStep1 = v.object({
+const SChatStoryBlueprintStep1 = v.object({
+	type: v.literal('Step1'),
 	originalStory: v.string(),
 	targetAudience: v.optional(v.string())
 });
 
-export const SChatStoryBlueprintStep2 = v.object({
+const SChatStoryBlueprintStep2 = v.object({
+	type: v.literal('Step2'),
 	script: SChatStoryScript
 });
 
+const SChatStoryBlueprintStep = v.union([SChatStoryBlueprintStep1, SChatStoryBlueprintStep2]);
+export type TChatStoryBlueprintStep = v.InferInput<typeof SChatStoryBlueprintStep>;
+
 export const SChatStoryBlueprint = v.object({
-	step1: v.optional(SChatStoryBlueprintStep1),
-	step2: v.optional(SChatStoryBlueprintStep2)
+	currentStep: SChatStoryBlueprintStep
 });
+export type TChatStoryBlueprint = v.InferInput<typeof SChatStoryBlueprint>;
+
+export function isChatStoryBlueprint(
+	value: unknown
+): value is v.InferInput<typeof SChatStoryBlueprint> {
+	return v.safeParse(SChatStoryBlueprint, value).success;
+}

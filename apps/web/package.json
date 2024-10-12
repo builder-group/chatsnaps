@@ -21,7 +21,7 @@
 		"url": "https://github.com/builder-group/shortify/issues"
 	},
 	"dependencies": {
-		"@blgc/utils": "^0.0.20",
+		"@blgc/utils": "^0.0.22",
 		"@million/lint": "^1.0.9",
 		"@radix-ui/react-icons": "^1.3.0",
 		"@radix-ui/react-scroll-area": "^1.2.0",
@@ -37,6 +37,7 @@
 		"feature-logger": "^0.0.23",
 		"feature-react": "^0.0.27",
 		"feature-state": "^0.0.29",
+		"fflate": "^0.8.2",
 		"lucide-react": "^0.449.0",
 		"next": "14.2.14",
 		"react": "^18.3.1",
