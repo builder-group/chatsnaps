@@ -5,7 +5,7 @@ const SChatStoryScriptEvent = v.union([
 		type: v.literal('Message'),
 		content: v.string(),
 		spokenContent: v.optional(v.string()),
-		participantId: v.number()
+		participantId: v.string()
 	}),
 	v.object({
 		type: v.literal('Pause'),

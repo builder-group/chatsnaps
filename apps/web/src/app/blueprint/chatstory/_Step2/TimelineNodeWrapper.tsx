@@ -5,11 +5,11 @@ export const TimelineNodeWrapper: React.FC<TProps> = (props) => {
 
 	return (
 		<li>
-			<hr className="w-1 bg-red-400" />
+			<hr className="min-h-4 w-1 bg-red-400" />
 			{start != null && <div className="timeline-start">{start}</div>}
 			{middle != null && <div className="timeline-middle">{middle}</div>}
 			{end != null && <div className="timeline-end">{end}</div>}
-			<hr className="w-1 bg-red-400" />
+			<hr className="min-h-4 w-1 bg-red-400" />
 		</li>
 	);
 };

@@ -90,7 +90,7 @@ class ChatStoryCreator {
 
 	public async create(): Promise<TResult<TChatStoryCreatorCreateResponse, AppError>> {
 		// Resolve voices
-		for (const participant of this.script.participants) {
+		for (const participant of Object.values(this.script.participants)) {
 			if (participant.voice != null) {
 				const voiceId = isVoiceId(participant.voice)
 					? participant.voice
@@ -148,7 +148,7 @@ class ChatStoryCreator {
 		item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>
 	): Promise<TResult<void, AppError>> {
 		const startFrame = msToFrames(this.currentTimeMs, this.config.fps);
-		const participant = this.script.participants.find((p) => p.id === item.participantId);
+		const participant = this.script.participants[item.participantId];
 		if (participant == null) {
 			logger.warn(`No participant for message '${item.content}' found!`);
 			return Ok(undefined);
@@ -344,7 +344,7 @@ class ChatStoryCreator {
 
 	private getFutureContentForParticipant(
 		startIndex: number,
-		participantId: number
+		participantId: string
 	): Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][] {
 		const content: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][] = [];
 		for (let i = startIndex; i < this.script.events.length; i++) {

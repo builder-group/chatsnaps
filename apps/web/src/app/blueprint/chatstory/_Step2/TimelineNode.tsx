@@ -1,5 +1,4 @@
-import { ChatBubbleIcon } from '@/components';
-
+import { cn } from '../../../../lib';
 import { type TChatStoryBlueprintStep2, type TChatStoryScriptEvent } from '../schema';
 import { MessageNode } from './MessageNode';
 import { PauseNode } from './PauseNode';
@@ -14,12 +13,16 @@ export const TimelineNode: React.FC<TProps> = (props) => {
 
 			return (
 				<TimelineNodeWrapper
-					start={!isSelf ? <MessageNode event={event} /> : undefined}
-					end={isSelf ? <MessageNode event={event} /> : undefined}
+					// start={!isSelf ? <MessageNode event={event} /> : undefined}
+					// end={isSelf ? <MessageNode event={event} /> : undefined}
+					// middle={
+					// 	<div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-400">
+					// 		<ChatBubbleIcon className="h-4 w-4" />
+					// 	</div>
+					// }
+					// start={<div className="h-48" />}
 					middle={
-						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-400">
-							<ChatBubbleIcon className="h-4 w-4" />
-						</div>
+						<MessageNode event={event} className={cn({ 'ml-16': isSelf, 'mr-16': !isSelf })} />
 					}
 				/>
 			);

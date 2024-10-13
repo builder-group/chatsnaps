@@ -193,7 +193,7 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 		originalStory: bodyOrginalStory,
 		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
-		targetLength = '60-90 second conversation with approximately 70-110 messages (4-5k tokens)'
+		targetLength = '30-60 second conversation with approximately 35-55 messages (2-3k tokens)'
 	} = c.req.valid('json');
 
 	let originalStory = bodyOrginalStory;
@@ -272,7 +272,8 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 		const { error, message } = extractErrorData(e);
 		throw new AppError('#ERR_ANTHROPIC', 500, {
 			description: `Invalid content response: ${message}`,
-			throwable: error ?? undefined
+			throwable: error ?? undefined,
+			additionalErrors: [{ content: content.text }]
 		});
 	}
 

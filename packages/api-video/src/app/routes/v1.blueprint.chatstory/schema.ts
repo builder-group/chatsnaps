@@ -13,7 +13,7 @@ const SChatStoryScriptEvent = z.union([
 		type: z.literal('Message'),
 		content: z.string(),
 		spokenContent: z.string().optional(),
-		participantId: z.number()
+		participantId: z.string()
 	}),
 	z.object({
 		type: z.literal('Pause'),
@@ -23,7 +23,6 @@ const SChatStoryScriptEvent = z.union([
 export type TChatStoryScriptEvent = z.infer<typeof SChatStoryScriptEvent>;
 
 const SChatStoryScriptParticipant = z.object({
-	id: z.number(),
 	displayName: z.string(),
 	isSelf: z.boolean(),
 	voice: z.string().optional()
@@ -32,7 +31,7 @@ export type TChatStoryVideoParticipant = z.infer<typeof SChatStoryScriptParticip
 
 export const SChatStoryScriptDto = z.object({
 	title: z.string(),
-	participants: z.array(SChatStoryScriptParticipant),
+	participants: z.record(z.string(), SChatStoryScriptParticipant),
 	events: z.array(SChatStoryScriptEvent),
 	messenger: SChatStoryMessenger.optional()
 });
