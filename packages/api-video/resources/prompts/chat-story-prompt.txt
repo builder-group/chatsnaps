@@ -77,18 +77,16 @@ Output your adapted viral chat story using the following JSON format:
 <format>
 {
     "title": "Catchy, Intriguing Title That Hooks Instantly",
-    "participants": [
-        {
-            "id": 1,
+    "participants": {
+        1: {
             "displayName": "Character1",
             "isSelf": false
         },
-        {
-            "id": 2,
+        2: {
             "displayName": "Character2",
             "isSelf": true
         }
-    ],
+    },
     "events": [
         {
             "type": "Message",

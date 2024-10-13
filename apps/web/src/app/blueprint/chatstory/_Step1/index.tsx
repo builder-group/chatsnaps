@@ -7,6 +7,8 @@ import {
 	FormFieldValidateMode
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
+import { useGlobalState, type TState } from 'feature-react/state';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
@@ -25,11 +27,14 @@ import {
 	FormLabel,
 	FormMessage,
 	Input,
+	SpinnerIcon,
 	Textarea,
 	type TBlockMessage
 } from '@/components';
 
-import { type TChatStoryBlueprintStep1 } from './schema';
+import { getPath } from '../get-path';
+import { type TChatStoryBlueprint, type TChatStoryBlueprintStep1 } from '../schema';
+import { moveToStep2 } from './actions';
 
 const $form = createForm<Omit<TChatStoryBlueprintStep1, 'step'>>({
 	fields: {
@@ -48,8 +53,10 @@ const $form = createForm<Omit<TChatStoryBlueprintStep1, 'step'>>({
 });
 
 export const Step1: React.FC<TProps> = (props) => {
-	const { step, blockMessage } = props;
+	const { step, blockMessage, $blueprint } = props;
 	const { handleSubmit, field } = useForm($form);
+	const isSubmitting = useGlobalState($form.isSubmitting);
+	const { replace } = useRouter();
 
 	React.useEffect(() => {
 		$form.fields.originalStory.set(step.originalStory, { additionalData: { background: true } });
@@ -63,8 +70,21 @@ export const Step1: React.FC<TProps> = (props) => {
 	}, [step]);
 
 	const onSubmit = handleSubmit({
-		onValidSubmit: (data) => {
-			console.log({ data });
+		onValidSubmit: async (data) => {
+			const step1: TChatStoryBlueprintStep1 = { step: 1, ...data };
+			$blueprint._value.steps[0] = step1;
+
+			const step2 = await moveToStep2(step1);
+			if ($blueprint._value.steps.length >= 2) {
+				$blueprint._value.steps[1] = step2;
+			} else {
+				$blueprint._value.steps.push(step2);
+			}
+
+			// Notify to persist changes, no re-render necessary because of path replacement
+			$blueprint._notify({ additionalData: { background: true } });
+
+			replace(getPath($blueprint._value.id, 2));
 		},
 		preventDefault: true
 	});
@@ -135,7 +155,9 @@ export const Step1: React.FC<TProps> = (props) => {
 						)}
 					</CardContent>
 					<CardFooter>
-						<Button type="submit">Next</Button>
+						<Button type="submit" disabled={isSubmitting}>
+							{isSubmitting ? <SpinnerIcon className="h-8 w-8 animate-spin" /> : 'Next'}
+						</Button>
 					</CardFooter>
 				</form>
 			</Card>
@@ -146,4 +168,5 @@ export const Step1: React.FC<TProps> = (props) => {
 interface TProps {
 	step: TChatStoryBlueprintStep1;
 	blockMessage?: TBlockMessage;
+	$blueprint: TState<TChatStoryBlueprint, ['base']>;
 }

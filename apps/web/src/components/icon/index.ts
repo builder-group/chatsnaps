@@ -2,5 +2,15 @@
 export * from './SpinnerIcon';
 
 // Third Party Icons
-export { ExclamationTriangleIcon, PauseIcon, PlayIcon } from '@radix-ui/react-icons';
-export { AlertCircle as AlertCircleIcon, CheckCircle as CheckCircleIcon } from 'lucide-react';
+export {
+	ChatBubbleIcon,
+	ExclamationTriangleIcon,
+	PauseIcon,
+	PlayIcon
+} from '@radix-ui/react-icons';
+export {
+	AlertCircle as AlertCircleIcon,
+	CheckCircle as CheckCircleIcon,
+	PauseCircle as PauseCircleIcon,
+	PlusCircle as PlusCircleIcon
+} from 'lucide-react';

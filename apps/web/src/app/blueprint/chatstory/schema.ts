@@ -12,18 +12,20 @@ const SChatStoryScriptEvent = v.union([
 		durationMs: v.number()
 	})
 ]);
+export type TChatStoryScriptEvent = v.InferInput<typeof SChatStoryScriptEvent>;
 
 const SChatStoryScriptParticipant = v.object({
-	id: v.number(),
 	displayName: v.string(),
 	isSelf: v.boolean(),
 	voice: v.optional(v.string())
 });
 
 export const SChatStoryScript = v.object({
-	participants: v.array(SChatStoryScriptParticipant),
+	title: v.optional(v.string()),
+	participants: v.record(v.string(), SChatStoryScriptParticipant),
 	events: v.array(SChatStoryScriptEvent)
 });
+export type TChatStoryScript = v.InferInput<typeof SChatStoryScript>;
 
 const SChatStoryBlueprintStep1 = v.object({
 	step: v.literal(1),
