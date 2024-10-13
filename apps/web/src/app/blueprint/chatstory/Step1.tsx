@@ -7,6 +7,7 @@ import {
 	FormFieldValidateMode
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
@@ -31,36 +32,41 @@ import {
 
 import { type TChatStoryBlueprintStep1 } from './schema';
 
-const $form = createForm<Omit<TChatStoryBlueprintStep1, 'type'>>({
+const $form = createForm<Omit<TChatStoryBlueprintStep1, 'step'>>({
 	fields: {
 		originalStory: {
-			validator: vValidator(v.pipe(v.string(), v.minLength(1), v.maxLength(2000))),
+			validator: vValidator(v.pipe(v.string(), v.minLength(1), v.maxLength(3000))),
 			defaultValue: ''
 		},
 		targetAudience: {
-			validator: vValidator(v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(2000)))),
+			validator: vValidator(v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(500)))),
 			defaultValue: ''
 		}
 	},
 	validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
-	reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur)
+	reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur),
+	notifyOnStatusChange: false
 });
 
 export const Step1: React.FC<TProps> = (props) => {
 	const { step, blockMessage } = props;
 	const { handleSubmit, field } = useForm($form);
+	const { replace } = useRouter();
 
 	React.useEffect(() => {
-		$form.fields.originalStory.set(step.originalStory);
-		$form.fields.targetAudience?.set(step.targetAudience);
+		$form.fields.originalStory.set(step.originalStory, { additionalData: { background: true } });
+		$form.fields.originalStory._intialValue = step.originalStory;
+		if ($form.fields.targetAudience != null) {
+			$form.fields.targetAudience.set(step.targetAudience, {
+				additionalData: { background: true }
+			});
+			$form.fields.targetAudience._intialValue = step.targetAudience;
+		}
 	}, [step]);
 
 	const onSubmit = handleSubmit({
-		onInvalidSubmit: (errors) => {
-			console.log({ errors });
-		},
 		onValidSubmit: (data) => {
-			console.log({ data });
+			// TODO
 		},
 		preventDefault: true
 	});
@@ -87,6 +93,11 @@ export const Step1: React.FC<TProps> = (props) => {
 											{(status) => (
 												<Input
 													{...fieldData}
+													defaultValue={
+														step.targetAudience != null && step.targetAudience.length > 0
+															? step.targetAudience
+															: fieldData.defaultValue
+													}
 													placeholder="Target Audience"
 													type="text"
 													variant={status.type === 'INVALID' ? 'destructive' : 'default'}
@@ -105,6 +116,11 @@ export const Step1: React.FC<TProps> = (props) => {
 											{(status) => (
 												<Textarea
 													{...fieldData}
+													defaultValue={
+														step.originalStory.length > 0
+															? step.originalStory
+															: fieldData.defaultValue
+													}
 													className="max-h-48"
 													placeholder="Orginal Story"
 													variant={status.type === 'INVALID' ? 'destructive' : 'default'}

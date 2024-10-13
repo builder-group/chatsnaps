@@ -26,14 +26,14 @@ export const SChatStoryScript = v.object({
 });
 
 const SChatStoryBlueprintStep1 = v.object({
-	type: v.literal('Step1'),
+	step: v.literal(1),
 	originalStory: v.string(),
 	targetAudience: v.optional(v.string())
 });
 export type TChatStoryBlueprintStep1 = v.InferInput<typeof SChatStoryBlueprintStep1>;
 
 const SChatStoryBlueprintStep2 = v.object({
-	type: v.literal('Step2'),
+	step: v.literal(2),
 	script: SChatStoryScript
 });
 export type TChatStoryBlueprintStep2 = v.InferInput<typeof SChatStoryBlueprintStep2>;
@@ -42,7 +42,8 @@ const SChatStoryBlueprintStep = v.union([SChatStoryBlueprintStep1, SChatStoryBlu
 export type TChatStoryBlueprintStep = v.InferInput<typeof SChatStoryBlueprintStep>;
 
 export const SChatStoryBlueprint = v.object({
-	currentStep: SChatStoryBlueprintStep
+	id: v.pipe(v.string(), v.startsWith('blueprint')),
+	steps: v.array(SChatStoryBlueprintStep)
 });
 export type TChatStoryBlueprint = v.InferInput<typeof SChatStoryBlueprint>;
 

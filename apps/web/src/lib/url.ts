@@ -5,6 +5,12 @@ import { unzlibSync, zlibSync } from 'fflate';
 import * as v from 'valibot';
 
 export function encodeString(str: string): string {
+	// https://stackoverflow.com/questions/812925/what-is-the-maximum-possible-length-of-a-query-string
+	if (str.length > 2048) {
+		console.warn(
+			'Warning: The URL exceeds the recommended length (2048 characters). Some browsers may not support URLs of this length, which could cause issues. Consider reducing the amount of data passed in the URL.'
+		);
+	}
 	const compressed = zlibSync(Buffer.from(str, 'utf-8'), { level: 6 });
 	return Buffer.from(compressed)
 		.toString('base64')
