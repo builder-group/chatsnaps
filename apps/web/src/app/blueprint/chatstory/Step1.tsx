@@ -7,7 +7,6 @@ import {
 	FormFieldValidateMode
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
-import { useRouter } from 'next/navigation';
 import React from 'react';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
@@ -35,11 +34,11 @@ import { type TChatStoryBlueprintStep1 } from './schema';
 const $form = createForm<Omit<TChatStoryBlueprintStep1, 'step'>>({
 	fields: {
 		originalStory: {
-			validator: vValidator(v.pipe(v.string(), v.minLength(1), v.maxLength(3000))),
+			validator: vValidator(v.pipe(v.string(), v.minLength(1), v.maxLength(8000))),
 			defaultValue: ''
 		},
 		targetAudience: {
-			validator: vValidator(v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(500)))),
+			validator: vValidator(v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(2000)))),
 			defaultValue: ''
 		}
 	},
@@ -51,7 +50,6 @@ const $form = createForm<Omit<TChatStoryBlueprintStep1, 'step'>>({
 export const Step1: React.FC<TProps> = (props) => {
 	const { step, blockMessage } = props;
 	const { handleSubmit, field } = useForm($form);
-	const { replace } = useRouter();
 
 	React.useEffect(() => {
 		$form.fields.originalStory.set(step.originalStory, { additionalData: { background: true } });
@@ -66,7 +64,7 @@ export const Step1: React.FC<TProps> = (props) => {
 
 	const onSubmit = handleSubmit({
 		onValidSubmit: (data) => {
-			// TODO
+			console.log({ data });
 		},
 		preventDefault: true
 	});
