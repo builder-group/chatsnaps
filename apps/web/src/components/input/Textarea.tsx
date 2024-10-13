@@ -42,22 +42,17 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TTextareaProps>(
 			);
 		}
 
-		if (childrenAfter != null || children != null) {
-			return (
-				<div className="relative">
-					{children}
-					<textarea
-						className={cn(inputVariants({ variant, size, className }))}
-						ref={ref}
-						{...props}
-					/>
-					{childrenAfter}
-				</div>
-			);
-		}
-
 		return (
-			<textarea className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
+			<div className="relative">
+				{children}
+				{/* The textarea element must always stay the same to avoid resetting its state in non-controlled forms */}
+				<textarea
+					className={cn(inputVariants({ variant, size, className }))}
+					ref={ref}
+					{...props}
+				/>
+				{childrenAfter}
+			</div>
 		);
 	}
 );

@@ -1,6 +1,11 @@
 'use client';
 
-import { createForm } from 'feature-form';
+import {
+	bitwiseFlag,
+	createForm,
+	FormFieldReValidateMode,
+	FormFieldValidateMode
+} from 'feature-form';
 import { useForm } from 'feature-react/form';
 import React from 'react';
 import * as v from 'valibot';
@@ -37,12 +42,8 @@ const $form = createForm<Omit<TChatStoryBlueprintStep1, 'type'>>({
 			defaultValue: ''
 		}
 	},
-	onValidSubmit: (data) => {
-		console.log('ValidSubmit', data);
-	},
-	onInvalidSubmit: (errors) => {
-		console.log('InvalidSubmit', errors);
-	}
+	validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
+	reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur)
 });
 
 export const Step1: React.FC<TProps> = (props) => {
@@ -130,7 +131,5 @@ export const Step1: React.FC<TProps> = (props) => {
 
 interface TProps {
 	step: TChatStoryBlueprintStep1;
-	// onChange: (step: TChatStoryBlueprintStep1) => void;
-	// onNext: (step: TChatStoryBlueprintStep1) => void;
 	blockMessage?: TBlockMessage;
 }
