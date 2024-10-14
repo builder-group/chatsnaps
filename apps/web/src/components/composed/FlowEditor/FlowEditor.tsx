@@ -15,37 +15,29 @@ export const FlowEditor: React.FC = () => {
 			return;
 		}
 
-		let isPanning = false;
-		let startX = 0,
-			startY = 0;
-		let initialTranslateX = 0,
-			initialTranslateY = 0;
-
 		const handleMouseDown = (event: MouseEvent): void => {
 			if (event.button === 0) {
-				isPanning = true;
-				startX = event.clientX;
-				startY = event.clientY;
-				initialTranslateX = flowEditor.position._value.x;
-				initialTranslateY = flowEditor.position._value.y;
-				flowEditor.interaction.set('DRAGGING');
+				flowEditor.interaction.set({
+					type: 'Panning',
+					start: { x: event.clientX, y: event.clientY },
+					origin: { x: flowEditor.position._value.x, y: flowEditor.position._value.y }
+				});
 			}
 		};
 
 		const handleMouseMove = (event: MouseEvent): void => {
-			if (isPanning) {
-				const deltaX = event.clientX - startX;
-				const deltaY = event.clientY - startY;
+			if (flowEditor.interaction._value.type === 'Panning') {
+				const deltaX = event.clientX - flowEditor.interaction._value.start.x;
+				const deltaY = event.clientY - flowEditor.interaction._value.start.y;
 				flowEditor.position.set({
-					x: initialTranslateX + deltaX,
-					y: initialTranslateY + deltaY
+					x: flowEditor.interaction._value.origin.x + deltaX,
+					y: flowEditor.interaction._value.origin.y + deltaY
 				});
 			}
 		};
 
 		const handleMouseUp = (): void => {
-			isPanning = false;
-			flowEditor.interaction.set('NONE');
+			flowEditor.interaction.set({ type: 'None' });
 		};
 
 		const handleWheel = (event: WheelEvent): void => {

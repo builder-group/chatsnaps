@@ -6,4 +6,6 @@ export interface TFlowEditor {
 	position: TState<{ x: number; y: number }, ['base']>;
 }
 
-export type TFlowEditorInteraction = 'DRAGGING' | 'NONE';
+export type TFlowEditorInteraction =
+	| { type: 'None' }
+	| { type: 'Panning'; start: { x: number; y: number }; origin: { x: number; y: number } };

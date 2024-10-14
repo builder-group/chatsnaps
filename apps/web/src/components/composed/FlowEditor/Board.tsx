@@ -36,8 +36,8 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 		<div
 			ref={ref}
 			className={cn('relative h-full w-full', {
-				'cursor-grabbing': interaction === 'DRAGGING',
-				'cursor-grab': interaction !== 'DRAGGING'
+				'cursor-grabbing': interaction.type === 'Panning',
+				'cursor-grab': interaction.type !== 'Panning'
 			})}
 		>
 			<svg className="absolute h-full w-full origin-top-left">
