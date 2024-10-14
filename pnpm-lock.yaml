@@ -105,8 +105,8 @@ importers:
         specifier: ^0.0.28
         version: 0.0.28(react@18.3.1)
       feature-state:
-        specifier: ^0.0.31
-        version: 0.0.31
+        specifier: ^0.0.33
+        version: 0.0.33
       fflate:
         specifier: ^0.8.2
         version: 0.8.2
@@ -4422,8 +4422,8 @@ packages:
   feature-state@0.0.29:
     resolution: {integrity: sha512-xwy37vAjaAWxVhdWEVEMWIL6tgMgG1nhUIvWhNVUnZiwDsEvN66CMypADnGAkyFRy3GWdfIyoZGF5VgHsE1wFw==}
 
-  feature-state@0.0.31:
-    resolution: {integrity: sha512-14/B3lmxkDBolUzuH3at2AIr6lEr1UtRcpC3CJKsIrhcSOKR88JKakkl0KrAMshlRP070DZy3YvzsfPO7QUBsw==}
+  feature-state@0.0.33:
+    resolution: {integrity: sha512-9UCdVekBjWOsyq8zYaxBgyIuTWiwkf+KYyteTPCNrwyjRsTJcGVPlIc2M3eT5uT0JvTh2LUmMRN7ahd8XCDyjQ==}
 
   fecha@4.2.3:
     resolution: {integrity: sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==}
@@ -12972,7 +12972,7 @@ snapshots:
       '@blgc/types': 0.0.7
       '@blgc/utils': 0.0.19
 
-  feature-state@0.0.31:
+  feature-state@0.0.33:
     dependencies:
       '@blgc/types': 0.0.7
       '@blgc/utils': 0.0.23
