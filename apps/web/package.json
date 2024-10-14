@@ -33,6 +33,7 @@
 		"@repo/video": "workspace:*",
 		"@tanstack/react-virtual": "^3.10.8",
 		"@vidstack/react": "^1.12.11",
+		"@xyflow/react": "^12.3.2",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"feature-fetch": "^0.0.30",
