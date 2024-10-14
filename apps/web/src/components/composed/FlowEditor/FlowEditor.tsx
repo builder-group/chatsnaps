@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Board } from './Board';
 import { createFlowEditor } from './create-flow-editor';
+import { DefaultNode } from './DefaultNode';
 
 export const FlowEditor: React.FC = () => {
 	const flowEditor = React.useMemo(() => createFlowEditor(), []);
@@ -20,19 +21,26 @@ export const FlowEditor: React.FC = () => {
 				flowEditor.interaction.set({
 					type: 'Panning',
 					start: { x: event.clientX, y: event.clientY },
-					origin: { x: flowEditor.position._value.x, y: flowEditor.position._value.y }
+					origin: {
+						x: flowEditor.viewport._value.position.x,
+						y: flowEditor.viewport._value.position.y
+					}
 				});
 			}
 		};
 
 		const handleMouseMove = (event: MouseEvent): void => {
 			if (flowEditor.interaction._value.type === 'Panning') {
-				const deltaX = event.clientX - flowEditor.interaction._value.start.x;
-				const deltaY = event.clientY - flowEditor.interaction._value.start.y;
-				flowEditor.position.set({
-					x: flowEditor.interaction._value.origin.x + deltaX,
-					y: flowEditor.interaction._value.origin.y + deltaY
-				});
+				const { start, origin } = flowEditor.interaction._value;
+				const deltaX = event.clientX - start.x;
+				const deltaY = event.clientY - start.y;
+				flowEditor.viewport.set((v) => ({
+					...v,
+					position: {
+						x: origin.x + deltaX,
+						y: origin.y + deltaY
+					}
+				}));
 			}
 		};
 
@@ -44,7 +52,7 @@ export const FlowEditor: React.FC = () => {
 			// Zooming
 			if (event.ctrlKey) {
 				event.preventDefault();
-				const scale = flowEditor.scale.get();
+				const { scale, position } = flowEditor.viewport._value;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
 
@@ -52,22 +60,24 @@ export const FlowEditor: React.FC = () => {
 				const cursorX = event.clientX - rect.left;
 				const cursorY = event.clientY - rect.top;
 
-				const currentX = flowEditor.position._value.x;
-				const currentY = flowEditor.position._value.y;
+				const currentX = position.x;
+				const currentY = position.y;
 				const newX = currentX - (cursorX - currentX) * (newScale / scale - 1);
 				const newY = currentY - (cursorY - currentY) * (newScale / scale - 1);
 
-				flowEditor.scale.set(newScale);
-				flowEditor.position.set({ x: newX, y: newY });
+				flowEditor.viewport.set({ scale: newScale, position: { x: newX, y: newY } });
 			}
 			// Vertical scrolling
 			else {
 				const scrollSpeed = 1;
 				const deltaY = event.deltaY * scrollSpeed;
-				flowEditor.position.set({
-					x: flowEditor.position._value.x,
-					y: flowEditor.position._value.y - deltaY
-				});
+				flowEditor.viewport.set((v) => ({
+					...v,
+					position: {
+						x: v.position.x,
+						y: v.position.y - deltaY
+					}
+				}));
 			}
 		};
 
@@ -84,11 +94,33 @@ export const FlowEditor: React.FC = () => {
 		};
 	}, [flowEditor]);
 
+	const handleNodeClick = React.useCallback(
+		(nodeId: string, event: React.MouseEvent) => {
+			if (event.shiftKey) {
+				flowEditor.selected._value.push(nodeId);
+				flowEditor.selected._notify();
+			} else {
+				flowEditor.selected.set([nodeId]);
+			}
+		},
+		[flowEditor]
+	);
+
 	return (
 		<Board flowEditor={flowEditor} ref={boardRef}>
 			<div className="absolute left-10 top-10 h-20 w-20 bg-blue-500">Example Node</div>
-			{/* <div className="absolute inset-0 h-full w-full"></div>
-                <div className="absolute inset-0 h-full w-full"></div> */}
+			<div className="absolute h-full w-full">
+				{Object.values(flowEditor.nodes).map((node) => (
+					<DefaultNode
+						key={node.id}
+						node={node as any}
+						isSelected
+						onClick={(event) => {
+							handleNodeClick(node.id, event);
+						}}
+					/>
+				))}
+			</div>
 		</Board>
 	);
 };

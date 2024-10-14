@@ -15,8 +15,7 @@ const FADE_END_SCALE = 0.5;
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	const { flowEditor } = props;
 	const interaction = useGlobalState(flowEditor.interaction);
-	const scale = useGlobalState(flowEditor.scale);
-	const position = useGlobalState(flowEditor.position);
+	const { scale, position } = useGlobalState(flowEditor.viewport);
 
 	const adjustedSpacing = DOT_BASE_SPACING * scale;
 	const patternX = position.x % adjustedSpacing;
@@ -73,5 +72,5 @@ Board.displayName = 'Board';
 
 interface TProps {
 	flowEditor: TFlowEditor;
-	children?: React.ReactElement;
+	children?: React.ReactElement[] | React.ReactElement;
 }

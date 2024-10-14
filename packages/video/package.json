@@ -31,7 +31,7 @@
 	},
 	"homepage": "",
 	"dependencies": {
-		"@blgc/utils": "^0.0.22",
+		"@blgc/utils": "^0.0.23",
 		"@radix-ui/react-icons": "^1.3.0",
 		"@remotion/zod-types": "4.0.217",
 		"clsx": "^2.1.1",
