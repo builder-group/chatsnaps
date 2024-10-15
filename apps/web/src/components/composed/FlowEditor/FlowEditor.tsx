@@ -2,9 +2,11 @@
 
 import React from 'react';
 
+import { Background } from './Background';
 import { Board } from './Board';
 import { createFlowEditor } from './create-flow-editor';
 import { DefaultNode } from './DefaultNode';
+import { Draggable } from './Draggable';
 
 export const FlowEditor: React.FC = () => {
 	const flowEditor = React.useMemo(() => createFlowEditor(), []);
@@ -17,7 +19,7 @@ export const FlowEditor: React.FC = () => {
 		}
 
 		const handleMouseDown = (event: MouseEvent): void => {
-			if (event.button === 0) {
+			if (event.button === 1) {
 				flowEditor.interaction.set({
 					type: 'Panning',
 					start: { x: event.clientX, y: event.clientY },
@@ -108,19 +110,23 @@ export const FlowEditor: React.FC = () => {
 
 	return (
 		<Board flowEditor={flowEditor} ref={boardRef}>
-			<div className="absolute left-10 top-10 h-20 w-20 bg-blue-500">Example Node</div>
-			<div className="absolute h-full w-full">
-				{Object.values(flowEditor.nodes).map((node) => (
-					<DefaultNode
-						key={node.id}
-						node={node as any}
-						isSelected
-						onClick={(event) => {
-							handleNodeClick(node.id, event);
-						}}
-					/>
-				))}
-			</div>
+			<Background flowEditor={flowEditor} />
+			<Draggable flowEditor={flowEditor}>
+				<div className="absolute left-10 top-10 h-20 w-20 bg-blue-500">Draggable</div>
+				<div className="absolute h-full w-full">
+					{Object.values(flowEditor.nodes).map((node) => (
+						<DefaultNode
+							key={node.id}
+							node={node as any}
+							isSelected
+							onClick={(event) => {
+								handleNodeClick(node.id, event);
+							}}
+						/>
+					))}
+				</div>
+			</Draggable>
+			<div className="absolute left-10 top-10 h-20 w-20 bg-red-500">Fixed</div>
 		</Board>
 	);
 };
