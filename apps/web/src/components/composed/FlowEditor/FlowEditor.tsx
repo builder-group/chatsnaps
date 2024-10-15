@@ -22,16 +22,16 @@ export const FlowEditor: React.FC = () => {
 					type: 'Panning',
 					start: { x: event.clientX, y: event.clientY },
 					origin: {
-						x: flowEditor.viewport._value.position.x,
-						y: flowEditor.viewport._value.position.y
+						x: flowEditor.viewport._v.position.x,
+						y: flowEditor.viewport._v.position.y
 					}
 				});
 			}
 		};
 
 		const handleMouseMove = (event: MouseEvent): void => {
-			if (flowEditor.interaction._value.type === 'Panning') {
-				const { start, origin } = flowEditor.interaction._value;
+			if (flowEditor.interaction._v.type === 'Panning') {
+				const { start, origin } = flowEditor.interaction._v;
 				const deltaX = event.clientX - start.x;
 				const deltaY = event.clientY - start.y;
 				flowEditor.viewport.set((v) => ({
@@ -52,7 +52,7 @@ export const FlowEditor: React.FC = () => {
 			// Zooming
 			if (event.ctrlKey) {
 				event.preventDefault();
-				const { scale, position } = flowEditor.viewport._value;
+				const { scale, position } = flowEditor.viewport._v;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
 
@@ -97,7 +97,7 @@ export const FlowEditor: React.FC = () => {
 	const handleNodeClick = React.useCallback(
 		(nodeId: string, event: React.MouseEvent) => {
 			if (event.shiftKey) {
-				flowEditor.selected._value.push(nodeId);
+				flowEditor.selected._v.push(nodeId);
 				flowEditor.selected._notify();
 			} else {
 				flowEditor.selected.set([nodeId]);

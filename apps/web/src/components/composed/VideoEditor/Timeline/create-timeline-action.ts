@@ -19,15 +19,15 @@ export function createTimelineAction(
 		_timeline: timeline,
 		interaction: createState('NONE' as TTimelineActionInteraction),
 		x(this: TTimelineAction) {
-			return parseTimeToPixel(this._value.start, this._timeline.scale._value);
+			return parseTimeToPixel(this._v.start, this._timeline.scale._v);
 		},
 		y(this: TTimelineAction) {
-			const index = this._timeline.trackIds._value.findIndex((id) => id === this._value.trackId);
+			const index = this._timeline.trackIds._v.findIndex((id) => id === this._v.trackId);
 			return index * this._timeline._config.trackHeight;
 		},
 		width(this: TTimelineAction) {
-			return parseTimeToPixel(this._value.duration, {
-				...this._timeline.scale._value,
+			return parseTimeToPixel(this._v.duration, {
+				...this._timeline.scale._v,
 				startLeft: 0
 			});
 		},

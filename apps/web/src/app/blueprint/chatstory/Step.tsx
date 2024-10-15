@@ -48,21 +48,21 @@ export const Step: React.FC<TProps> = (props) => {
 		);
 	}
 
-	if ($blueprint._value.steps.length < step) {
-		replace(getPath(id, $blueprint._value.steps.length));
+	if ($blueprint._v.steps.length < step) {
+		replace(getPath(id, $blueprint._v.steps.length));
 		return null;
 	}
 
 	switch (step) {
 		case 1: {
-			const stepData = $blueprint._value.steps[step - 1];
+			const stepData = $blueprint._v.steps[step - 1];
 			if (stepData?.step === 1) {
 				return <Step1 step={stepData} $blueprint={$blueprint} />;
 			}
 			break;
 		}
 		case 2: {
-			const stepData = $blueprint._value.steps[step - 1];
+			const stepData = $blueprint._v.steps[step - 1];
 			if (stepData?.step === 2) {
 				return <Step2 step={stepData} />;
 			}

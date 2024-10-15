@@ -96,17 +96,17 @@ importers:
         specifier: ^0.0.30
         version: 0.0.30
       feature-form:
-        specifier: ^0.0.28
-        version: 0.0.28
+        specifier: ^0.0.29
+        version: 0.0.29
       feature-logger:
         specifier: ^0.0.23
         version: 0.0.23
       feature-react:
-        specifier: ^0.0.28
-        version: 0.0.28(react@18.3.1)
+        specifier: ^0.0.29
+        version: 0.0.29(react@18.3.1)
       feature-state:
-        specifier: ^0.0.33
-        version: 0.0.33
+        specifier: ^0.0.34
+        version: 0.0.34
       fflate:
         specifier: ^0.8.2
         version: 0.8.2
@@ -1742,8 +1742,8 @@ packages:
   '@microsoft/tsdoc@0.14.2':
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
 
-  '@million/install@1.0.9':
-    resolution: {integrity: sha512-tJk7azrjsIkHl/xTppFw8K7M/CIrqa1y9J75By+dtW6jZBQi51DQlsp5J1SuAcTR89XwpGEuhN29HOvHosblPw==}
+  '@million/install@1.0.11':
+    resolution: {integrity: sha512-koRlY6tCYa6isBUTheP0pL7PC31pBY1QlL8F/Yaorcx6gIyZSJNVqTGBDqLvDeeV8QcmD/S9mswSazI/FsyGKQ==}
     hasBin: true
 
   '@million/lint@1.0.9':
@@ -3937,6 +3937,9 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
+  effect@3.9.2:
+    resolution: {integrity: sha512-1sx/v1HTWHTodXfzWxAFg+SCF+ACgpJVruaAMIh/NmDVvrUsf0x9PzpXvkgJUbQ1fMdmKYK//FqxeHSQ+Zxv/Q==}
+
   ejs@3.1.10:
     resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
     engines: {node: '>=0.10.0'}
@@ -4408,22 +4411,19 @@ packages:
   feature-fetch@0.0.30:
     resolution: {integrity: sha512-OiK/LvC8bHdKW0CCDlFFU80QMCMF+TMceOwHgR82KoR9Sy9WCwzjOZ8o6zkKlLReWcVXuVbHUtVwHL933QWodw==}
 
-  feature-form@0.0.28:
-    resolution: {integrity: sha512-FdAh/he4kyl1OC6Ys+fjQzD1xX817c3EqTKreWlzILvGK8kW5fM5j7qC3lDq101xxGyYA3dkMfotIZ8ahokSFw==}
+  feature-form@0.0.29:
+    resolution: {integrity: sha512-NQJBfzKX9kjJSKd6LNkOqfQqKKbREv9RjemLKjznPn8XVMJm05Et105xHEe2EdTlYu0EJ5joM4BLWKz8FLzSZw==}
 
   feature-logger@0.0.23:
     resolution: {integrity: sha512-5OfwQr3fvFp+gay/DNWVwXcGaVK0aM9tXswjI+EXS7RJUAUv3fOdzMhoP+uq7Hee0qH+IDTYql8IQALB8RfhbQ==}
 
-  feature-react@0.0.28:
-    resolution: {integrity: sha512-j1Xzj9fqt6RMvLbEpRzceXKOPpa2cD+ToLfeCfQSiUOH7WTCI2WznJr7tNigDNDur7cy8TArIOWS1gK7bV0Afw==}
+  feature-react@0.0.29:
+    resolution: {integrity: sha512-A0+OMFvJj5FHM2XEhD4BI/6VMiwImAPlDtrsobMQeGK7T5HHOra20udOP/mNbac0zUmv+J5mO4UaubyvL+z/EQ==}
     peerDependencies:
       react: ^18.3.1
 
-  feature-state@0.0.29:
-    resolution: {integrity: sha512-xwy37vAjaAWxVhdWEVEMWIL6tgMgG1nhUIvWhNVUnZiwDsEvN66CMypADnGAkyFRy3GWdfIyoZGF5VgHsE1wFw==}
-
-  feature-state@0.0.33:
-    resolution: {integrity: sha512-9UCdVekBjWOsyq8zYaxBgyIuTWiwkf+KYyteTPCNrwyjRsTJcGVPlIc2M3eT5uT0JvTh2LUmMRN7ahd8XCDyjQ==}
+  feature-state@0.0.34:
+    resolution: {integrity: sha512-gvcTTHHfTdM0Rn/WS67Dqu+/OvlBNDWAWKoV71YyyANpHP9mfo/d8ZiWfFSmagzweba6uUP5ZotpnDebZ6q2bQ==}
 
   fecha@4.2.3:
     resolution: {integrity: sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==}
@@ -9222,7 +9222,7 @@ snapshots:
 
   '@microsoft/tsdoc@0.14.2': {}
 
-  '@million/install@1.0.9':
+  '@million/install@1.0.11':
     dependencies:
       '@antfu/ni': 0.21.12
       '@axiomhq/js': 1.0.0-rc.3
@@ -9232,6 +9232,7 @@ snapshots:
       ast-types: 0.14.2
       cli-high: 0.4.2
       diff: 5.2.0
+      effect: 3.9.2
       nanoid: 5.0.7
       recast: 0.23.9
       xycolors: 0.1.2
@@ -9242,7 +9243,7 @@ snapshots:
       '@babel/core': 7.25.2
       '@babel/types': 7.25.2
       '@hono/node-server': 1.13.1(hono@4.6.3)
-      '@million/install': 1.0.9
+      '@million/install': 1.0.11
       '@rollup/pluginutils': 5.1.2(rollup@4.24.0)
       '@rrweb/types': 2.0.0-alpha.16
       babel-plugin-syntax-hermes-parser: 0.21.1
@@ -11961,6 +11962,8 @@ snapshots:
 
   ee-first@1.1.1: {}
 
+  effect@3.9.2: {}
+
   ejs@3.1.10:
     dependencies:
       jake: 10.9.2
@@ -12951,11 +12954,11 @@ snapshots:
     transitivePeerDependencies:
       - graphql
 
-  feature-form@0.0.28:
+  feature-form@0.0.29:
     dependencies:
       '@blgc/types': 0.0.7
-      '@blgc/utils': 0.0.19
-      feature-state: 0.0.29
+      '@blgc/utils': 0.0.23
+      feature-state: 0.0.34
       validation-adapter: 0.0.12
 
   feature-logger@0.0.23:
@@ -12963,16 +12966,11 @@ snapshots:
       '@blgc/types': 0.0.7
       '@blgc/utils': 0.0.19
 
-  feature-react@0.0.28(react@18.3.1):
+  feature-react@0.0.29(react@18.3.1):
     dependencies:
       react: 18.3.1
 
-  feature-state@0.0.29:
-    dependencies:
-      '@blgc/types': 0.0.7
-      '@blgc/utils': 0.0.19
-
-  feature-state@0.0.33:
+  feature-state@0.0.34:
     dependencies:
       '@blgc/types': 0.0.7
       '@blgc/utils': 0.0.23

@@ -72,19 +72,19 @@ export const Step1: React.FC<TProps> = (props) => {
 	const onSubmit = handleSubmit({
 		onValidSubmit: async (data) => {
 			const step1: TChatStoryBlueprintStep1 = { step: 1, ...data };
-			$blueprint._value.steps[0] = step1;
+			$blueprint._v.steps[0] = step1;
 
 			const step2 = await moveToStep2(step1);
-			if ($blueprint._value.steps.length >= 2) {
-				$blueprint._value.steps[1] = step2;
+			if ($blueprint._v.steps.length >= 2) {
+				$blueprint._v.steps[1] = step2;
 			} else {
-				$blueprint._value.steps.push(step2);
+				$blueprint._v.steps.push(step2);
 			}
 
 			// Notify to persist changes, no re-render necessary because of path replacement
 			$blueprint._notify({ additionalData: { background: true } });
 
-			replace(getPath($blueprint._value.id, 2));
+			replace(getPath($blueprint._v.id, 2));
 		},
 		preventDefault: true
 	});

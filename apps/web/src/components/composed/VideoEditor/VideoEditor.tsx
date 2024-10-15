@@ -94,7 +94,7 @@ export const VideoEditor: React.FC = () => {
 							ref={mediaPlayerRef}
 							playsInline
 							onTimeUpdate={({ currentTime }) => {
-								if (timeline.playState._value === 'PLAYING') {
+								if (timeline.playState._v === 'PLAYING') {
 									timeline.currentTime.set(currentTime, {
 										additionalData: { source: 'media-player' }
 									});

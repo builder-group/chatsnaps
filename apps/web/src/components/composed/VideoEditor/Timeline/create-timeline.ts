@@ -23,7 +23,7 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 			interaction: createState<TTimelineCursorInteraction>('NONE')
 		},
 		getTrackAtIndex(this: TTimeline, index) {
-			const trackId = this.trackIds._value[index];
+			const trackId = this.trackIds._v[index];
 			if (trackId == null) {
 				return null;
 			}
@@ -34,13 +34,13 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 			return track;
 		},
 		width(this: TTimeline) {
-			return parseTimeToPixel(this.duration._value, {
-				...timeline.scale._value,
+			return parseTimeToPixel(this.duration._v, {
+				...timeline.scale._v,
 				startLeft: 0
 			});
 		},
 		height(this: TTimeline) {
-			return this.trackIds._value.length * this._config.trackHeight;
+			return this.trackIds._v.length * this._config.trackHeight;
 		}
 	};
 
@@ -53,7 +53,7 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 			continue;
 		}
 
-		timeline.trackIds._value.push(trackId);
+		timeline.trackIds._v.push(trackId);
 
 		// Create and register the track
 		const track = createTimelineTrack(timeline, { id: trackId, actionIds: [] });
@@ -85,8 +85,8 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 						// Only re-render canvas if action is visible
 						if (
 							(pA.type === 'Plugin' && pA.pluginId === 'chat-story') ||
-							(timeline.currentTime._value > value.start &&
-								timeline.currentTime._value < value.start + value.duration)
+							(timeline.currentTime._v > value.start &&
+								timeline.currentTime._v < value.start + value.duration)
 						) {
 							onChange();
 						}
@@ -94,12 +94,12 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 
 					// TODO: Figure out performant way to recompute duration
 					// and introduce fixed and dynamic duration mode
-					// if (value.start + value.duration > timeline.duration._value) {
+					// if (value.start + value.duration > timeline.duration._v) {
 					// 	timeline.duration.set(value.start + value.duration);
 					// }
 				});
 				timeline._actionMap[actionId] = action;
-				track._value.actionIds.push(actionId);
+				track._v.actionIds.push(actionId);
 			} else {
 				console.warn(`Action with ID ${actionId} not found in actionMap`);
 			}
@@ -116,7 +116,7 @@ export function createTimeline(video: TVideoComp, onChange: () => void): TTimeli
 		timeline.duration.set(
 			Math.max(
 				...Object.values(timeline._actionMap).map((action) => {
-					return action._value.start + action._value.duration;
+					return action._v.start + action._v.duration;
 				})
 			)
 		);
