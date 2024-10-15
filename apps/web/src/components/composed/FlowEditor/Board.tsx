@@ -12,13 +12,10 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	// https://stackoverflow.com/questions/68162617/whats-the-correct-way-to-use-useref-and-forwardref-together
 	useImperativeHandle(ref, () => boardRef.current as unknown as HTMLDivElement);
 
-	React.useEffect(() => {
-		const board = boardRef.current;
-		if (board == null) {
-			return;
-		}
+	const handlePointerDown = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>): void => {
+			event.preventDefault();
 
-		const handleMouseDown = (event: MouseEvent): void => {
 			if (event.button === 1) {
 				flowEditor.interactionMode.set({
 					type: 'Panning',
@@ -29,9 +26,23 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 					}
 				});
 			}
-		};
+		},
+		[flowEditor]
+	);
 
-		const handleMouseMove = (event: MouseEvent): void => {
+	const handlePointerUp = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>): void => {
+			event.preventDefault();
+
+			flowEditor.interactionMode.set({ type: 'None' });
+		},
+		[flowEditor]
+	);
+
+	const handlePointerMove = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>): void => {
+			event.preventDefault();
+
 			if (flowEditor.interactionMode._v.type === 'Panning') {
 				const { start, origin } = flowEditor.interactionMode._v;
 				const deltaX = event.clientX - start.x;
@@ -44,13 +55,18 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 					}
 				}));
 			}
-		};
+		},
+		[flowEditor]
+	);
 
-		const handleMouseUp = (): void => {
-			flowEditor.interactionMode.set({ type: 'None' });
-		};
+	const handleWheel = React.useCallback(
+		(event: React.WheelEvent<HTMLDivElement>): void => {
+			event.preventDefault();
 
-		const handleWheel = (event: WheelEvent): void => {
+			if (boardRef.current == null) {
+				return;
+			}
+
 			// Zooming
 			if (event.ctrlKey) {
 				event.preventDefault();
@@ -58,7 +74,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
 
-				const rect = board.getBoundingClientRect();
+				const rect = boardRef.current.getBoundingClientRect();
 				const cursorX = event.clientX - rect.left;
 				const cursorY = event.clientY - rect.top;
 
@@ -81,20 +97,9 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 					}
 				}));
 			}
-		};
-
-		board.addEventListener('mousedown', handleMouseDown);
-		board.addEventListener('mousemove', handleMouseMove);
-		board.addEventListener('mouseup', handleMouseUp);
-		board.addEventListener('wheel', handleWheel, { passive: false });
-
-		return () => {
-			board.removeEventListener('mousedown', handleMouseDown);
-			board.removeEventListener('mousemove', handleMouseMove);
-			board.removeEventListener('mouseup', handleMouseUp);
-			board.removeEventListener('wheel', handleWheel);
-		};
-	}, [flowEditor]);
+		},
+		[flowEditor]
+	);
 
 	// Note: Not passed into component as 'styles' because 'styles', don't support priority like !important
 	React.useEffect(() => {
@@ -131,7 +136,15 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	}, [interaction.type]);
 
 	return (
-		<div id="flow-editor_board" ref={boardRef} className="relative h-full w-full">
+		<div
+			id="flow-editor_board"
+			ref={boardRef}
+			className="relative h-full w-full"
+			onPointerDown={handlePointerDown}
+			onPointerUp={handlePointerUp}
+			onPointerMove={handlePointerMove}
+			onWheel={handleWheel}
+		>
 			{props.children}
 		</div>
 	);

@@ -1,11 +1,16 @@
 import { type TState } from 'feature-state';
 
 export interface TFlowEditor {
+	_nodes: Record<string, TFlowEditorNode>;
+	_selected: TState<string[], ['base']>;
 	interactionMode: TState<TFlowEditorInteractionMode, ['base']>;
 	interactionTool: TState<TFlowEditorInteractionTool, ['base']>;
 	viewport: TFlowEditorViewport;
-	selected: TState<string[], ['base']>;
-	nodes: Record<string, TFlowEditorNode>;
+	addSelected: (nodeId: string) => boolean;
+	removeSelected: (nodeId: string) => boolean;
+	setSelected: (nodeIds: string[]) => boolean;
+	select: (nodeIds: string[], toggleOnly?: boolean) => void;
+	unselect: () => void;
 }
 
 export type TFlowEditorViewport = TState<
@@ -26,20 +31,20 @@ export interface TFlowEditorNode<
 	GType extends TNodeDataTypes = string,
 	GData extends TNodeData<GType> = TNodeData<GType>
 > {
-	_config: TFlowEditorNodeConfig<GType>;
+	//_config: TFlowEditorNodeConfig<GType>;
 	id: string;
+	type: GType;
 	position: TState<TPosition, ['base']>;
 	data: TState<GData, ['base']>;
 	selected: TState<boolean, ['base']>;
 	locked: TState<boolean, ['base']>;
 }
 
-interface TFlowEditorNodeConfig<GType extends string = string> {
-	type: GType;
-}
+// interface TFlowEditorNodeConfig<GType extends string = string> {
+// }
 
 export type TNodesDataMap = {
-	default: { label: string };
+	default: { label: string; color?: string };
 } & TThirdPartyNodeDataMap &
 	Record<string, any>;
 

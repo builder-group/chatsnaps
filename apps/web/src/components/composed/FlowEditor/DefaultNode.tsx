@@ -2,32 +2,33 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions -- WIP */
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
+import { cn } from '@/lib';
 
 import { type TFlowEditorNode } from './types';
 
 export const DefaultNode: React.FC<TProps> = (props) => {
-	const { node, isSelected, onClick } = props;
+	const { node, onClick } = props;
 	const position = useGlobalState(node.position);
-	const data = useGlobalState(node.data);
+	const { label, color = '#d3d3d3' } = useGlobalState(node.data);
+	const isSelected = useGlobalState(node.selected);
 
 	return (
 		<div
-			className={`absolute cursor-pointer select-none rounded-md p-2 ${
-				isSelected ? 'ring-2 ring-blue-500' : ''
-			}`}
+			className={cn('absolute cursor-pointer select-none rounded-md p-2', {
+				'ring-2 ring-blue-500': isSelected
+			})}
 			style={{
-				backgroundColor: data.color,
+				backgroundColor: color,
 				transform: `translate(${position.x.toString()}px, ${position.y.toString()}px)`
 			}}
 			onClick={onClick}
 		>
-			{data.label}
+			{label}
 		</div>
 	);
 };
 
 interface TProps {
-	node: TFlowEditorNode<{ label: string; color: string }>;
-	isSelected: boolean;
+	node: TFlowEditorNode<'default'>;
 	onClick: (event: React.MouseEvent) => void;
 }

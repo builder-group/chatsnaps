@@ -41,8 +41,18 @@ export const Background: React.FC<TProps> = (props) => {
 		);
 	}, [scale, minOpacity, maxOpacity, opacityFadeStartScale, opacityFadeEndScale]);
 
+	// TODO: Blocked by board
+	const handlePointerDown = React.useCallback(
+		(event: React.PointerEvent<SVGSVGElement>): void => {
+			if (event.button === 1) {
+				flowEditor.unselect();
+			}
+		},
+		[flowEditor]
+	);
+
 	return (
-		<svg className="absolute h-full w-full origin-top-left">
+		<svg className="absolute h-full w-full origin-top-left" onPointerDown={handlePointerDown}>
 			<pattern
 				id={DOT_PATTERN_ID}
 				width={adjustedSpacing}

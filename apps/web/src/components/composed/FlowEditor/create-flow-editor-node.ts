@@ -8,9 +8,7 @@ export function createFlowEditorNode<
 >(type: GType, config: TCreateFlowEditorNodeConfig<GType, GData>): TFlowEditorNode<GType, GData> {
 	const { id, data, position, locked = false, selected = false } = config;
 	return {
-		_config: {
-			type
-		},
+		type,
 		id,
 		position: createState(position),
 		data: createState(data),

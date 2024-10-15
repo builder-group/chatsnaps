@@ -3,7 +3,7 @@ import { FlowEditor } from '@/components';
 
 const Page: React.FC = () => {
 	return (
-		<div className="h-screen w-screen overflow-hidden">
+		<div className="h-[1000px] w-[1000px] overflow-hidden border border-black">
 			<FlowEditor />
 		</div>
 	);

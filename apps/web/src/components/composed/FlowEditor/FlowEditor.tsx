@@ -16,8 +16,13 @@ export const FlowEditor: React.FC = () => {
 				nodes: [
 					createFlowEditorNode('default', {
 						id: '1',
-						position: { x: 0, y: 0 },
-						data: { label: 'test' }
+						position: { x: 500, y: 500 },
+						data: { label: 'Node 1' }
+					}),
+					createFlowEditorNode('default', {
+						id: '2',
+						position: { x: 400, y: 500 },
+						data: { label: 'Node 2' }
 					})
 				]
 			}),
