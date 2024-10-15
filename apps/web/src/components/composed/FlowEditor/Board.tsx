@@ -1,10 +1,11 @@
 import { useGlobalState } from 'feature-react/state';
 import React, { useImperativeHandle } from 'react';
+import { cn } from '@/lib';
 
 import { type TFlowEditor } from './types';
 
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
-	const { flowEditor } = props;
+	const { flowEditor, className } = props;
 	const interaction = useGlobalState(flowEditor.interactionMode);
 
 	const boardRef = React.useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	);
 
 	const handleWheel = React.useCallback(
-		(event: React.WheelEvent<HTMLDivElement>): void => {
+		(event: WheelEvent): void => {
 			event.preventDefault();
 
 			if (boardRef.current == null) {
@@ -69,7 +70,6 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 
 			// Zooming
 			if (event.ctrlKey) {
-				event.preventDefault();
 				const { scale, position } = flowEditor.viewport._v;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
@@ -100,6 +100,17 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 		},
 		[flowEditor]
 	);
+
+	// React's onWheel handler defaults to "passive: true", which prevents calling preventDefault() to stop the outer scroll.
+	// To override this, we manually attach the "wheel" event listener with { passive: false } inside useEffect.
+	React.useEffect(() => {
+		if (boardRef.current != null) {
+			boardRef.current.addEventListener('wheel', handleWheel, { passive: false });
+		}
+		return () => {
+			boardRef.current?.removeEventListener('wheel', handleWheel);
+		};
+	}, [handleWheel]);
 
 	// Note: Not passed into component as 'styles' because 'styles', don't support priority like !important
 	React.useEffect(() => {
@@ -139,11 +150,11 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 		<div
 			id="flow-editor_board"
 			ref={boardRef}
-			className="relative h-full w-full"
+			className={cn('relative h-full w-full overflow-hidden', className)}
 			onPointerDown={handlePointerDown}
 			onPointerUp={handlePointerUp}
 			onPointerMove={handlePointerMove}
-			onWheel={handleWheel}
+			style={{ pointerEvents: 'none', touchAction: 'none' }}
 		>
 			{props.children}
 		</div>
@@ -154,4 +165,5 @@ Board.displayName = 'Board';
 interface TProps {
 	flowEditor: TFlowEditor;
 	children?: React.ReactElement[] | React.ReactElement;
+	className?: string;
 }

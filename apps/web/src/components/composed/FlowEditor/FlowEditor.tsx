@@ -9,7 +9,8 @@ import { createFlowEditorNode } from './create-flow-editor-node';
 import { Draggable } from './Draggable';
 import { Nodes } from './Nodes';
 
-export const FlowEditor: React.FC = () => {
+export const FlowEditor: React.FC<TProps> = (props) => {
+	const { className } = props;
 	const flowEditor = React.useMemo(
 		() =>
 			createFlowEditor({
@@ -30,7 +31,7 @@ export const FlowEditor: React.FC = () => {
 	);
 
 	return (
-		<Board flowEditor={flowEditor}>
+		<Board flowEditor={flowEditor} className={className}>
 			<Background flowEditor={flowEditor} />
 			<Draggable flowEditor={flowEditor}>
 				<div
@@ -45,3 +46,7 @@ export const FlowEditor: React.FC = () => {
 		</Board>
 	);
 };
+
+interface TProps {
+	className?: string;
+}

@@ -19,7 +19,8 @@ export const DefaultNode: React.FC<TProps> = (props) => {
 			})}
 			style={{
 				backgroundColor: color,
-				transform: `translate(${position.x.toString()}px, ${position.y.toString()}px)`
+				transform: `translate(${position.x.toString()}px, ${position.y.toString()}px)`,
+				pointerEvents: 'auto'
 			}}
 			onClick={onClick}
 		>
