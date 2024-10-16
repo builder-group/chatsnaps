@@ -3,10 +3,10 @@ import React from 'react';
 
 import { type TSize } from '../types';
 
-export function useUpdateSize<T extends HTMLElement = HTMLDivElement>(
+export function useSizeObserver<T extends HTMLElement = HTMLDivElement>(
 	ref: React.RefObject<T>,
 	sizeState: TState<TSize, ['base']>,
-	measureSize = true
+	observeSize = true
 ): void {
 	const handleSize = React.useCallback(
 		(entries: ResizeObserverEntry[]) => {
@@ -27,7 +27,7 @@ export function useUpdateSize<T extends HTMLElement = HTMLDivElement>(
 
 	React.useEffect(() => {
 		let resizeObserver: ResizeObserver | null = null;
-		if (measureSize && ref.current != null) {
+		if (observeSize && ref.current != null) {
 			resizeObserver = new ResizeObserver(handleSize);
 			resizeObserver.observe(ref.current);
 		}
@@ -35,5 +35,5 @@ export function useUpdateSize<T extends HTMLElement = HTMLDivElement>(
 		return () => {
 			resizeObserver?.disconnect();
 		};
-	}, [ref, measureSize, handleSize]);
+	}, [ref, observeSize, handleSize]);
 }

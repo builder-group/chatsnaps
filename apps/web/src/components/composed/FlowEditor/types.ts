@@ -1,3 +1,4 @@
+import { type XYPosition } from '@xyflow/react';
 import { type TState } from 'feature-state';
 
 export interface TFlowEditor {
@@ -8,17 +9,24 @@ export interface TFlowEditor {
 	interactionTool: TState<TFlowEditorInteractionTool, ['base']>;
 	viewport: TState<TTransform, ['base']>;
 	size: TState<TSize, ['base']>;
+	boundingRect: TState<TBoundingRect, ['base']>;
 	addSelected: (nodeId: string) => boolean;
 	removeSelected: (nodeId: string) => boolean;
 	setSelected: (nodeIds: string[]) => boolean;
 	select: (nodeIds: string[], toggleOnly?: boolean) => void;
 	unselect: () => void;
+	viewportPointToBoardPoint: (point: TXYPosition) => XYPosition;
+	boardPointToViewportPoint: (point: TXYPosition) => XYPosition;
+	pointerEventToViewportPoint: (
+		pointerEvent: PointerEvent | { clientX: number; clientY: number }
+	) => XYPosition;
 	getVisibleNodes: () => TFlowEditorNode[];
 }
 
 export interface TFlowEditorConfig {
 	snapGrid: TSnapGrid;
 	measureSize: boolean;
+	measureBoundingRect: boolean;
 	debug: boolean;
 }
 
@@ -70,7 +78,7 @@ export type TExtendedNodeDataTypes = Exclude<TNodeDataTypes, TDefaultNodeDataTyp
 
 export interface TNodeProps<GType extends TNodeDataTypes = string> {
 	node: TFlowEditorNode<GType>;
-	onClick: (event: React.MouseEvent) => void;
+	onPointerDown: (event: React.PointerEvent) => void;
 }
 
 export type TNodeFC<GType extends TNodeDataTypes> = React.FC<TNodeProps<GType>>;
@@ -82,6 +90,11 @@ export type TExtendedNodeMap = {
 	[GType in TExtendedNodeDataTypes]: TNodeFC<GType>;
 };
 export type TNodeMap = TDefaultNodeMap & TExtendedNodeMap;
+
+export interface TBoundingRect {
+	left: number;
+	top: number;
+}
 
 export interface TXYPosition {
 	x: number;

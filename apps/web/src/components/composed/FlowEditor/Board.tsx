@@ -2,8 +2,8 @@ import { useGlobalState } from 'feature-react/state';
 import React, { useImperativeHandle } from 'react';
 import { cn } from '@/lib';
 
-import { useUpdateSize } from './hooks';
-import { type TFlowEditor, type TXYPosition } from './types';
+import { useBoundingRectObserver, useSizeObserver } from './hooks';
+import { type TFlowEditor } from './types';
 
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	const { flowEditor, className } = props;
@@ -13,22 +13,8 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	// https://stackoverflow.com/questions/68162617/whats-the-correct-way-to-use-useref-and-forwardref-together
 	useImperativeHandle(ref, () => boardRef.current as unknown as HTMLDivElement);
 
-	useUpdateSize(boardRef, flowEditor.size, flowEditor._config.measureSize);
-
-	const pointToBoardPoint = React.useCallback((point: TXYPosition) => {
-		const rect = boardRef.current?.getBoundingClientRect();
-		if (rect == null) {
-			return point;
-		}
-		return { x: point.x - rect.left, y: point.y - rect.top };
-	}, []);
-
-	const pointerEventToBoardPoint = React.useCallback(
-		(event: PointerEvent | { clientX: number; clientY: number }) => {
-			return pointToBoardPoint({ x: event.clientX, y: event.clientY });
-		},
-		[pointToBoardPoint]
-	);
+	useSizeObserver(boardRef, flowEditor.size, flowEditor._config.measureSize);
+	useBoundingRectObserver(boardRef, flowEditor.boundingRect);
 
 	const handlePointerDown = React.useCallback(
 		(event: React.PointerEvent<HTMLDivElement>): void => {
@@ -38,7 +24,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				case 1:
 					flowEditor.interactionMode.set({
 						type: 'Panning',
-						origin: pointerEventToBoardPoint(event),
+						origin: flowEditor.pointerEventToViewportPoint(event),
 						start: {
 							x: flowEditor.viewport._v[0],
 							y: flowEditor.viewport._v[1]
@@ -48,7 +34,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				default:
 					flowEditor.interactionMode.set({
 						type: 'Pressing',
-						origin: pointerEventToBoardPoint(event),
+						origin: flowEditor.pointerEventToViewportPoint(event),
 						button: event.button
 					});
 			}
@@ -72,7 +58,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 			switch (flowEditor.interactionMode._v.type) {
 				case 'Panning': {
 					const { origin, start } = flowEditor.interactionMode._v;
-					const { x: cursorX, y: cursorY } = pointerEventToBoardPoint(event);
+					const { x: cursorX, y: cursorY } = flowEditor.pointerEventToViewportPoint(event);
 					const deltaX = cursorX - origin.x;
 					const deltaY = cursorY - origin.y;
 					flowEditor.viewport.set((v) => [start.x + deltaX, start.y + deltaY, v[2]]);
@@ -82,7 +68,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				// do nothing
 			}
 		},
-		[flowEditor, pointerEventToBoardPoint]
+		[flowEditor]
 	);
 
 	const handleWheel = React.useCallback(
@@ -94,7 +80,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				const [x, y, scale] = flowEditor.viewport._v;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
-				const { x: cursorX, y: cursorY } = pointerEventToBoardPoint(event);
+				const { x: cursorX, y: cursorY } = flowEditor.pointerEventToViewportPoint(event);
 
 				const currentX = x;
 				const currentY = y;
@@ -111,7 +97,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				flowEditor.viewport.set((v) => [v[0] - deltaX, v[1] - deltaY, v[2]]);
 			}
 		},
-		[flowEditor, pointerEventToBoardPoint]
+		[flowEditor]
 	);
 
 	// React's onWheel handler defaults to "passive: true", which prevents calling preventDefault() to stop the outer scroll.

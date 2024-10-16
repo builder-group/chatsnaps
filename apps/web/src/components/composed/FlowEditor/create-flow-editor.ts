@@ -1,6 +1,11 @@
 import { createState } from 'feature-state';
 
 import {
+	boardPointToViewportPoint,
+	pointerEventToViewportPoint,
+	viewportPointToBoardPoint
+} from './helper';
+import {
 	type TFlowEditor,
 	type TFlowEditorConfig,
 	type TFlowEditorInteractionMode,
@@ -15,11 +20,12 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		snapGrid = [50, 50],
 		size = { width: 500, height: 500 },
 		measureSize = config.size == null,
-		debug = false
+		debug = false,
+		measureBoundingRect = true
 	} = config;
 
 	return {
-		_config: { snapGrid, measureSize, debug },
+		_config: { snapGrid, measureSize, debug, measureBoundingRect },
 		_nodes: nodes.reduce<Record<string, TFlowEditorNode>>((obj, node) => {
 			obj[node.id] = node;
 			return obj;
@@ -29,6 +35,7 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		interactionTool: createState<TFlowEditorInteractionTool>({ type: 'Select' }),
 		viewport: createState([0, 0, 1]),
 		size: createState(size),
+		boundingRect: createState({ left: 0, top: 0 }),
 		addSelected(this: TFlowEditor, nodeId) {
 			const node = this._nodes[nodeId];
 			if (node == null) {
@@ -106,6 +113,15 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 
 			this._selected._v = [];
 			this._selected._notify();
+		},
+		viewportPointToBoardPoint(this: TFlowEditor, point) {
+			return viewportPointToBoardPoint(point, this.viewport._v, this._config.snapGrid);
+		},
+		boardPointToViewportPoint(this: TFlowEditor, point) {
+			return boardPointToViewportPoint(point, this.viewport._v);
+		},
+		pointerEventToViewportPoint(this: TFlowEditor, pointerEvent) {
+			return pointerEventToViewportPoint(pointerEvent, this.boundingRect._v);
 		},
 		getVisibleNodes(this: TFlowEditor) {
 			const visibleNodes: TFlowEditorNode[] = [];

@@ -1,1 +1,1 @@
-export * from './render-point';
+export * from './viewport-point';

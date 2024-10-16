@@ -5,13 +5,23 @@ import { type TFlowEditor, type TNodeMap } from './types';
 export const NodeRenderer: React.FC<TProps> = (props) => {
 	const { flowEditor, nodeMap } = props;
 
-	const handleNodeClick = React.useCallback(
-		(nodeId: string, event: React.MouseEvent) => {
+	const handlePointerDown = React.useCallback(
+		(nodeId: string, event: React.PointerEvent) => {
+			event.preventDefault();
+			// Prevent event bubbling to Board listener (may be needed later for nested selection support)
+			event.stopPropagation();
+
 			if (event.shiftKey) {
 				flowEditor.select([nodeId]);
 			} else {
 				flowEditor.setSelected([nodeId]);
 			}
+
+			flowEditor.interactionMode.set({
+				type: 'Translating',
+				origin: flowEditor.pointerEventToViewportPoint(event),
+				current: { x: 0, y: 0 } // TODO:
+			});
 		},
 		[flowEditor]
 	);
@@ -28,8 +38,8 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 					<NodeComponent
 						key={node.id}
 						node={node}
-						onClick={(event) => {
-							handleNodeClick(node.id, event);
+						onPointerDown={(event) => {
+							handlePointerDown(node.id, event);
 						}}
 					/>
 				);
