@@ -81,6 +81,7 @@ export type TExtendedNodeDataTypes = Exclude<TNodeDataTypes, TDefaultNodeDataTyp
 export interface TNodeProps<GType extends TNodeDataTypes = string> {
 	node: TFlowEditorNode<GType>;
 	onPointerDown: (event: React.PointerEvent) => void;
+	onPointerUp: (event: React.PointerEvent) => void;
 }
 
 export type TNodeFC<GType extends TNodeDataTypes> = React.FC<TNodeProps<GType>>;
