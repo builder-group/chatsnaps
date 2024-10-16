@@ -7,7 +7,7 @@ import { type TFlowEditor } from './types';
 
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	const { flowEditor, className } = props;
-	const interaction = useGlobalState(flowEditor.interactionMode);
+	const interaction = useGlobalState(flowEditor.interactionMode); // TODO: only re-render on type change with useSelector?
 	const boardRef = React.useRef<HTMLDivElement>(null);
 
 	// https://stackoverflow.com/questions/68162617/whats-the-correct-way-to-use-useref-and-forwardref-together
@@ -21,16 +21,15 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 			event.preventDefault();
 
 			switch (event.button) {
-				case 1:
+				case 1: {
+					const origin = flowEditor.pointerEventToViewportPoint(event);
 					flowEditor.interactionMode.set({
 						type: 'Panning',
-						origin: flowEditor.pointerEventToViewportPoint(event),
-						start: {
-							x: flowEditor.viewport._v[0],
-							y: flowEditor.viewport._v[1]
-						}
+						origin,
+						current: origin
 					});
 					break;
+				}
 				default:
 					flowEditor.interactionMode.set({
 						type: 'Pressing',
@@ -57,11 +56,29 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 
 			switch (flowEditor.interactionMode._v.type) {
 				case 'Panning': {
-					const { origin, start } = flowEditor.interactionMode._v;
-					const { x: cursorX, y: cursorY } = flowEditor.pointerEventToViewportPoint(event);
-					const deltaX = cursorX - origin.x;
-					const deltaY = cursorY - origin.y;
-					flowEditor.viewport.set((v) => [start.x + deltaX, start.y + deltaY, v[2]]);
+					const { current } = flowEditor.interactionMode._v;
+					const cursor = flowEditor.pointerEventToViewportPoint(event);
+					const deltaX = cursor.x - current.x;
+					const deltaY = cursor.y - current.y;
+
+					flowEditor.viewport.set((v) => [v[0] + deltaX, v[1] + deltaY, v[2]]);
+
+					flowEditor.interactionMode._v.current = cursor;
+					// flowEditor.interactionMode._notify(); // TODO: Not notifying until selector
+					break;
+				}
+				case 'Translating': {
+					const { current } = flowEditor.interactionMode._v;
+					const cursor = flowEditor.pointerEventToViewportPoint(event);
+					const deltaX = cursor.x - current.x;
+					const deltaY = cursor.y - current.y;
+
+					for (const node of flowEditor.getSelectedNodes()) {
+						node.position.set((n) => ({ x: n.x + deltaX, y: n.y + deltaY }));
+					}
+
+					flowEditor.interactionMode._v.current = cursor;
+					// flowEditor.interactionMode._notify(); // TODO: Not notifying until selector
 					break;
 				}
 				default:

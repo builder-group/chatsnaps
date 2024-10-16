@@ -20,6 +20,8 @@ export interface TFlowEditor {
 	pointerEventToViewportPoint: (
 		pointerEvent: PointerEvent | { clientX: number; clientY: number }
 	) => XYPosition;
+	getNode: (nodeId: string) => TFlowEditorNode | null;
+	getSelectedNodes: () => TFlowEditorNode[];
 	getVisibleNodes: () => TFlowEditorNode[];
 }
 
@@ -36,7 +38,7 @@ export type TFlowEditorInteractionMode =
 	// When the user's pointer is pressed.
 	| { type: 'Pressing'; origin: TXYPosition; button: number }
 	// When the user is dragging
-	| { type: 'Panning'; start: TXYPosition; origin: TXYPosition }
+	| { type: 'Panning'; origin: TXYPosition; current: TXYPosition }
 	// When the user is moving selected nodes
 	| { type: 'Translating'; origin: TXYPosition; current: TXYPosition };
 

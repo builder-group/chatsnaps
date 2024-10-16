@@ -17,10 +17,11 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 				flowEditor.setSelected([nodeId]);
 			}
 
+			const origin = flowEditor.pointerEventToViewportPoint(event);
 			flowEditor.interactionMode.set({
 				type: 'Translating',
-				origin: flowEditor.pointerEventToViewportPoint(event),
-				current: { x: 0, y: 0 } // TODO:
+				origin,
+				current: origin
 			});
 		},
 		[flowEditor]

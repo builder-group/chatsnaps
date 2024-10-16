@@ -1,4 +1,5 @@
 import { createState } from 'feature-state';
+import { notEmpty } from '@blgc/utils';
 
 import {
 	boardPointToViewportPoint,
@@ -122,6 +123,12 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		},
 		pointerEventToViewportPoint(this: TFlowEditor, pointerEvent) {
 			return pointerEventToViewportPoint(pointerEvent, this.boundingRect._v);
+		},
+		getNode(this: TFlowEditor, nodeId) {
+			return this._nodes[nodeId] ?? null;
+		},
+		getSelectedNodes(this: TFlowEditor) {
+			return this._selected._v.map((nodeId) => this.getNode(nodeId)).filter(notEmpty);
 		},
 		getVisibleNodes(this: TFlowEditor) {
 			const visibleNodes: TFlowEditorNode[] = [];
