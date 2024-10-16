@@ -14,11 +14,12 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		nodes = [],
 		snapGrid = [50, 50],
 		size = { width: 500, height: 500 },
-		measureSize = config.size == null
+		measureSize = config.size == null,
+		debug = false
 	} = config;
 
 	return {
-		_config: { snapGrid, measureSize },
+		_config: { snapGrid, measureSize, debug },
 		_nodes: nodes.reduce<Record<string, TFlowEditorNode>>((obj, node) => {
 			obj[node.id] = node;
 			return obj;

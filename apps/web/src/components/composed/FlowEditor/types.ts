@@ -19,11 +19,18 @@ export interface TFlowEditor {
 export interface TFlowEditorConfig {
 	snapGrid: TSnapGrid;
 	measureSize: boolean;
+	debug: boolean;
 }
 
 export type TFlowEditorInteractionMode =
+	// Default Artboard mode. Nothing is happening
 	| { type: 'None' }
-	| { type: 'Panning'; start: TXYPosition; origin: TXYPosition };
+	// When the user's pointer is pressed.
+	| { type: 'Pressing'; origin: TXYPosition; button: number }
+	// When the user is dragging
+	| { type: 'Panning'; start: TXYPosition; origin: TXYPosition }
+	// When the user is moving selected nodes
+	| { type: 'Translating'; origin: TXYPosition; current: TXYPosition };
 
 export type TFlowEditorInteractionTool = { type: 'Select' } | { type: 'Todo' };
 

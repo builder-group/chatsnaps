@@ -31,10 +31,21 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 						position: { x: 400, y: 500 },
 						data: { label: 'Node 2' }
 					})
-				]
+				],
+				debug: true
 			}),
 		[]
 	);
+
+	React.useEffect(() => {
+		if (!flowEditor._config.debug) {
+			return;
+		}
+
+		flowEditor.interactionMode.listen(({ value }) => {
+			console.log('[InteractionMode]', { value });
+		});
+	}, [flowEditor, flowEditor._config.debug]);
 
 	return (
 		<Board flowEditor={flowEditor} className={className}>

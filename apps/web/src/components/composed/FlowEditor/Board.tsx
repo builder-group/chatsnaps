@@ -3,7 +3,7 @@ import React, { useImperativeHandle } from 'react';
 import { cn } from '@/lib';
 
 import { useUpdateSize } from './hooks';
-import { type TFlowEditor } from './types';
+import { type TFlowEditor, type TXYPosition } from './types';
 
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	const { flowEditor, className } = props;
@@ -15,19 +15,42 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 
 	useUpdateSize(boardRef, flowEditor.size, flowEditor._config.measureSize);
 
+	const pointToBoardPoint = React.useCallback((point: TXYPosition) => {
+		const rect = boardRef.current?.getBoundingClientRect();
+		if (rect == null) {
+			return point;
+		}
+		return { x: point.x - rect.left, y: point.y - rect.top };
+	}, []);
+
+	const pointerEventToBoardPoint = React.useCallback(
+		(event: PointerEvent | { clientX: number; clientY: number }) => {
+			return pointToBoardPoint({ x: event.clientX, y: event.clientY });
+		},
+		[pointToBoardPoint]
+	);
+
 	const handlePointerDown = React.useCallback(
 		(event: React.PointerEvent<HTMLDivElement>): void => {
 			event.preventDefault();
 
-			if (event.button === 1) {
-				flowEditor.interactionMode.set({
-					type: 'Panning',
-					start: { x: event.clientX, y: event.clientY },
-					origin: {
-						x: flowEditor.viewport._v[0],
-						y: flowEditor.viewport._v[1]
-					}
-				});
+			switch (event.button) {
+				case 1:
+					flowEditor.interactionMode.set({
+						type: 'Panning',
+						origin: pointerEventToBoardPoint(event),
+						start: {
+							x: flowEditor.viewport._v[0],
+							y: flowEditor.viewport._v[1]
+						}
+					});
+					break;
+				default:
+					flowEditor.interactionMode.set({
+						type: 'Pressing',
+						origin: pointerEventToBoardPoint(event),
+						button: event.button
+					});
 			}
 		},
 		[flowEditor]
@@ -48,36 +71,30 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 
 			switch (flowEditor.interactionMode._v.type) {
 				case 'Panning': {
-					const { start, origin } = flowEditor.interactionMode._v;
-					const deltaX = event.clientX - start.x;
-					const deltaY = event.clientY - start.y;
-					flowEditor.viewport.set((v) => [origin.x + deltaX, origin.y + deltaY, v[2]]);
+					const { origin, start } = flowEditor.interactionMode._v;
+					const { x: cursorX, y: cursorY } = pointerEventToBoardPoint(event);
+					const deltaX = cursorX - origin.x;
+					const deltaY = cursorY - origin.y;
+					flowEditor.viewport.set((v) => [start.x + deltaX, start.y + deltaY, v[2]]);
 					break;
 				}
 				default:
 				// do nothing
 			}
 		},
-		[flowEditor]
+		[flowEditor, pointerEventToBoardPoint]
 	);
 
 	const handleWheel = React.useCallback(
 		(event: WheelEvent): void => {
 			event.preventDefault();
 
-			if (boardRef.current == null) {
-				return;
-			}
-
 			// Zooming
 			if (event.ctrlKey) {
 				const [x, y, scale] = flowEditor.viewport._v;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
-
-				const rect = boardRef.current.getBoundingClientRect();
-				const cursorX = event.clientX - rect.left;
-				const cursorY = event.clientY - rect.top;
+				const { x: cursorX, y: cursorY } = pointerEventToBoardPoint(event);
 
 				const currentX = x;
 				const currentY = y;
@@ -94,7 +111,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				flowEditor.viewport.set((v) => [v[0] - deltaX, v[1] - deltaY, v[2]]);
 			}
 		},
-		[flowEditor]
+		[flowEditor, pointerEventToBoardPoint]
 	);
 
 	// React's onWheel handler defaults to "passive: true", which prevents calling preventDefault() to stop the outer scroll.
@@ -132,6 +149,8 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				  `;
 				document.head.appendChild(style);
 				break;
+			default:
+			// do nothing
 		}
 
 		return () => {
