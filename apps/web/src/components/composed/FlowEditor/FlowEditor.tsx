@@ -55,11 +55,11 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 					className="absolute h-20 w-20 bg-blue-500"
 					style={{ transform: 'translate(200px, 200px)' }}
 				>
-					Draggable
+					Fixed on Artboard
 				</div>
 				<NodeRenderer flowEditor={flowEditor} nodeMap={nodeMap} />
 			</Viewport>
-			<div className="absolute left-10 top-10 h-20 w-20 bg-red-500">Fixed</div>
+			<div className="absolute left-10 top-10 h-20 w-20 bg-red-500">Fixed on Viewport</div>
 		</Board>
 	);
 };

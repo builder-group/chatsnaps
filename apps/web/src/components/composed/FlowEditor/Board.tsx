@@ -58,6 +58,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				case 'Panning': {
 					const { current } = flowEditor.interactionMode._v;
 					const cursor = flowEditor.pointerEventToViewportPoint(event);
+
 					const deltaX = cursor.x - current.x;
 					const deltaY = cursor.y - current.y;
 
@@ -69,9 +70,11 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				}
 				case 'Translating': {
 					const { current } = flowEditor.interactionMode._v;
+					const [, , scale] = flowEditor.viewport._v;
 					const cursor = flowEditor.pointerEventToViewportPoint(event);
-					const deltaX = cursor.x - current.x;
-					const deltaY = cursor.y - current.y;
+
+					const deltaX = (cursor.x - current.x) / scale;
+					const deltaY = (cursor.y - current.y) / scale;
 
 					for (const node of flowEditor.getSelectedNodes()) {
 						node.position.set((n) => ({ x: n.x + deltaX, y: n.y + deltaY }));
