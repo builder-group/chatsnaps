@@ -46,11 +46,16 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 		(event: React.PointerEvent<HTMLDivElement>): void => {
 			event.preventDefault();
 
-			if (flowEditor.interactionMode._v.type === 'Panning') {
-				const { start, origin } = flowEditor.interactionMode._v;
-				const deltaX = event.clientX - start.x;
-				const deltaY = event.clientY - start.y;
-				flowEditor.viewport.set((v) => [origin.x + deltaX, origin.y + deltaY, v[2]]);
+			switch (flowEditor.interactionMode._v.type) {
+				case 'Panning': {
+					const { start, origin } = flowEditor.interactionMode._v;
+					const deltaX = event.clientX - start.x;
+					const deltaY = event.clientY - start.y;
+					flowEditor.viewport.set((v) => [origin.x + deltaX, origin.y + deltaY, v[2]]);
+					break;
+				}
+				default:
+				// do nothing
 			}
 		},
 		[flowEditor]
@@ -85,7 +90,8 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 			else {
 				const scrollSpeed = 1;
 				const deltaY = event.deltaY * scrollSpeed;
-				flowEditor.viewport.set((v) => [v[0], v[1] - deltaY, v[2]]);
+				const deltaX = event.deltaX * scrollSpeed;
+				flowEditor.viewport.set((v) => [v[0] - deltaX, v[1] - deltaY, v[2]]);
 			}
 		},
 		[flowEditor]
