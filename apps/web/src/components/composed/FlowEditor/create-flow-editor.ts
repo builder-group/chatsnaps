@@ -2,15 +2,23 @@ import { createState } from 'feature-state';
 
 import {
 	type TFlowEditor,
+	type TFlowEditorConfig,
 	type TFlowEditorInteractionMode,
 	type TFlowEditorInteractionTool,
-	type TFlowEditorNode
+	type TFlowEditorNode,
+	type TSize
 } from './types';
 
 export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
-	const { nodes = [] } = config;
+	const {
+		nodes = [],
+		snapGrid = [50, 50],
+		size = { width: 500, height: 500 },
+		measureSize = config.size == null
+	} = config;
 
 	return {
+		_config: { snapGrid, measureSize },
 		_nodes: nodes.reduce<Record<string, TFlowEditorNode>>((obj, node) => {
 			obj[node.id] = node;
 			return obj;
@@ -18,7 +26,8 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		_selected: createState<string[]>([]),
 		interactionMode: createState<TFlowEditorInteractionMode>({ type: 'None' }),
 		interactionTool: createState<TFlowEditorInteractionTool>({ type: 'Select' }),
-		viewport: createState({ scale: 1, position: { x: 0, y: 0 } }),
+		viewport: createState([0, 0, 1]),
+		size: createState(size),
 		addSelected(this: TFlowEditor, nodeId) {
 			const node = this._nodes[nodeId];
 			if (node == null) {
@@ -96,10 +105,20 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 
 			this._selected._v = [];
 			this._selected._notify();
+		},
+		getVisibleNodes(this: TFlowEditor) {
+			const visibleNodes: TFlowEditorNode[] = [];
+			const [vx, vy, vScale] = this.viewport._v;
+			const { width, height } = this.size._v;
+
+			// TODO:
+
+			return visibleNodes;
 		}
 	};
 }
 
-interface TCreateFlowEditorConfig {
+interface TCreateFlowEditorConfig extends Partial<TFlowEditorConfig> {
 	nodes?: TFlowEditorNode[];
+	size?: TSize;
 }

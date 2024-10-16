@@ -6,11 +6,17 @@ import { Background } from './Background';
 import { Board } from './Board';
 import { createFlowEditor } from './create-flow-editor';
 import { createFlowEditorNode } from './create-flow-editor-node';
-import { Draggable } from './Draggable';
-import { Nodes } from './Nodes';
+import { NodeRenderer } from './NodeRenderer';
+import { defaultNodeMap } from './nodes';
+import { type TExtendedNodeMap, type TNodeMap } from './types';
+import { Viewport } from './Viewport';
 
 export const FlowEditor: React.FC<TProps> = (props) => {
-	const { className } = props;
+	const { className, extendedNodeMap = {} } = props;
+	const nodeMap = React.useMemo<TNodeMap>(
+		() => ({ ...extendedNodeMap, ...(defaultNodeMap as TNodeMap) }),
+		[extendedNodeMap]
+	);
 	const flowEditor = React.useMemo(
 		() =>
 			createFlowEditor({
@@ -33,15 +39,15 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 	return (
 		<Board flowEditor={flowEditor} className={className}>
 			<Background flowEditor={flowEditor} />
-			<Draggable flowEditor={flowEditor}>
+			<Viewport flowEditor={flowEditor}>
 				<div
 					className="absolute h-20 w-20 bg-blue-500"
 					style={{ transform: 'translate(200px, 200px)' }}
 				>
 					Draggable
 				</div>
-				<Nodes flowEditor={flowEditor} />
-			</Draggable>
+				<NodeRenderer flowEditor={flowEditor} nodeMap={nodeMap} />
+			</Viewport>
 			<div className="absolute left-10 top-10 h-20 w-20 bg-red-500">Fixed</div>
 		</Board>
 	);
@@ -49,4 +55,5 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 
 interface TProps {
 	className?: string;
+	extendedNodeMap?: TExtendedNodeMap;
 }

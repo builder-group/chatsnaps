@@ -4,13 +4,17 @@ import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/lib';
 
-import { type TFlowEditorNode } from './types';
+import { useUpdateSize } from '../hooks';
+import { type TNodeFC } from '../types';
 
-export const DefaultNode: React.FC<TProps> = (props) => {
+export const DefaultNode: TNodeFC<'default'> = (props) => {
 	const { node, onClick } = props;
 	const position = useGlobalState(node.position);
 	const { label, color = '#d3d3d3' } = useGlobalState(node.data);
 	const isSelected = useGlobalState(node.selected);
+	const nodeRef = React.useRef<HTMLDivElement>(null);
+
+	useUpdateSize(nodeRef, node.size, node._config.measureSize);
 
 	return (
 		<div
@@ -23,13 +27,9 @@ export const DefaultNode: React.FC<TProps> = (props) => {
 				pointerEvents: 'auto'
 			}}
 			onClick={onClick}
+			ref={nodeRef}
 		>
 			{label}
 		</div>
 	);
 };
-
-interface TProps {
-	node: TFlowEditorNode<'default'>;
-	onClick: (event: React.MouseEvent) => void;
-}

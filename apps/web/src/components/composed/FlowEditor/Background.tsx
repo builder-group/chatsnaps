@@ -9,7 +9,6 @@ export const Background: React.FC<TProps> = (props) => {
 	const {
 		flowEditor,
 		dotSize = 2,
-		dotBaseSpacing = 50,
 		opacity = {
 			min: 0.0,
 			max: 0.7,
@@ -17,6 +16,7 @@ export const Background: React.FC<TProps> = (props) => {
 			fadeEndScale: 0.5
 		}
 	} = props;
+	const { snapGrid } = flowEditor._config;
 	const {
 		min: minOpacity,
 		max: maxOpacity,
@@ -24,16 +24,23 @@ export const Background: React.FC<TProps> = (props) => {
 		fadeEndScale: opacityFadeEndScale
 	} = opacity;
 
-	const { scale, position } = useGlobalState(flowEditor.viewport);
+	const [x, y, scale] = useGlobalState(flowEditor.viewport);
 
-	const adjustedSpacing = React.useMemo(() => dotBaseSpacing * scale, [dotBaseSpacing, scale]);
-	const patternX = position.x % adjustedSpacing;
-	const patternY = position.y % adjustedSpacing;
+	const [adjustedSpacingX, adjustedSpacingY] = React.useMemo(
+		() => [snapGrid[0] * scale, snapGrid[1] * scale],
+		[snapGrid, scale]
+	);
+	const patternX = x % adjustedSpacingX;
+	const patternY = y % adjustedSpacingY;
 
 	// Calculate dot opacity based on scale
 	const dotOpacity = React.useMemo(() => {
-		if (scale > opacityFadeStartScale) return maxOpacity;
-		if (scale < opacityFadeEndScale) return minOpacity;
+		if (scale > opacityFadeStartScale) {
+			return maxOpacity;
+		}
+		if (scale < opacityFadeEndScale) {
+			return minOpacity;
+		}
 		return (
 			minOpacity +
 			(maxOpacity - minOpacity) *
@@ -58,8 +65,8 @@ export const Background: React.FC<TProps> = (props) => {
 		>
 			<pattern
 				id={DOT_PATTERN_ID}
-				width={adjustedSpacing}
-				height={adjustedSpacing}
+				width={adjustedSpacingX}
+				height={adjustedSpacingY}
 				x={patternX}
 				y={patternY}
 				patternUnits="userSpaceOnUse"
@@ -79,7 +86,6 @@ export const Background: React.FC<TProps> = (props) => {
 interface TProps {
 	flowEditor: TFlowEditor;
 	dotSize?: number;
-	dotBaseSpacing?: number;
 	opacity?: {
 		min: number;
 		max: number;

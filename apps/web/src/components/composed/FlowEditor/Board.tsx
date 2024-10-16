@@ -2,16 +2,18 @@ import { useGlobalState } from 'feature-react/state';
 import React, { useImperativeHandle } from 'react';
 import { cn } from '@/lib';
 
+import { useUpdateSize } from './hooks';
 import { type TFlowEditor } from './types';
 
 export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 	const { flowEditor, className } = props;
 	const interaction = useGlobalState(flowEditor.interactionMode);
-
 	const boardRef = React.useRef<HTMLDivElement>(null);
 
 	// https://stackoverflow.com/questions/68162617/whats-the-correct-way-to-use-useref-and-forwardref-together
 	useImperativeHandle(ref, () => boardRef.current as unknown as HTMLDivElement);
+
+	useUpdateSize(boardRef, flowEditor.size, flowEditor._config.measureSize);
 
 	const handlePointerDown = React.useCallback(
 		(event: React.PointerEvent<HTMLDivElement>): void => {
@@ -22,8 +24,8 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 					type: 'Panning',
 					start: { x: event.clientX, y: event.clientY },
 					origin: {
-						x: flowEditor.viewport._v.position.x,
-						y: flowEditor.viewport._v.position.y
+						x: flowEditor.viewport._v[0],
+						y: flowEditor.viewport._v[1]
 					}
 				});
 			}
@@ -48,13 +50,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				const { start, origin } = flowEditor.interactionMode._v;
 				const deltaX = event.clientX - start.x;
 				const deltaY = event.clientY - start.y;
-				flowEditor.viewport.set((v) => ({
-					...v,
-					position: {
-						x: origin.x + deltaX,
-						y: origin.y + deltaY
-					}
-				}));
+				flowEditor.viewport.set((v) => [origin.x + deltaX, origin.y + deltaY, v[2]]);
 			}
 		},
 		[flowEditor]
@@ -70,7 +66,7 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 
 			// Zooming
 			if (event.ctrlKey) {
-				const { scale, position } = flowEditor.viewport._v;
+				const [x, y, scale] = flowEditor.viewport._v;
 				const deltaScale = -event.deltaY * 0.001;
 				const newScale = Math.max(0.1, Math.min(5, scale * (1 + deltaScale)));
 
@@ -78,24 +74,18 @@ export const Board = React.forwardRef<HTMLDivElement, TProps>((props, ref) => {
 				const cursorX = event.clientX - rect.left;
 				const cursorY = event.clientY - rect.top;
 
-				const currentX = position.x;
-				const currentY = position.y;
+				const currentX = x;
+				const currentY = y;
 				const newX = currentX - (cursorX - currentX) * (newScale / scale - 1);
 				const newY = currentY - (cursorY - currentY) * (newScale / scale - 1);
 
-				flowEditor.viewport.set({ scale: newScale, position: { x: newX, y: newY } });
+				flowEditor.viewport.set([newX, newY, newScale]);
 			}
 			// Vertical scrolling
 			else {
 				const scrollSpeed = 1;
 				const deltaY = event.deltaY * scrollSpeed;
-				flowEditor.viewport.set((v) => ({
-					...v,
-					position: {
-						x: v.position.x,
-						y: v.position.y - deltaY
-					}
-				}));
+				flowEditor.viewport.set((v) => [v[0], v[1] - deltaY, v[2]]);
 			}
 		},
 		[flowEditor]
