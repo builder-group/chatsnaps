@@ -46,7 +46,7 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 			if (!this._selected._v.includes(nodeId)) {
 				this._selected._v.push(nodeId);
 				this._selected._notify();
-				node.selected.set(true);
+				node.isSelected.set(true);
 			}
 
 			return true;
@@ -61,7 +61,7 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 			this._selected._notify();
 			const node = this._nodes[nodeId];
 			if (node != null) {
-				node.selected.set(false);
+				node.isSelected.set(false);
 			}
 
 			return true;
@@ -74,7 +74,7 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 				const node = this._nodes[nodeId];
 				if (node != null) {
 					this._selected._v.push(nodeId);
-					node.selected.set(true);
+					node.isSelected.set(true);
 				}
 			}
 
@@ -108,7 +108,7 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 			for (const selectedNodeId of this._selected._v) {
 				const selectedNode = this._nodes[selectedNodeId];
 				if (selectedNode != null) {
-					selectedNode.selected.set(false);
+					selectedNode.isSelected.set(false);
 				}
 			}
 

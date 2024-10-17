@@ -8,8 +8,8 @@ import { type TNodeFC } from '../types';
 export const DefaultNode: TNodeFC<'default'> = (props) => {
 	const { node, onPointerDown, onPointerUp } = props;
 	const position = useGlobalState(node.position);
-	const { label, color = '#d3d3d3' } = useGlobalState(node.data);
-	const isSelected = useGlobalState(node.selected);
+	const { label, color = '#d3d3d3' } = useGlobalState(node.customData);
+	const isSelected = useGlobalState(node.isSelected);
 	const nodeRef = React.useRef<HTMLDivElement>(null);
 
 	useSizeObserver(nodeRef, node.size, node._config.measureSize);

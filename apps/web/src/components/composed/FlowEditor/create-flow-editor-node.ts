@@ -30,9 +30,9 @@ export function createFlowEditorNode<
 		id,
 		position: createState(position),
 		size: createState(size),
-		data: createState(data),
-		selected: createState(selected),
-		locked: createState(locked)
+		customData: createState(data),
+		isSelected: createState(selected),
+		isLocked: createState(locked)
 	};
 }
 

@@ -3,12 +3,19 @@ import { type TState } from 'feature-state';
 
 export interface TFlowEditor {
 	_config: TFlowEditorConfig;
+	// Stores the nodes within the editor, each identified by a unique ID
 	_nodes: Record<string, TFlowEditorNode>;
+	// List of currently selected node IDs
 	_selected: TState<string[], ['base']>;
+	// Mode for user interaction (e.g., Panning, Translating, Pressing, etc.)
 	interactionMode: TState<TFlowEditorInteractionMode, ['base']>;
+	// Tool currently being used (e.g., Select)
 	interactionTool: TState<TFlowEditorInteractionTool, ['base']>;
+	// Viewport transform (pan and zoom settings) applied to the artboard
 	viewport: TState<TTransform, ['base']>;
+	// Size of the viewport (defaults to DOM measurement if unspecified)
 	size: TState<TSize, ['base']>;
+	// Offset of the viewport relative to the window
 	boundingRect: TState<TBoundingRect, ['base']>;
 	addSelected: (nodeId: string) => boolean;
 	removeSelected: (nodeId: string) => boolean;
@@ -49,13 +56,20 @@ export interface TFlowEditorNode<
 	GData extends TNodeData<GType> = TNodeData<GType>
 > {
 	_config: TFlowEditorNodeConfig;
+	// Unique identifier for the node
 	id: string;
+	// Type of the node, used to determine the render component
 	type: GType;
+	// Node's position on the artboard (x, y coordinates)
 	position: TState<TXYPosition, ['base']>;
+	// Size of the node (defaults to DOM measurement if unspecified)
 	size: TState<TSize, ['base']>;
-	data: TState<GData, ['base']>;
-	selected: TState<boolean, ['base']>;
-	locked: TState<boolean, ['base']>;
+	// Custom data passed to the node's render component
+	customData: TState<GData, ['base']>;
+	// Indicates whether the node is currently selected
+	isSelected: TState<boolean, ['base']>;
+	// Indicates whether the node is locked from modifications
+	isLocked: TState<boolean, ['base']>;
 }
 
 export interface TFlowEditorNodeConfig {
