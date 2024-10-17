@@ -3,8 +3,10 @@ import { type TState } from 'feature-state';
 
 export interface TFlowEditor {
 	_config: TFlowEditorConfig;
+	// Array of node IDs defining the visual render order (from back to front)
+	_nodeIds: TState<TId[], ['base']>;
 	// Stores the nodes within the editor, each identified by a unique ID
-	_nodes: Record<string, TFlowEditorNode>;
+	_nodes: Record<TId, TFlowEditorNode>;
 	// List of currently selected node IDs
 	_selected: TState<string[], ['base']>;
 	// Mode for user interaction (e.g., Panning, Translating, Pressing, etc.)
@@ -130,3 +132,5 @@ export type TTransform = [number, number, number];
 
 // width, height
 export type TSnapGrid = [number, number];
+
+type TId = string;

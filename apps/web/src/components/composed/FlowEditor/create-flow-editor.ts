@@ -25,12 +25,19 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 		measureBoundingRect = true
 	} = config;
 
+	const { _nodeIds, _nodes } = nodes.reduce(
+		(acc, node) => {
+			acc._nodeIds.push(node.id); // Add node ID to the _nodeIds array
+			acc._nodes[node.id] = node; // Add node to the _nodes map
+			return acc;
+		},
+		{ _nodeIds: [] as string[], _nodes: {} as Record<string, TFlowEditorNode> }
+	);
+
 	return {
 		_config: { snapGrid, measureSize, debug, measureBoundingRect },
-		_nodes: nodes.reduce<Record<string, TFlowEditorNode>>((obj, node) => {
-			obj[node.id] = node;
-			return obj;
-		}, {}),
+		_nodeIds: createState(_nodeIds),
+		_nodes,
 		_selected: createState<string[]>([]),
 		interactionMode: createState<TFlowEditorInteractionMode>({ type: 'None' }),
 		interactionTool: createState<TFlowEditorInteractionTool>({ type: 'Select' }),

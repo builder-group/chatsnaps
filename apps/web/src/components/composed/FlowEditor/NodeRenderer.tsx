@@ -1,9 +1,11 @@
+import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
 import { type TFlowEditor, type TNodeMap } from './types';
 
 export const NodeRenderer: React.FC<TProps> = (props) => {
 	const { flowEditor, nodeMap } = props;
+	const nodeIds = useGlobalState(flowEditor._nodeIds);
 
 	const handlePointerDown = React.useCallback(
 		(nodeId: string, event: React.PointerEvent) => {
@@ -65,7 +67,11 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 
 	return (
 		<>
-			{Object.values(flowEditor._nodes).map((node) => {
+			{nodeIds.map((nodeId) => {
+				const node = flowEditor.getNode(nodeId);
+				if (node == null) {
+					return;
+				}
 				const NodeComponent = nodeMap[node.type];
 				if (NodeComponent == null) {
 					return null;

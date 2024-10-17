@@ -17,6 +17,8 @@ import React from 'react';
 
 import '@xyflow/react/dist/style.css';
 
+import { ChildComponent } from './ChildComponent';
+
 // https://github.com/idootop/reactflow-auto-layout
 
 const initialNodes: Node[] = [
@@ -69,6 +71,7 @@ const Page: React.FC = () => {
 				onConnect={onConnect}
 				fitView
 			>
+				<ChildComponent />
 				<Background />
 				<Controls />
 			</ReactFlow>
