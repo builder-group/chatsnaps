@@ -30,6 +30,12 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 						id: '2',
 						position: { x: 400, y: 500 },
 						data: { label: 'Node 2' }
+					}),
+					createFlowEditorNode('default', {
+						id: '3',
+						position: { x: 300, y: 500 },
+						data: { label: 'Node 3' },
+						locked: true
 					})
 				],
 				debug: true

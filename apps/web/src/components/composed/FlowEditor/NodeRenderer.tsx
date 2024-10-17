@@ -1,15 +1,19 @@
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
-import { type TFlowEditor, type TNodeMap } from './types';
+import { type TFlowEditor, type TFlowEditorNode, type TNodeMap } from './types';
 
 export const NodeRenderer: React.FC<TProps> = (props) => {
 	const { flowEditor, nodeMap } = props;
 	const nodeIds = useGlobalState(flowEditor._nodeIds);
 
 	const handlePointerDown = React.useCallback(
-		(nodeId: string, event: React.PointerEvent) => {
+		(node: TFlowEditorNode<string, any>, event: React.PointerEvent) => {
 			event.preventDefault();
+
+			if (node.isLocked._v) {
+				return;
+			}
 
 			switch (event.button) {
 				case 0: {
@@ -18,11 +22,11 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 
 					// Add to selection if Shift key is pressed
 					if (event.shiftKey) {
-						flowEditor.select([nodeId]);
+						flowEditor.select([node.id]);
 					}
 					// Set as only selection if no other nodes are selected
 					else if (flowEditor._selected._v.length <= 1) {
-						flowEditor.setSelected([nodeId]);
+						flowEditor.setSelected([node.id]);
 					}
 
 					const origin = flowEditor.pointerEventToViewportPoint(event);
@@ -41,8 +45,12 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 	);
 
 	const handlePointerUp = React.useCallback(
-		(nodeId: string, event: React.PointerEvent) => {
+		(node: TFlowEditorNode<string, any>, event: React.PointerEvent) => {
 			event.preventDefault();
+
+			if (node.isLocked._v) {
+				return;
+			}
 
 			switch (event.button) {
 				case 0: {
@@ -54,7 +62,7 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 						flowEditor.interactionMode._v.origin.x === flowEditor.interactionMode._v.current.x &&
 						flowEditor.interactionMode._v.origin.y === flowEditor.interactionMode._v.current.y
 					) {
-						flowEditor.setSelected([nodeId]);
+						flowEditor.setSelected([node.id]);
 					}
 					break;
 				}
@@ -82,10 +90,10 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 						key={node.id}
 						node={node}
 						onPointerDown={(event) => {
-							handlePointerDown(node.id, event);
+							handlePointerDown(node, event);
 						}}
 						onPointerUp={(event) => {
-							handlePointerUp(node.id, event);
+							handlePointerUp(node, event);
 						}}
 					/>
 				);
