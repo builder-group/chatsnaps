@@ -1,7 +1,7 @@
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 
-import { type TFlowEditor, type TFlowEditorNode, type TNodeMap } from './types';
+import { type TFlowEditor, type TFlowEditorNode, type TFlowEditorNodeFCMap } from './types';
 
 export const NodeRenderer: React.FC<TProps> = (props) => {
 	const { flowEditor, nodeMap } = props;
@@ -104,5 +104,5 @@ export const NodeRenderer: React.FC<TProps> = (props) => {
 
 interface TProps {
 	flowEditor: TFlowEditor;
-	nodeMap: TNodeMap;
+	nodeMap: TFlowEditorNodeFCMap;
 }

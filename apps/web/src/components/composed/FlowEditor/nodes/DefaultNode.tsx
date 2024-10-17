@@ -3,9 +3,9 @@ import React from 'react';
 import { cn } from '@/lib';
 
 import { useSizeObserver } from '../hooks';
-import { type TNodeFC } from '../types';
+import { type TFlowEditorNodeFC } from '../types';
 
-export const DefaultNode: TNodeFC<'default'> = (props) => {
+export const DefaultNode: TFlowEditorNodeFC<'default'> = (props) => {
 	const { node, onPointerDown, onPointerUp } = props;
 	const position = useGlobalState(node.position);
 	const { label, color = '#d3d3d3' } = useGlobalState(node.customData);

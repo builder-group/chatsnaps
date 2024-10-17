@@ -145,6 +145,38 @@ export function createFlowEditor(config: TCreateFlowEditorConfig): TFlowEditor {
 			// TODO:
 
 			return visibleNodes;
+		},
+		getNodesWithinRect(this: TFlowEditor, rect) {
+			const rectLeft = rect.x;
+			const rectRight = rect.x + rect.width;
+			const rectTop = rect.y;
+			const rectBottom = rect.y + rect.height;
+
+			return Object.values(this._nodes).filter((node) => {
+				const nodeLeft = node.position._v.x;
+				const nodeRight = node.position._v.x + node.size._v.width;
+				const nodeTop = node.position._v.y;
+				const nodeBottom = node.position._v.y + node.size._v.height;
+
+				// Check if the node is within the rectangular boundary
+				const isWithinX = nodeRight >= rectLeft && nodeLeft <= rectRight;
+				const isWithinY = nodeBottom >= rectTop && nodeTop <= rectBottom;
+
+				return isWithinX && isWithinY;
+			});
+		},
+		getNodesWithinDinstance(this: TFlowEditor, position, distance) {
+			return Object.values(this._nodes).filter((node) => {
+				const nodeCenterX = node.position._v.x + node.size._v.width / 2;
+				const nodeCenterY = node.position._v.y + node.size._v.height / 2;
+
+				// Calculate the distance from the position to the center of the node
+				const dx = position.x - nodeCenterX;
+				const dy = position.y - nodeCenterY;
+				const distToNode = Math.sqrt(dx * dx + dy * dy);
+
+				return distToNode <= distance;
+			});
 		}
 	};
 }

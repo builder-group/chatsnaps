@@ -3,15 +3,15 @@ import { createState } from 'feature-state';
 import {
 	type TFlowEditorNode,
 	type TFlowEditorNodeConfig,
-	type TNodeData,
-	type TNodeDataTypes,
+	type TFlowEditorNodeData,
+	type TFlowEditorNodeDataTypes,
 	type TSize,
 	type TXYPosition
 } from './types';
 
 export function createFlowEditorNode<
-	GType extends TNodeDataTypes,
-	GData extends TNodeData<GType> = TNodeData<GType>
+	GType extends TFlowEditorNodeDataTypes,
+	GData extends TFlowEditorNodeData<GType> = TFlowEditorNodeData<GType>
 >(type: GType, config: TCreateFlowEditorNodeConfig<GType, GData>): TFlowEditorNode<GType, GData> {
 	const {
 		id,
@@ -37,8 +37,8 @@ export function createFlowEditorNode<
 }
 
 interface TCreateFlowEditorNodeConfig<
-	GType extends TNodeDataTypes,
-	GData extends TNodeData<GType> = TNodeData<GType>
+	GType extends TFlowEditorNodeDataTypes,
+	GData extends TFlowEditorNodeData<GType> = TFlowEditorNodeData<GType>
 > extends Partial<TFlowEditorNodeConfig> {
 	id: string;
 	position: TXYPosition;

@@ -8,13 +8,13 @@ import { createFlowEditor } from './create-flow-editor';
 import { createFlowEditorNode } from './create-flow-editor-node';
 import { NodeRenderer } from './NodeRenderer';
 import { defaultNodeMap } from './nodes';
-import { type TExtendedNodeMap, type TNodeMap } from './types';
+import { type TExtendedFlowEditorNodeFCMap, type TFlowEditorNodeFCMap } from './types';
 import { Viewport } from './Viewport';
 
 export const FlowEditor: React.FC<TProps> = (props) => {
 	const { className, extendedNodeMap = {} } = props;
-	const nodeMap = React.useMemo<TNodeMap>(
-		() => ({ ...extendedNodeMap, ...(defaultNodeMap as TNodeMap) }),
+	const nodeMap = React.useMemo<TFlowEditorNodeFCMap>(
+		() => ({ ...extendedNodeMap, ...(defaultNodeMap as TFlowEditorNodeFCMap) }),
 		[extendedNodeMap]
 	);
 	const flowEditor = React.useMemo(
@@ -72,5 +72,5 @@ export const FlowEditor: React.FC<TProps> = (props) => {
 
 interface TProps {
 	className?: string;
-	extendedNodeMap?: TExtendedNodeMap;
+	extendedNodeMap?: TExtendedFlowEditorNodeFCMap;
 }

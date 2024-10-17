@@ -1,12 +1,16 @@
 import { type XYPosition } from '@xyflow/react';
 import { type TState } from 'feature-state';
 
+// =========================================================================
+// Flow Editor
+// =========================================================================
+
 export interface TFlowEditor {
 	_config: TFlowEditorConfig;
 	// Array of node IDs defining the visual render order (from back to front)
-	_nodeIds: TState<TId[], ['base']>;
+	_nodeIds: TState<TFlowEditorNodeId[], ['base']>;
 	// Stores the nodes within the editor, each identified by a unique ID
-	_nodes: Record<TId, TFlowEditorNode>;
+	_nodes: Record<TFlowEditorNodeId, TFlowEditorNode>;
 	// List of currently selected node IDs
 	_selected: TState<string[], ['base']>;
 	// Mode for user interaction (e.g., Panning, Translating, Pressing, etc.)
@@ -32,6 +36,8 @@ export interface TFlowEditor {
 	getNode: (nodeId: string) => TFlowEditorNode | null;
 	getSelectedNodes: () => TFlowEditorNode[];
 	getVisibleNodes: () => TFlowEditorNode[];
+	getNodesWithinDinstance: (position: TXYPosition, distance: number) => TFlowEditorNode[];
+	getNodesWithinRect: (rect: TRect) => TFlowEditorNode[];
 }
 
 export interface TFlowEditorConfig {
@@ -53,13 +59,18 @@ export type TFlowEditorInteractionMode =
 
 export type TFlowEditorInteractionTool = { type: 'Select' } | { type: 'Todo' };
 
+// =========================================================================
+// Node
+// =========================================================================
+
 export interface TFlowEditorNode<
-	GType extends TNodeDataTypes = string,
-	GData extends TNodeData<GType> = TNodeData<GType>
+	GType extends TFlowEditorNodeDataTypes = string,
+	GData extends TFlowEditorNodeData<GType> = TFlowEditorNodeData<GType>
 > {
 	_config: TFlowEditorNodeConfig;
+	_handles: TState<TFlowEditorNodeHandle[], ['base']>;
 	// Unique identifier for the node
-	id: string;
+	id: TFlowEditorNodeId;
 	// Type of the node, used to determine the render component
 	type: GType;
 	// Node's position on the artboard (x, y coordinates)
@@ -74,41 +85,136 @@ export interface TFlowEditorNode<
 	isLocked: TState<boolean, ['base']>;
 }
 
+export type TFlowEditorNodeId = string;
+
 export interface TFlowEditorNodeConfig {
 	measureSize: boolean;
 }
 
-export interface TDefaultNodeDataMap {
+export interface TDefaultFlowEditorNodeDataMap {
 	default: { label: string; color?: string };
 }
 
-// Global registry for third party nodes
+// Global registry for third party FlowEditor nodes
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
-export interface TThirdPartyNodeDataMap {}
+export interface TThirdPartyFlowEditorNodeDataMap {}
 
-export type TNodeDataMap = TDefaultNodeDataMap & TThirdPartyNodeDataMap & Record<string, any>;
+export type TFlowEditorNodeDataMap = TDefaultFlowEditorNodeDataMap &
+	TThirdPartyFlowEditorNodeDataMap &
+	Record<string, any>;
 
-export type TNodeData<GKey extends TNodeDataTypes> = TNodeDataMap[GKey];
+export type TFlowEditorNodeData<GKey extends TFlowEditorNodeDataTypes> =
+	TFlowEditorNodeDataMap[GKey];
 
-export type TNodeDataTypes = keyof TNodeDataMap;
-export type TDefaultNodeDataTypes = keyof TDefaultNodeDataMap;
-export type TExtendedNodeDataTypes = Exclude<TNodeDataTypes, TDefaultNodeDataTypes>;
+export type TFlowEditorNodeDataTypes = keyof TFlowEditorNodeDataMap;
+export type TDefaultFlowEditorNodeDataTypes = keyof TDefaultFlowEditorNodeDataMap;
+export type TExtendedFlowEditorNodeDataTypes = Exclude<
+	TFlowEditorNodeDataTypes,
+	TDefaultFlowEditorNodeDataTypes
+>;
 
-export interface TNodeProps<GType extends TNodeDataTypes = string> {
+export interface TFlowEditorNodeProps<GType extends TFlowEditorNodeDataTypes = string> {
 	node: TFlowEditorNode<GType>;
 	onPointerDown: (event: React.PointerEvent) => void;
 	onPointerUp: (event: React.PointerEvent) => void;
 }
 
-export type TNodeFC<GType extends TNodeDataTypes> = React.FC<TNodeProps<GType>>;
+export type TFlowEditorNodeFC<GType extends TFlowEditorNodeDataTypes> = React.FC<
+	TFlowEditorNodeProps<GType>
+>;
 
-export type TDefaultNodeMap = {
-	[GType in TDefaultNodeDataTypes]: TNodeFC<GType>;
+export type TDefaultFlowEditorNodeFCMap = {
+	[GType in TDefaultFlowEditorNodeDataTypes]: TFlowEditorNodeFC<GType>;
 };
-export type TExtendedNodeMap = {
-	[GType in TExtendedNodeDataTypes]: TNodeFC<GType>;
+export type TExtendedFlowEditorNodeFCMap = {
+	[GType in TExtendedFlowEditorNodeDataTypes]: TFlowEditorNodeFC<GType>;
 };
-export type TNodeMap = TDefaultNodeMap & TExtendedNodeMap;
+export type TFlowEditorNodeFCMap = TDefaultFlowEditorNodeFCMap & TExtendedFlowEditorNodeFCMap;
+
+// =========================================================================
+// Node Handle
+// =========================================================================
+
+export interface TFlowEditorNodeHandle {
+	id: TFlowEditorHandleId;
+	type: 'source' | 'target';
+	anchor: TState<THandleAnchor, ['base']>;
+	position: TState<TXYPosition, ['base']>;
+	size: TState<TSize, ['base']>;
+}
+
+export type TFlowEditorHandleId = string;
+
+export type THandleAnchor = 'Top' | 'Left' | 'Bottom' | 'Right';
+
+// =========================================================================
+// Edge
+// =========================================================================
+
+export interface TFlowEditorEdge<
+	GType extends TFlowEditorEdgeDataTypes = string,
+	GData extends TFlowEditorEdgeData<GType> = TFlowEditorEdgeData<GType>
+> {
+	// Unique identifier for the edge
+	id: TFlowEditorEdgeId;
+	// Type of the edge, used to determine the render component
+	type: GType;
+	source: TState<TFlowEditorHandleReference, ['base']>;
+	target: TState<TFlowEditorHandleReference, ['base']>;
+	// Custom data passed to the edge's render component
+	customData: TState<GData, ['base']>;
+}
+
+export type TFlowEditorEdgeId = string;
+
+export interface TFlowEditorHandleReference {
+	nodeId: TFlowEditorNodeId;
+	handleId?: TFlowEditorHandleId;
+}
+
+export interface TDefaultFlowEditorEdgeDataMap {
+	default: { label: string; color?: string };
+}
+
+// Global registry for third party FlowEditor edges
+// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
+export interface TThirdPartyFlowEditorEdgeDataMap {}
+
+export type TFlowEditorEdgeDataMap = TDefaultFlowEditorEdgeDataMap &
+	TThirdPartyFlowEditorEdgeDataMap &
+	Record<string, any>;
+
+export type TFlowEditorEdgeData<GKey extends TFlowEditorEdgeDataTypes> =
+	TFlowEditorEdgeDataMap[GKey];
+
+export type TFlowEditorEdgeDataTypes = keyof TFlowEditorEdgeDataMap;
+export type TDefaultFlowEditorEdgeDataTypes = keyof TDefaultFlowEditorEdgeDataMap;
+export type TExtendedFlowEditorEdgeDataTypes = Exclude<
+	TFlowEditorEdgeDataTypes,
+	TDefaultFlowEditorEdgeDataTypes
+>;
+
+export interface TFlowEditorEdgeProps<GType extends TFlowEditorEdgeDataTypes = string> {
+	edge: TFlowEditorEdge<GType>;
+	onPointerDown: (event: React.PointerEvent) => void;
+	onPointerUp: (event: React.PointerEvent) => void;
+}
+
+export type TFlowEditorEdgeFC<GType extends TFlowEditorEdgeDataTypes> = React.FC<
+	TFlowEditorEdgeProps<GType>
+>;
+
+export type TDefaultFlowEditorEdgeFCMap = {
+	[GType in TDefaultFlowEditorEdgeDataTypes]: TFlowEditorEdgeFC<GType>;
+};
+export type TExtendedFlowEditorEdgeFCMap = {
+	[GType in TExtendedFlowEditorEdgeDataTypes]: TFlowEditorEdgeFC<GType>;
+};
+export type TFlowEditorEdgeFCMap = TDefaultFlowEditorEdgeFCMap & TExtendedFlowEditorEdgeFCMap;
+
+// =========================================================================
+// Other
+// =========================================================================
 
 export interface TBoundingRect {
 	left: number;
@@ -132,5 +238,3 @@ export type TTransform = [number, number, number];
 
 // width, height
 export type TSnapGrid = [number, number];
-
-type TId = string;
