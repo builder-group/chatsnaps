@@ -1,10 +1,11 @@
 import { P5RemotionController, TRemotionSketch } from '../P5RemotionController';
 
-export const sketch1: TRemotionSketch = (p5) => {
+export const rotatingPlaneSketch: TRemotionSketch = (p5) => {
 	const controller = new P5RemotionController(p5);
 
 	p5.setup = () => {
-		controller.setup();
+		controller.setup(p5.WEBGL);
+		p5.debugMode();
 	};
 
 	p5.updateWithProps = (props) => {

@@ -1,4 +1,5 @@
 import { P5CanvasInstance, Sketch, SketchProps } from '@p5-wrapper/react';
+import { RENDERER } from 'p5';
 
 export class P5RemotionController {
 	private p5: P5CanvasInstance<TRemotionSketchProps>;
@@ -9,8 +10,8 @@ export class P5RemotionController {
 		this.p5 = p5;
 	}
 
-	setup() {
-		this.p5.createCanvas(this.canvas.width, this.canvas.height, this.p5.WEBGL);
+	setup(renderer?: RENDERER, canvas?: object) {
+		this.p5.createCanvas(this.canvas.width, this.canvas.height, renderer, canvas);
 		this.p5.noLoop(); // Disable automatic looping
 	}
 

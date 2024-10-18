@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { TRemotionFC } from '@/types';
 
 import { SP5Comp } from './schema';
-import { sketch1 } from './sketches';
+import { playgroundSketch } from './sketches';
 
 export const P5Comp: TRemotionFC<z.infer<typeof SP5Comp>> = (props) => {
 	const { width, height } = useVideoConfig();
@@ -12,7 +12,11 @@ export const P5Comp: TRemotionFC<z.infer<typeof SP5Comp>> = (props) => {
 
 	return (
 		<AbsoluteFill className="bg-blue-500" style={{ width, height }}>
-			<ReactP5Wrapper sketch={sketch1} currentFrame={currentFrame} canvas={{ width, height }} />
+			<ReactP5Wrapper
+				sketch={playgroundSketch}
+				currentFrame={currentFrame}
+				canvas={{ width, height }}
+			/>
 		</AbsoluteFill>
 	);
 };
