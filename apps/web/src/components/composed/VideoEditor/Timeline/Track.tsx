@@ -21,7 +21,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 				return 0;
 			}
 
-			// console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
+			// console.log(`[estimateSize] ${action._v.id} (${index.toString()})`);
 
 			return calculateVirtualTimelineActionSize(action, track.getActionAtIndex(index - 1));
 		},

@@ -39,13 +39,11 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 			const { startClientX, startTime } = interactionStateRef.current;
 			const deltaX = e.clientX - startClientX;
 			const deltaTime = parsePixelToTime(deltaX, {
-				...timeline.scale._value,
+				...timeline.scale._v,
 				startLeft: 0
 			});
 
-			timeline.currentTime.set(
-				Math.min(Math.max(startTime + deltaTime, 0), timeline.duration._value)
-			);
+			timeline.currentTime.set(Math.min(Math.max(startTime + deltaTime, 0), timeline.duration._v));
 		},
 		[interaction, timeline]
 	);
@@ -85,7 +83,7 @@ export const Cursor: React.FC<TCursorProps> = (props) => {
 				handleMouseDown(e, 'DRAGGING');
 			}}
 			style={{
-				left: parseTimeToPixel(currentTime, timeline.scale._value),
+				left: parseTimeToPixel(currentTime, timeline.scale._v),
 				height: 'calc(100% - 16px)'
 			}}
 		>

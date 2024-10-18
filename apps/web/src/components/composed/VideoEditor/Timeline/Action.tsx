@@ -72,7 +72,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 			const affectedIndices: number[] = [];
 
 			const currAction = currentAction;
-			const currIndex = track._value.actionIds.indexOf(currAction._value.id);
+			const currIndex = track._v.actionIds.indexOf(currAction._v.id);
 			if (currIndex === -1) {
 				return [];
 			}
@@ -82,10 +82,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 			let compareAction = track.getActionAtIndex(compareIndex);
 
 			// Find the correct position to insert the action
-			while (
-				compareAction != null &&
-				comparisonFn(currAction._value.start, compareAction._value.start)
-			) {
+			while (compareAction != null && comparisonFn(currAction._v.start, compareAction._v.start)) {
 				targetIndex = compareIndex;
 				compareIndex += indexStep;
 				compareAction = track.getActionAtIndex(compareIndex);
@@ -94,9 +91,9 @@ export const Action: React.FC<TActionProps> = (props) => {
 			// If the action needs to be moved
 			if (targetIndex !== currIndex) {
 				// Remove the current action and insert it at the new position
-				const [movedActionId] = track._value.actionIds.splice(currIndex, 1);
+				const [movedActionId] = track._v.actionIds.splice(currIndex, 1);
 				if (movedActionId != null) {
-					track._value.actionIds.splice(targetIndex, 0, movedActionId);
+					track._v.actionIds.splice(targetIndex, 0, movedActionId);
 				}
 
 				// Determine the range of affected indices
@@ -120,11 +117,11 @@ export const Action: React.FC<TActionProps> = (props) => {
 	// 2. Don't always include the next action item. e.g. when moving item to the end or start
 	React.useEffect(() => {
 		const unsubscribe = action.interaction.listen(() => {
-			if (action.interaction._value !== 'NONE') {
+			if (action.interaction._v !== 'NONE') {
 				return;
 			}
 
-			// console.log('Before: ', { actionIds: [...track._value.actionIds] });
+			// console.log('Before: ', { actionIds: [...track._v.actionIds] });
 
 			let affectedIndices: number[] = [];
 			const currentAction = action;
@@ -150,7 +147,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 				affectedIndices.push(lastIndex + 1);
 			}
 
-			// console.log('After: ', { affectedIndices, actionIds: [...track._value.actionIds] });
+			// console.log('After: ', { affectedIndices, actionIds: [...track._v.actionIds] });
 
 			// Update virtual list items based on affected indexes
 			if (affectedIndices.length > 0) {
@@ -201,7 +198,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
 			const deltaTime = parsePixelToTime(deltaX, {
-				...action._timeline.scale._value,
+				...action._timeline.scale._v,
 				startLeft: 0
 			});
 

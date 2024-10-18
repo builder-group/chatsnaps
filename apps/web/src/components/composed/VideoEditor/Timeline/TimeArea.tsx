@@ -70,9 +70,9 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 			const position = e.clientX - rect.x;
 			const left = Math.max(position, scaleStartLeft);
 
-			const time = parsePixelToTime(left, timeline.scale._value);
+			const time = parsePixelToTime(left, timeline.scale._v);
 			timeline.playState.set('PAUSED');
-			timeline.currentTime.set(Math.min(time, timeline.duration._value));
+			timeline.currentTime.set(Math.min(time, timeline.duration._v));
 		},
 		[timeline, scaleStartLeft]
 	);
