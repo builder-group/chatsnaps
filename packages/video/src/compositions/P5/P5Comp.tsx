@@ -7,12 +7,12 @@ import { SP5Comp } from './schema';
 import { sketch1 } from './sketches';
 
 export const P5Comp: TRemotionFC<z.infer<typeof SP5Comp>> = (props) => {
-	const { width, height, fps } = useVideoConfig();
+	const { width, height } = useVideoConfig();
 	const currentFrame = useCurrentFrame();
 
 	return (
 		<AbsoluteFill className="bg-blue-500" style={{ width, height }}>
-			<ReactP5Wrapper sketch={sketch1} currentFrame={currentFrame} fps={fps} />
+			<ReactP5Wrapper sketch={sketch1} currentFrame={currentFrame} canvas={{ width, height }} />
 		</AbsoluteFill>
 	);
 };
