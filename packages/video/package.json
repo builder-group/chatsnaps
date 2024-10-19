@@ -35,6 +35,7 @@
 		"@p5-wrapper/react": "^4.4.2",
 		"@radix-ui/react-icons": "^1.3.0",
 		"@remotion/zod-types": "4.0.217",
+		"@tonejs/midi": "^2.0.28",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.449.0",
 		"p5": "^1.11.0",
