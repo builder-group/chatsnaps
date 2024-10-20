@@ -296,14 +296,16 @@ export class Engine {
 				b.lookupFramesIndex = -1;
 			}
 
+			// If in lookup state, do not handle ball-peg collisions
 			if (b.lookupFramesIndex > -1) continue;
 
 			const peg = this.pegs.getClosestPeg(b.pos.x, b.pos.y);
-			if (peg && b.shouldCollide(peg.x, peg.y, this.pegs.radius) !== false) {
+			if (peg != null && b.shouldCollide(peg.x, peg.y, this.pegs.radius) !== false) {
 				if (b.collidedWith(Engine.COLLISION_BALL)) {
 					const vx0 = b.vel.x;
 					const vy0 = b.vel.y;
 
+					// Only reverse sim ball-peg directly after ball-ball in same frame
 					const restitution = 1;
 					b.bounce(b.normal.x, b.normal.y, restitution, true);
 
@@ -311,16 +313,18 @@ export class Engine {
 					const dy = vy0 - b.vel.y;
 					this.ballCollisions.push(Math.sqrt(dx * dx + dy * dy));
 				} else {
+					// Enter lookup state
 					const nx = b.normal.x;
 					const ny = b.normal.y;
 					let vx = -b.vel.x;
 					let vy = -b.vel.y;
 
+					// Decrease large velocities for fewer high-velocity paths
 					const x = Math.sqrt(vx * vx + vy * vy);
 					const x1 = this.lookup.maxSpeed;
-					let k = Math.min(1, x / x1);
+					let k = Math.min(1, x / x1); // 0,1
 					k = Math.pow(k, this.transitionFactor);
-					k = 1 + k * (this.pegs.restitution - 1);
+					k = 1 + k * (this.pegs.restitution - 1); // -> 1,r
 
 					vx *= k;
 					vy *= k;
@@ -342,6 +346,9 @@ export class Engine {
 				b.pos.y += b.vel.y * this.dt;
 			} else {
 				const frame = b.lookupFrames[b.lookupFramesIndex--];
+				if (frame == null) {
+					continue;
+				}
 				b.pos.x = frame.x;
 				b.pos.y = frame.y;
 				b.vel.x = frame.vx;
@@ -349,6 +356,9 @@ export class Engine {
 
 				if (b.lookupFramesIndex === -1) {
 					const peg = this.pegs.getClosestPeg(b.pos.x, b.pos.y);
+					if (peg == null) {
+						continue;
+					}
 					this.genLookupFramesFromPeg(b, peg, b.nextCollisionIndex);
 					b.collided |= Engine.COLLISION_PEG;
 				}

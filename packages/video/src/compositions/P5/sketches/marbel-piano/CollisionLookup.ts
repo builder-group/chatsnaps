@@ -1,9 +1,10 @@
+import { Engine } from './Engine';
 import { Pegs } from './Pegs';
 import { TVector2D } from './types';
 
 export class CollisionLookup {
 	public pegs: Pegs;
-	public engine: any;
+	public engine: Engine;
 	public ball: Ball;
 
 	public cache: Map<number, number> = new Map();
@@ -22,6 +23,7 @@ export class CollisionLookup {
 	public filter: ((collisionIndex: number, px: number, py: number) => number) | null = null;
 
 	constructor(dt: number, gravity: number, ball: any, pegs: any) {
+		// TODO: Just copy the engine
 		this.pegs = pegs.copy();
 		this.pegs.bounds = {};
 		ball.pos.x = 0;
@@ -68,9 +70,13 @@ export class CollisionLookup {
 				}
 
 				const lastCollision = collisions[collisions.length - 1];
+				if (lastCollision == null) {
+					throw new Error('Unable to get last collision');
+				}
 				const escape: TEscape = {
 					lastCollision,
 					frames,
+					// Relative to the peg of the most recent collision
 					x: ball.pos.x,
 					y: ball.pos.y,
 					vx: ball.vel.x,
@@ -127,17 +133,18 @@ export class CollisionLookup {
 		this.avgSpeed = avgSpeed;
 		this.maxSpeed = maxSpeed;
 		this.escapes = escapes;
-		console.log(this.escapes.length);
+		console.log('Escapes lenght', this.escapes.length);
 
 		const N = 32;
-		this.angleBins = Array(N)
-			.fill([])
-			.map(() => []);
+		this.angleBins = [];
+		for (let i = 0; i < N; i++) {
+			this.angleBins.push([]);
+		}
 		const points = [...this.collisions];
-		points.splice(0, this.collisionThresholdIndex || 0);
+		points.splice(0, this.collisionThresholdIndex ?? 0);
 		for (let p of points) {
 			const angle = (Math.atan2(p.ny, p.nx) / Math.PI / 2 + 1) % 1;
-			this.angleBins[Math.floor(angle * N)].push(p);
+			this.angleBins[Math.floor(angle * N)]?.push(p);
 		}
 	}
 
@@ -146,7 +153,7 @@ export class CollisionLookup {
 		let i = 0;
 		for (let escape of this.escapes) {
 			if (i++ === 0) {
-				// console.log(escape)
+				console.log('Escape', escape);
 			}
 			while (escape.y - escape.startY < endY) {
 				escape.x += escape.vx * this.engine.dt;
@@ -160,11 +167,14 @@ export class CollisionLookup {
 		this.escapes.shift();
 
 		this.escapeBins = Array(numBins)
-			.fill([])
+			.fill(0)
 			.map(() => []);
 
-		const minVel = this.escapes[0].vy;
-		const maxVel = this.escapes[this.escapes.length - 1].vy;
+		const minVel = this.escapes[0]?.vy;
+		const maxVel = this.escapes[this.escapes.length - 1]?.vy;
+		if (minVel == null || maxVel == null) {
+			throw new Error('Failed to get first or last escape');
+		}
 
 		this.getEscapeBinIndex = (vy: number) => {
 			let k = (vy - minVel) / (maxVel - minVel);
@@ -179,10 +189,10 @@ export class CollisionLookup {
 			const dx = escape.x - escape.startX;
 			const endX = Math.round(dx / xSpacing) * xSpacing;
 			if (Math.abs(dx - endX) < radius) {
-				this.escapeBins[this.getEscapeBinIndex(escape.vy)].push(escape);
+				this.escapeBins[this.getEscapeBinIndex(escape.vy)]?.push(escape);
 			}
 		}
-		console.log(this.escapeBins);
+		console.log('Escape Bins', this.escapeBins);
 	}
 
 	public lookupClosestCollision(
@@ -205,7 +215,7 @@ export class CollisionLookup {
 			const dny = normK * (c.ny - ny);
 			return dvx * dvx + dvy * dvy + dnx * dnx + dny * dny;
 		};
-		if (this.filter) {
+		if (this.filter != null) {
 			const oldGetDist = getDist;
 			getDist = (c: TCollision) => {
 				const d1 = oldGetDist(c);
@@ -217,6 +227,7 @@ export class CollisionLookup {
 		const key = angle / (vx + vy + 1);
 		const value = this.cache.get(key);
 		if (value != null) {
+			// Don't care about hash collisions
 			return value;
 		}
 
@@ -229,6 +240,9 @@ export class CollisionLookup {
 		let closestDist = Infinity;
 		const searchBin = (binIndex: number) => {
 			const bin = this.angleBins[(binIndex + this.angleBins.length) % this.angleBins.length];
+			if (bin == null) {
+				throw Error("Couldn't find bin");
+			}
 			for (let c of bin) {
 				const dist = getDist(c);
 				if (dist < closestDist) {
