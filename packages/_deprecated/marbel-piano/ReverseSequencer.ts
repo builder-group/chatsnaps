@@ -47,15 +47,12 @@ export class ReverseSequencer {
 
 		let backtrackIndex = 0;
 		let prevEntry = this.sequence[0];
-		if (prevEntry == null) {
-			throw new Error('Failed to get prevEntry');
-		}
 		for (let i = 1; i < this.sequence.length; i++) {
 			const entry = this.sequence[i];
 			if (entry == null) {
 				continue;
 			}
-			if (entry.entryFrameIndex > prevEntry.entryFrameIndex) {
+			if (entry.entryFrameIndex > (prevEntry?.entryFrameIndex ?? 0)) {
 				backtrackIndex = i;
 			}
 			entry.backtrackIndex = backtrackIndex;

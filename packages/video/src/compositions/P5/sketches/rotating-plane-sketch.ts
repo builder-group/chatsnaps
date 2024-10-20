@@ -5,7 +5,7 @@ export const rotatingPlaneSketch: TRemotionSketch = (p5) => {
 
 	p5.setup = () => {
 		controller.setup(p5.WEBGL);
-		p5.debugMode();
+		// p5.debugMode();
 	};
 
 	p5.updateWithProps = (props) => {
