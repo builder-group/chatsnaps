@@ -1,3 +1,4 @@
+import { CompressedBall } from './CompressedBall';
 import { TPrevVector2D, TVector2D } from './types';
 
 export class Ball {
@@ -24,13 +25,15 @@ export class Ball {
 
 	public state = 0;
 
-	public color: string | null = null;
+	public color: [number, number, number] = [0, 0, 0];
 	public floorCount = 0;
 	public duration = 0;
 
 	public silent = false;
 
-	public static from(b: Ball | CompressedBall): Ball | null {
+	public prev: Ball | null = null;
+
+	public static from(b: Ball | CompressedBall): Ball {
 		if (b instanceof Ball) {
 			return b;
 		}
@@ -44,7 +47,7 @@ export class Ball {
 			}
 		}
 
-		return null;
+		throw new Error('Invalid Ball');
 	}
 
 	constructor(

@@ -1,5 +1,6 @@
 import { Ball } from './Ball';
 import { Engine } from './Engine';
+import { TNote } from './get-note-sequence';
 
 export class ReverseSequencer {
 	public static STATE_FREE_FALL = 1;
@@ -19,7 +20,7 @@ export class ReverseSequencer {
 	public topBounds?: { x1: number; x2: number };
 	public escapeFilter?: (i: number, px: number, py: number) => boolean;
 
-	constructor(engine: Engine, ball: Ball, sequence: TSequenceInput[], maxRetries: number = 4) {
+	constructor(engine: Engine, ball: Ball, sequence: TNote[], maxRetries: number = 4) {
 		this.random = Math.random;
 		this.ball = ball.copy();
 		this.ball.state = ReverseSequencer.STATE_FREE_FALL;
@@ -288,23 +289,12 @@ export class ReverseSequencer {
 	}
 }
 
-interface TSequenceInput {
-	timeOfImpact: number;
-	endTime: number;
-	yVelocityBin: number;
-	xPositionBin: number;
-	color: string;
-}
-
-interface TSequenceEntry {
+interface TSequenceEntry extends Omit<TNote, 'timeOfImpact' | 'endTime'> {
 	entryFrameIndex: number;
 	escape: TEscape | null;
 	retryCount: number;
 	backtrackIndex: number;
 	duration: number;
-	yVelocityBin: number;
-	xPositionBin: number;
-	color: string;
 }
 
 interface TEscape {
