@@ -1,10 +1,7 @@
 import { Midi } from '@tonejs/midi';
 import { staticFile } from 'remotion';
 
-import {
-	P5RemotionController,
-	TRemotionSketch
-} from '../../video/src/compositions/P5/P5RemotionController';
+import { P5RemotionController, TRemotionSketch } from '../_compositions/P5/P5RemotionController';
 import { Ball } from './Ball';
 import { Engine } from './Engine';
 import { getNoteSequence, TNote } from './get-note-sequence';
