@@ -1,3 +1,5 @@
+// https://github.com/isaac-mason/sketches/blob/main/sketches/melodic-marble-run/src/sketch.tsx
+
 import sunsetEnvironment from '@pmndrs/assets/hdri/sunset.exr';
 import { Environment, PerspectiveCamera } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
@@ -11,8 +13,10 @@ import {
 	RigidBodyProps,
 	Vector3Tuple
 } from '@react-three/rapier';
+import { ThreeCanvas } from '@remotion/three';
 import { useControls } from 'leva';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useVideoConfig } from 'remotion';
 import * as THREE from 'three';
 import * as tone from 'tone';
 
@@ -158,9 +162,10 @@ export function MelodicMarbleRunSketch() {
 	const { debug } = useControls('note-pillars', {
 		debug: false
 	});
+	const { width, height } = useVideoConfig();
 
 	return (
-		<>
+		<ThreeCanvas linear width={width} height={height}>
 			<Physics debug={debug} paused gravity={[0, -20, 0]}>
 				<PhysicsWrapper>
 					<Marble position={[-4, 10, 0]} />
@@ -192,6 +197,6 @@ export function MelodicMarbleRunSketch() {
 			<Environment files={sunsetEnvironment} />
 
 			<PerspectiveCamera makeDefault position={[0, 0, 30]} />
-		</>
+		</ThreeCanvas>
 	);
 }
