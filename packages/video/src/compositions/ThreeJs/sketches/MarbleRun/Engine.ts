@@ -14,13 +14,16 @@ export class Engine {
 	private _marble: TBody;
 	private _boxes: TBody[] = [];
 
+	private currentNoteIndex: number = 0;
+	private currentTime: number = 0;
+	private currentPathIndex: number = 0;
+
 	constructor(scene: THREE.Scene, world: RAPIER.World, notes: TNote[]) {
 		this._scene = scene;
 		this._world = world;
 		this._notes = notes;
-		this._guidePath = generateZigZagPath({});
+		this._guidePath = generateZigZagPath({ start: { x: 0, y: 0 }, width: 100, height: 1000 });
 		this.initializeMarble();
-		this.createBox(new THREE.Vector3(0, -5, 0), 45);
 	}
 
 	public get scene(): THREE.Scene {
@@ -82,7 +85,89 @@ export class Engine {
 		this._boxes.push({ mesh: boxMesh, body: boxBody });
 	}
 
-	public previewStep() {
+	private calculateBoxRotation(
+		marblePosition: RAPIER.Vector,
+		marbleVelocity: RAPIER.Vector
+	): number {
+		const nextPathPoint =
+			this.guidePath[this.currentPathIndex + 1] || this.guidePath[this.currentPathIndex];
+		if (nextPathPoint == null) {
+			throw Error("Couldn't find next path point");
+		}
+		const desiredDirection = new THREE.Vector2(
+			nextPathPoint.x - marblePosition.x,
+			nextPathPoint.y - marblePosition.y
+		).normalize();
+
+		const currentDirection = new THREE.Vector2(marbleVelocity.x, marbleVelocity.y).normalize();
+
+		// Calculate the angle to rotate the box
+		let rotationAngle =
+			Math.atan2(desiredDirection.y, desiredDirection.x) -
+			Math.atan2(currentDirection.y, currentDirection.x);
+
+		// Adjust rotation based on how far off-track the marble is
+		const distanceFromPath = this.getDistanceFromPath(marblePosition);
+		const maxDistance = 10; // Adjust this value as needed
+		const correctionFactor = Math.min(distanceFromPath / maxDistance, 1);
+		rotationAngle *= 1 + correctionFactor;
+
+		return rotationAngle;
+	}
+
+	private getDistanceFromPath(position: RAPIER.Vector): number {
+		const closestPoint = this.findClosestPointOnPath(position);
+		return Math.sqrt(
+			Math.pow(position.x - closestPoint.x, 2) + Math.pow(position.y - closestPoint.y, 2)
+		);
+	}
+
+	private findClosestPointOnPath(position: RAPIER.Vector): { x: number; y: number } {
+		let closestPoint = this.guidePath[0];
+		let minDistance = Number.MAX_VALUE;
+
+		for (const point of this.guidePath) {
+			const distance = Math.sqrt(
+				Math.pow(position.x - point.x, 2) + Math.pow(position.y - point.y, 2)
+			);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestPoint = point;
+			}
+		}
+
+		if (closestPoint == null) {
+			throw new Error("Couldn't find closest point");
+		}
+
+		this.currentPathIndex = this.guidePath.indexOf(closestPoint);
+		return closestPoint;
+	}
+
+	public update(deltaTime: number) {
+		this.world.step();
+		this.syncBodies();
+		this.currentTime += deltaTime;
+
+		if (
+			this.currentNoteIndex < this._notes.length &&
+			this.currentTime >= (this._notes[this.currentNoteIndex]?.timeOfImpact ?? 0)
+		) {
+			const marblePosition = this._marble.body.translation();
+			const marbleVelocity = this._marble.body.linvel();
+			const boxRotation = this.calculateBoxRotation(marblePosition, marbleVelocity);
+			this.createBox(new THREE.Vector3(marblePosition.x, marblePosition.y, 0), boxRotation);
+			this.currentNoteIndex++;
+		}
+
+		// this._marble.body.setTranslation(new RAPIER.Vector3(0, 0, 0), true);
+
+		if (this.currentTime % 5 < 0.01) {
+			console.log({ engine: this, currentTime: this.currentTime });
+		}
+	}
+
+	public syncBodies() {
 		const marblePosition = this._marble.body.translation();
 		this._marble.mesh.position.set(marblePosition.x, marblePosition.y, marblePosition.z);
 

@@ -15,12 +15,14 @@ export const LoadEngine: React.FC<TProps> = (props) => {
 	React.useEffect(() => {
 		(async () => {
 			// Load Midi Notes
-			const midi = await loadMidi('static/midi/ncs.mid');
+			const midi = await loadMidi('static/midi/simple.mid');
 			if (midi == null || midi.tracks.length === 0) {
 				console.warn('Midi is empty', { midi });
 				return;
 			}
 			const notes = getNoteSequence(midi.tracks[0]!);
+
+			console.log({ notes, midi });
 
 			// // Init Physics World/Engine
 			// await RAPIER.init();
@@ -41,8 +43,9 @@ export const LoadEngine: React.FC<TProps> = (props) => {
 		}
 	}, [engine]);
 
-	useFrame(() => {
-		engine?.previewStep();
+	useFrame((_, delta) => {
+		// engine?.syncBodies();
+		engine?.update(delta);
 	});
 
 	return null;
