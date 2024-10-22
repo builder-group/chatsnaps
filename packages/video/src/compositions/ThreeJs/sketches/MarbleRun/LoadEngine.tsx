@@ -1,6 +1,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRapier } from '@react-three/rapier';
 import React from 'react';
+import * as THREE from 'three';
 
 import { Engine } from './Engine';
 import { getNoteSequence } from './get-note-sequence';
@@ -35,13 +36,16 @@ export const LoadEngine: React.FC<TProps> = (props) => {
 			const engine = new Engine(scene, world, notes);
 			setEngine(engine);
 
-			engine.startGeneration((success) => {
-				if (success) {
-					console.log('Track generated successfully!');
-				} else {
-					console.log('Failed to generate track');
-				}
-			});
+			// engine.startGeneration((success) => {
+			// 	if (success) {
+			// 		console.log('Track generated successfully!');
+			// 	} else {
+			// 		console.log('Failed to generate track');
+			// 	}
+			// });
+
+			engine.createPlank(new THREE.Vector3(0, -20, 0), 0);
+			engine.startPlayback();
 		})();
 	}, [world, scene]);
 

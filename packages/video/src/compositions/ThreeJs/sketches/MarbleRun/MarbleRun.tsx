@@ -40,8 +40,7 @@ export const MarbleRun: React.FC = () => {
 						);
 					})}
 				</Physics>
-
-				<PerspectiveCamera makeDefault position={[0, 0, 30]} />
+				<PerspectiveCamera makeDefault position={[0, -45, 90]} />
 				<Environment files={sunsetEnvironment} />
 			</ThreeCanvas>
 		</div>
