@@ -34,6 +34,14 @@ export const LoadEngine: React.FC<TProps> = (props) => {
 
 			const engine = new Engine(scene, world, notes);
 			setEngine(engine);
+
+			engine.startGeneration((success) => {
+				if (success) {
+					console.log('Track generated successfully!');
+				} else {
+					console.log('Failed to generate track');
+				}
+			});
 		})();
 	}, [world, scene]);
 
@@ -44,7 +52,6 @@ export const LoadEngine: React.FC<TProps> = (props) => {
 	}, [engine]);
 
 	useFrame((_, delta) => {
-		// engine?.syncBodies();
 		engine?.update(delta);
 	});
 
