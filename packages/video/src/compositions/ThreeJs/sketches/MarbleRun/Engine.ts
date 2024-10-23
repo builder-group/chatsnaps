@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
@@ -420,18 +421,22 @@ export class Engine {
 			return;
 		}
 
-		// Initialize array to store positions
-		this._marble.trail = {
-			geometry: new THREE.BufferGeometry(),
-			positions: []
-		};
+		const points: THREE.Vector3[] = [];
 
-		// Create material for the trail
-		const material = new THREE.LineBasicMaterial({
-			color: 0xff0000
+		// Create visual mesh
+		const trailGeometry = new MeshLineGeometry();
+		trailGeometry.setPoints(points);
+		const trailMaterial = new MeshLineMaterial({
+			color: 0xff0000,
+			resolution: new THREE.Vector2(1080, 1920)
 		});
+		const trailMesh = new THREE.Mesh(trailGeometry, trailMaterial);
 
-		this._scene.add(new THREE.Line(this._marble.trail.geometry, material));
+		this._marble.trail = {
+			geometry: trailGeometry,
+			points
+		};
+		this._scene.add(trailMesh);
 	}
 
 	private updateTrail(): void {
@@ -439,24 +444,19 @@ export class Engine {
 			return;
 		}
 
-		// Get current marble position
-		const currentPosition = this._marble.mesh.position.clone();
-
 		// Add new position to the start of the array
-		this._marble.trail.positions.unshift(currentPosition);
+		this._marble.trail.points.unshift(this._marble.mesh.position.clone());
 
 		// Remove old positions if we exceed the trail length
-		if (this._marble.trail.positions.length > 500) {
-			this._marble.trail.positions.pop();
+		if (this._marble.trail.points.length > 500) {
+			this._marble.trail.points.pop();
 		}
 
-		// Create array of points for the line geometry
-		const points = this._marble.trail.positions.map(
-			(pos) => new THREE.Vector3(pos.x, pos.y, pos.z)
-		);
-
 		// Update the geometry
-		this._marble.trail.geometry.setFromPoints(points);
+		const points = this._marble.trail.points.map(
+			(pos) => new THREE.Vector3(pos.x, pos.y, pos.z + 0.05)
+		);
+		this._marble.trail.geometry.setPoints(points);
 	}
 }
 
@@ -467,8 +467,8 @@ interface TMeshBody {
 
 interface TMarble extends TMeshBody {
 	trail?: {
-		geometry: THREE.BufferGeometry;
-		positions: THREE.Vector3[];
+		geometry: MeshLineGeometry;
+		points: THREE.Vector3[];
 	};
 }
 
