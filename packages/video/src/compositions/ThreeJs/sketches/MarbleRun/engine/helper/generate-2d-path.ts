@@ -1,6 +1,7 @@
 import seedrandom from 'seedrandom';
+import * as THREE from 'three';
 
-export function generateZigZagPath(options: TGenerate2DPathOptions = {}): T2DPoint[] {
+export function generate2DPath(options: TGenerate2DPathOptions = {}): THREE.Vector2[] {
 	const {
 		start,
 		width = 2000,
@@ -18,7 +19,7 @@ export function generateZigZagPath(options: TGenerate2DPathOptions = {}): T2DPoi
 	let currentY = start != null ? start.y : 0;
 	let velocityX = 0;
 	let velocityY = 0;
-	const path: T2DPoint[] = [{ x: currentX, y: currentY }];
+	const path: THREE.Vector2[] = [new THREE.Vector2(currentX, currentY)];
 
 	for (let i = 1; i < numPoints; i++) {
 		const progress = i / (numPoints - 1);
@@ -45,14 +46,14 @@ export function generateZigZagPath(options: TGenerate2DPathOptions = {}): T2DPoi
 			velocityX *= -(1.5 + (rng() - 0.5) * 0.1);
 		}
 
-		path.push({ x: currentX, y: currentY });
+		path.push(new THREE.Vector2(currentX, currentY));
 	}
 
 	return path;
 }
 
-interface TGenerate2DPathOptions {
-	start?: T2DPoint;
+export interface TGenerate2DPathOptions {
+	start?: THREE.Vector2;
 	width?: number;
 	height?: number;
 	numPoints?: number;
@@ -60,9 +61,4 @@ interface TGenerate2DPathOptions {
 	smoothness?: number;
 	gravity?: number;
 	seed?: string;
-}
-
-export interface T2DPoint {
-	x: number;
-	y: number;
 }

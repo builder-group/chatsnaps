@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useRapier } from '@react-three/rapier';
 import React from 'react';
 
-import { Engine } from './Engine';
+import { Engine } from './engine';
 import { getNoteSequence } from './get-note-sequence';
 import { loadMidi } from './load-midi';
 
@@ -56,20 +56,15 @@ export const EngineComponent: React.FC<TProps> = () => {
 				}
 			];
 
-			const engine = new Engine(scene, world, testNotes);
+			const engine = new Engine(scene, world, { debug: true, seed: 'test' });
+			engine.generate(testNotes);
+
 			setEngine(engine);
-
-			engine.startGeneration((success) => {
-				if (success) {
-					console.log('Track generated successfully!');
-				} else {
-					console.log('Failed to generate track');
-				}
-			});
-
-			// engine.createPlank(new THREE.Vector3(0, -20, 0), 0);
-			// engine.startPlayback();
 		})();
+
+		return () => {
+			engine?.clear();
+		};
 	}, [world, scene]);
 
 	useFrame((state, delta) => {
