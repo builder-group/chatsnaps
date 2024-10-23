@@ -1,22 +1,26 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
+import { calculateRotationRange } from './calculate-rotation-range';
 import { generateZigZagPath as generateGuidePath, T2DPoint } from './generate-guide-path';
 import { TNote } from './get-note-sequence';
-import { rapierToThreeVector } from './rapier-three';
 
 const DEFAULT_CONFIG: TEngineConfig = {
+	debug: true,
+	seed: Math.random().toString(),
+	//	seed: 'test',
 	marble: {
 		radius: 1,
-		restitution: 0.7,
+		restitution: 1,
 		linearDamping: 0.1,
 		color: 0xffffff
 	},
 	plank: {
-		width: 3,
-		height: 0.5,
-		depth: 1,
-		restitution: 0.7,
+		width: 4,
+		height: 1,
+		depth: 2,
+		restitution: 1,
 		color: 0x808080
 	},
 
@@ -39,7 +43,7 @@ export class Engine {
 	private readonly _world: RAPIER.World;
 	private readonly _scene: THREE.Scene;
 
-	private _marble: TMeshBody | null = null;
+	private _marble: TMarble | null = null;
 	private _planks: TMeshBody[] = [];
 
 	private _isGenerating = false;
@@ -50,6 +54,10 @@ export class Engine {
 
 	private _currentTime = 0;
 
+	private _rng: seedrandom.PRNG;
+
+	private _pause = false;
+
 	constructor(
 		scene: THREE.Scene,
 		world: RAPIER.World,
@@ -57,10 +65,15 @@ export class Engine {
 		options: Partial<TEngineConfig> = {}
 	) {
 		this.config = { ...DEFAULT_CONFIG, ...options };
+		this._rng = seedrandom(this.config.seed);
 		this._scene = scene;
 		this._world = world;
 		this._notes = notes;
 		this._guidePath = generateGuidePath({ start: { x: 0, y: 0 }, width: 100, height: 1000 });
+
+		if (this.config.debug) {
+			this.visualizeGuidePath();
+		}
 	}
 
 	public get scene(): THREE.Scene {
@@ -83,6 +96,10 @@ export class Engine {
 		this._onGenerationComplete = callback;
 		this.reset();
 		this._marble = this.createMarble();
+
+		if (this.config.debug) {
+			this.initMarbleTrail();
+		}
 	}
 
 	/**
@@ -138,7 +155,8 @@ export class Engine {
 		// Create physics body
 		const marbleDesc = RAPIER.RigidBodyDesc.dynamic()
 			.setTranslation(position.x, position.y, position.z)
-			.setLinearDamping(this.config.marble.linearDamping);
+			.setLinearDamping(this.config.marble.linearDamping)
+			.enabledTranslations(true, true, false); // Lock z axis
 		const marbleBody = this._world.createRigidBody(marbleDesc);
 
 		// Create collider
@@ -195,6 +213,22 @@ export class Engine {
 			.setFriction(0.7);
 		this._world.createCollider(colliderDesc, plankBody);
 
+		if (this.config.debug) {
+			// Create the red dot to represent the origin point
+			const originGeometry = new THREE.SphereGeometry(0.1); // Small sphere
+			const originMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
+			const originMesh = new THREE.Mesh(originGeometry, originMaterial);
+
+			// Set the position of the origin dot to match the plank's position
+			originMesh.position.copy(position);
+
+			// Optionally, set the origin dot to be in front of the plank if needed
+			originMesh.position.z += this.config.plank.depth / 2 + 0.1; // Adjust this if needed
+
+			// Add the origin mesh to the scene
+			this._scene.add(originMesh);
+		}
+
 		const plank: TMeshBody = { mesh: plankMesh, body: plankBody };
 		this._planks.push(plank);
 		this._scene.add(plankMesh);
@@ -229,27 +263,25 @@ export class Engine {
 	}
 
 	/**
-	 * Get the current marble state
-	 */
-	private getMarbleState(): TMarbleState | null {
-		if (this._marble == null) {
-			return null;
-		}
-
-		return {
-			position: rapierToThreeVector(this._marble.body.translation()),
-			velocity: rapierToThreeVector(this._marble.body.linvel())
-		};
-	}
-
-	/**
 	 * Update the engine state
 	 */
-	public update(deltaTime: number): void {
+	public update(camera: THREE.Camera, deltaTime: number): void {
+		if (this._pause) {
+			return;
+		}
+
 		if (this._isGenerating) {
 			this.updateGeneration(deltaTime);
 		} else {
 			this.updatePlayback(deltaTime);
+		}
+
+		if (this._marble != null) {
+			camera.lookAt(this._marble?.mesh.position);
+		}
+
+		if (this.config.debug) {
+			this.updateTrail();
 		}
 	}
 
@@ -266,17 +298,12 @@ export class Engine {
 		// Check if we need to place a new plank
 		const currentNote = this._notes[this._nextNoteIndex];
 		if (currentNote != null && this._currentTime >= currentNote.timeOfImpact) {
-			const marbleState = this.getMarbleState();
-			if (marbleState == null) {
-				this._isGenerating = false;
-				this._onGenerationComplete?.(false);
-				return;
-			}
-
-			console.log('Place Plank for note', { currentNote, marbleState });
-
-			const success = await this.placePlank(marbleState);
+			const success = await this.placePlank();
 			if (success) {
+				this._pause = true;
+				setTimeout(() => {
+					this._pause = false;
+				}, 1000);
 				this._nextNoteIndex++;
 			} else {
 				this._isGenerating = false;
@@ -307,12 +334,43 @@ export class Engine {
 	/**
 	 * Place a plank with simulation and scoring
 	 */
-	private async placePlank(marbleState: TMarbleState): Promise<boolean> {
+	private async placePlank(): Promise<boolean> {
+		if (this._marble == null) {
+			console.warn("Can't place plank without knowing marble movement.");
+			return false;
+		}
+
+		// Get world snapshot and simulate
 		const worldSnapshot = this._world.takeSnapshot();
-
 		const simWorld = RAPIER.World.restoreSnapshot(worldSnapshot);
+		const simMarble = simWorld.getRigidBody(this._marble.body.handle);
+		const velocity = simMarble.linvel();
 
-		// TODO: Generate Plank Candidates
+		// Calculate rotation range and random rotation
+		const { minRotationRad, maxRotationRad } = calculateRotationRange(velocity.x, velocity.y);
+		const randomRotationRad = minRotationRad + this._rng() * (maxRotationRad - minRotationRad);
+		const rotationRad = randomRotationRad + Math.PI / 2; // Add 90 degrees because its based on x axis rotation
+
+		const marblePosition = simMarble.translation();
+
+		// Step 1: Start from the ball's position
+		// Step 2: Calculate the offset needed to place the plank surface at the ball
+		//         considering the ball's radius and plank's height
+		const surfaceOffset = this.config.marble.radius + this.config.plank.height / 2;
+
+		// Step 3: Calculate the offset direction based on rotation
+		// When the plank is rotated, we need to move it down and to the side
+		const offsetX = surfaceOffset * Math.sin(rotationRad);
+		const offsetY = surfaceOffset * Math.cos(rotationRad);
+
+		// Step 4: Calculate final plank position
+		const plankPosition = new THREE.Vector3(
+			marblePosition.x + offsetX,
+			marblePosition.y - offsetY, // Subtract because Y grows upward
+			marblePosition.z
+		);
+
+		this.createPlank(plankPosition, rotationRad);
 
 		return true;
 	}
@@ -340,6 +398,66 @@ export class Engine {
 		const point = this._guidePath[index];
 		return pos.distanceTo(new THREE.Vector3(point!.x, point!.y, 0));
 	}
+
+	/**
+	 * Visualize the guide path defined in this._guidePath
+	 */
+	private visualizeGuidePath() {
+		this._guidePath.forEach((point) => {
+			// Create visual mesh
+			const sphereGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+			const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+			const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+			sphereMesh.position.set(point.x, -point.y, 0);
+
+			this._scene.add(sphereMesh);
+		});
+	}
+
+	private initMarbleTrail(): void {
+		if (this._marble == null) {
+			return;
+		}
+
+		// Initialize array to store positions
+		this._marble.trail = {
+			geometry: new THREE.BufferGeometry(),
+			positions: []
+		};
+
+		// Create material for the trail
+		const material = new THREE.LineBasicMaterial({
+			color: 0xff0000
+		});
+
+		this._scene.add(new THREE.Line(this._marble.trail.geometry, material));
+	}
+
+	private updateTrail(): void {
+		if (this._marble?.trail == null) {
+			return;
+		}
+
+		// Get current marble position
+		const currentPosition = this._marble.mesh.position.clone();
+
+		// Add new position to the start of the array
+		this._marble.trail.positions.unshift(currentPosition);
+
+		// Remove old positions if we exceed the trail length
+		if (this._marble.trail.positions.length > 500) {
+			this._marble.trail.positions.pop();
+		}
+
+		// Create array of points for the line geometry
+		const points = this._marble.trail.positions.map(
+			(pos) => new THREE.Vector3(pos.x, pos.y, pos.z)
+		);
+
+		// Update the geometry
+		this._marble.trail.geometry.setFromPoints(points);
+	}
 }
 
 interface TMeshBody {
@@ -347,9 +465,19 @@ interface TMeshBody {
 	body: RAPIER.RigidBody;
 }
 
+interface TMarble extends TMeshBody {
+	trail?: {
+		geometry: THREE.BufferGeometry;
+		positions: THREE.Vector3[];
+	};
+}
+
 type TGenerationCompleteCallback = (success: boolean) => void;
 
 interface TEngineConfig {
+	debug: boolean;
+	seed: string;
+
 	marble: TMarbleConfig;
 	plank: TPlankConfig;
 

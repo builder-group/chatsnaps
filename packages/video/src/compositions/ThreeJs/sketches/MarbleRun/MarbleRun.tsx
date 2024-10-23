@@ -1,46 +1,31 @@
 import sunsetEnvironment from '@pmndrs/assets/hdri/sunset.exr';
-import { Environment, PerspectiveCamera } from '@react-three/drei';
+import { Environment, PerspectiveCamera, Plane } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import { ThreeCanvas } from '@remotion/three';
 import React from 'react';
 import { useVideoConfig } from 'remotion';
-import * as THREE from 'three';
 
-import { Engine } from './Engine';
-import { LoadEngine } from './LoadEngine';
+import { EngineComponent } from './EngineComponent';
 
 export const MarbleRun: React.FC = () => {
 	const { width, height } = useVideoConfig();
-	const [engine, setEngine] = React.useState<Engine | null>(null);
-
-	console.log({ engine });
 
 	return (
 		<div className="relative" style={{ width, height }}>
-			{engine == null && <div>Loding</div>}
-
 			<ThreeCanvas linear width={width} height={height}>
-				<Physics debug={true} gravity={[0, -20, 0]}>
-					<LoadEngine updateEngine={setEngine} />
+				<Plane args={[1000, 1000]} position={[0, 0, 0]} rotation={[0, 0, 0]}>
+					<meshStandardMaterial attach="material" color="lightgreen" />
+				</Plane>
+				<Physics paused debug={true} gravity={[0, -20, 0]}>
 					{/* <RigidBody position={[0, 10, 0]} type="dynamic" colliders="ball">
 						<mesh>
 							<sphereGeometry args={[1, 32, 32]} />
 							<meshStandardMaterial color="white" />
 						</mesh>
 					</RigidBody> */}
-					{engine?.guidePath.map((point) => {
-						return (
-							<mesh
-								key={`${point.x}-${point.y}`}
-								position={new THREE.Vector3(point.x, -point.y, 0)}
-							>
-								<sphereGeometry args={[0.2, 32, 32]} />
-								<meshStandardMaterial color="red" />
-							</mesh>
-						);
-					})}
+					<EngineComponent />
 				</Physics>
-				<PerspectiveCamera makeDefault position={[0, -45, 90]} />
+				<PerspectiveCamera makeDefault position={[0, 45, 100]} />
 				<Environment files={sunsetEnvironment} />
 			</ThreeCanvas>
 		</div>
