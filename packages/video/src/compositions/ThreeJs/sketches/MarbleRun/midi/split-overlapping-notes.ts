@@ -1,14 +1,22 @@
 import { Midi, Track } from '@tonejs/midi';
 
-import { EPitchRange, getPitchRange } from './get-pitch-range';
-
 /**
- * Splits overlapping notes in a MIDI file into separate tracks based on pitch range.
+ * Splits overlapping notes in a MIDI file into separate non-overlapping tracks.
+ * Tries to minimize the number of tracks by only splitting when necessary.
  *
  * @param midi - The input Midi file object from @tonejs/midi
- * @returns A new Midi file with split tracks
+ * @param options - Configuration options for the splitting behavior
+ * @returns A new Midi file with minimal non-overlapping tracks
  */
-export function splitOverlappingNotes(midi: Midi): Midi {
+export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = {}): Midi {
+	const {
+		pitchWindow = 12,
+		overlapThreshold = 0,
+		groupByPitch = true,
+		trackNamePattern = '{originalName}_{index}',
+		copyControlChanges: shouldCopyControlChanges = true
+	} = options;
+
 	const newMidi = new Midi();
 
 	for (const originalTrack of midi.tracks) {
@@ -16,96 +24,173 @@ export function splitOverlappingNotes(midi: Midi): Midi {
 			continue;
 		}
 
-		// Initialize maps to store tracks for each pitch range
-		const pitchRangeTracks: Map<EPitchRange, Track[]> = new Map([
-			[EPitchRange.Bass, [newMidi.addTrack()]],
-			[EPitchRange.Tenor, [newMidi.addTrack()]],
-			[EPitchRange.Alto, [newMidi.addTrack()]],
-			[EPitchRange.Soprano, [newMidi.addTrack()]]
-		]);
-
-		// Initialize all tracks with original settings
-		pitchRangeTracks.forEach((tracks, pitchRange) => {
-			const initialTrack = tracks[0]!;
-			initialTrack.name = `${originalTrack.name || 'Track'}_${pitchRange}_0`;
-			initialTrack.channel = originalTrack.channel;
-			if (originalTrack.instrument) {
-				initialTrack.instrument.number = originalTrack.instrument.number;
-				initialTrack.instrument.name = originalTrack.instrument.name;
-			}
-		});
-
 		// Sort notes by time for sequential processing
 		const sortedNotes = [...originalTrack.notes].sort((a, b) => a.time - b.time);
 
+		// Create initial track
+		const tracks: Track[] = [createNewTrack(newMidi, originalTrack, 0, trackNamePattern)];
+
+		// Try to distribute notes to existing tracks or create new ones as needed
 		for (const note of sortedNotes) {
-			const pitchRange = getPitchRange(note.midi);
-			const tracksForRange = pitchRangeTracks.get(pitchRange)!;
-			let noteAdded = false;
+			let trackFound = false;
 
-			for (const track of tracksForRange) {
-				const hasOverlap = track.notes.some((existingNote) => {
-					const noteStart = note.time;
-					const noteEnd = note.time + note.duration;
-					const existingStart = existingNote.time;
-					const existingEnd = existingNote.time + existingNote.duration;
-					return noteStart < existingEnd && noteEnd > existingStart;
-				});
+			// Get tracks sorted by compatibility
+			const compatibleTracks = groupByPitch
+				? findTracksWithSimilarPitch(tracks, note.midi, pitchWindow)
+				: tracks;
 
-				if (!hasOverlap) {
-					track.addNote({
-						midi: note.midi,
-						time: note.time,
-						duration: note.duration,
-						velocity: note.velocity
-					});
-					noteAdded = true;
+			// Try to add to existing tracks
+			for (const track of compatibleTracks) {
+				if (!hasOverlappingNotes(track, note, overlapThreshold)) {
+					addNoteToTrack(track, note);
+					trackFound = true;
 					break;
 				}
 			}
 
-			if (!noteAdded) {
-				// Create new track if note couldn't be added to existing tracks
-				const newTrack = newMidi.addTrack();
-				newTrack.name = `${originalTrack.name || 'Track'}_${pitchRange}_${tracksForRange.length}`;
-				newTrack.channel = originalTrack.channel;
-
-				if (originalTrack.instrument) {
-					newTrack.instrument.number = originalTrack.instrument.number;
-					newTrack.instrument.name = originalTrack.instrument.name;
-				}
-
-				newTrack.addNote({
-					midi: note.midi,
-					time: note.time,
-					duration: note.duration,
-					velocity: note.velocity
-				});
-
-				tracksForRange.push(newTrack);
+			// If no existing track works, create a new one
+			if (!trackFound) {
+				const newTrack = createNewTrack(newMidi, originalTrack, tracks.length, trackNamePattern);
+				addNoteToTrack(newTrack, note);
+				tracks.push(newTrack);
 			}
 		}
 
-		// Copy control changes to all tracks in each pitch range
-		if (originalTrack.controlChanges) {
-			pitchRangeTracks.forEach((tracks) => {
-				for (const track of tracks) {
-					Object.entries(originalTrack.controlChanges).forEach(([ccNumber, changes]) => {
-						changes.forEach((cc) => {
-							track.addCC({
-								number: parseInt(ccNumber),
-								value: cc.value,
-								time: cc.time
-							});
-						});
-					});
-				}
+		// Copy control changes to all tracks (since they affect the entire channel)
+		if (shouldCopyControlChanges && originalTrack.controlChanges) {
+			tracks.forEach((track) => {
+				copyControlChanges(originalTrack, track);
 			});
 		}
 	}
 
-	// Remove empty tracks
-	newMidi.tracks = newMidi.tracks.filter((track) => track.notes.length);
-
 	return newMidi;
+}
+
+export interface TSplitNotesOptions {
+	/**
+	 * Window size in semitones for considering notes to be in a similar pitch range
+	 * Default: 12 (one octave)
+	 */
+	pitchWindow?: number;
+
+	/**
+	 * Minimum time offset in seconds between notes to consider them non-overlapping
+	 * Negative values allow some overlap, positive values force a gap
+	 * Default: 0 (exact overlap)
+	 */
+	overlapThreshold?: number;
+
+	/**
+	 * Whether to prioritize keeping similar pitched notes together
+	 * Default: true
+	 */
+	groupByPitch?: boolean;
+
+	/**
+	 * Custom naming pattern for split tracks
+	 * Available variables: {originalName}, {index}
+	 * Default: "{originalName}_{index}"
+	 */
+	trackNamePattern?: string;
+
+	/**
+	 * Whether to copy control changes to all split tracks
+	 * Default: true
+	 */
+	copyControlChanges?: boolean;
+}
+
+function createNewTrack(
+	midi: Midi,
+	originalTrack: Track,
+	index: number,
+	trackNamePattern: string
+): Track {
+	const track = midi.addTrack();
+	const trackName = trackNamePattern
+		.replace('{originalName}', originalTrack.name ?? 'Track')
+		.replace('{index}', index.toString());
+
+	track.name = trackName;
+	track.channel = originalTrack.channel;
+
+	if (originalTrack.instrument) {
+		track.instrument.number = originalTrack.instrument.number;
+		track.instrument.name = originalTrack.instrument.name;
+	}
+
+	return track;
+}
+
+function hasOverlappingNotes(
+	track: Track,
+	note: { time: number; duration: number },
+	overlapThreshold: number
+): boolean {
+	return track.notes.some((existingNote) => {
+		const noteStart = note.time;
+		const noteEnd = note.time + note.duration;
+		const existingStart = existingNote.time;
+		const existingEnd = existingNote.time + existingNote.duration;
+
+		return noteStart - overlapThreshold < existingEnd && noteEnd + overlapThreshold > existingStart;
+	});
+}
+
+function addNoteToTrack(
+	track: Track,
+	note: { midi: number; time: number; duration: number; velocity: number }
+) {
+	track.addNote({
+		midi: note.midi,
+		time: note.time,
+		duration: note.duration,
+		velocity: note.velocity
+	});
+}
+
+function copyControlChanges(originalTrack: Track, newTrack: Track) {
+	Object.entries(originalTrack.controlChanges).forEach(([ccNumber, changes]) => {
+		changes.forEach((cc) => {
+			newTrack.addCC({
+				number: parseInt(ccNumber),
+				value: cc.value,
+				time: cc.time
+			});
+		});
+	});
+}
+
+function findTracksWithSimilarPitch(
+	tracks: Track[],
+	midiNote: number,
+	pitchWindow: number
+): Track[] {
+	// Sort tracks by how well they match the pitch range
+	return [...tracks].sort((trackA, trackB) => {
+		const avgPitchA = getAveragePitch(trackA);
+		const avgPitchB = getAveragePitch(trackB);
+
+		const distanceA = Math.abs(avgPitchA - midiNote);
+		const distanceB = Math.abs(avgPitchB - midiNote);
+
+		// Prioritize tracks within the pitch window
+		const aInWindow = distanceA <= pitchWindow;
+		const bInWindow = distanceB <= pitchWindow;
+
+		if (aInWindow && !bInWindow) return -1;
+		if (!aInWindow && bInWindow) return 1;
+
+		// If both are in/out of window, sort by closest average pitch
+		return distanceA - distanceB;
+	});
+}
+
+function getAveragePitch(track: Track): number {
+	if (!track.notes.length) {
+		return 0;
+	}
+	const sum = track.notes.reduce((acc, note) => acc + note.midi, 0);
+	return sum / track.notes.length;
 }

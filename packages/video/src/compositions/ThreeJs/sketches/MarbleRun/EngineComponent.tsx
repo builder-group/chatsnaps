@@ -5,7 +5,6 @@ import React from 'react';
 
 import { Engine } from './engine';
 import { loadMidi } from './load-midi';
-import { splitOverlappingNotes, STUDIO_writeMidi } from './midi';
 
 export const EngineComponent: React.FC<TProps> = () => {
 	const { world } = useRapier();
@@ -15,16 +14,15 @@ export const EngineComponent: React.FC<TProps> = () => {
 	React.useEffect(() => {
 		(async () => {
 			// Load Midi Notes
-			const midi = await loadMidi('static/midi/mission-impossible.mid');
+			const midi = await loadMidi('static/midi/mission-impossible_split.mid');
 			if (midi == null || !midi.tracks.length) {
 				console.warn('Midi is empty', { midi });
 				return;
 			}
-			const splitMit = splitOverlappingNotes(midi);
 
-			console.log({ splitMit, midi });
-
-			await STUDIO_writeMidi(splitMit, 'static/midi/split/mission-impossible_split.mid');
+			// const splitMit = splitOverlappingNotes(midi);
+			// console.log({ splitMit, midi });
+			// await STUDIO_writeMidi(splitMit, 'static/midi/split/mission-impossible_split3.mid');
 
 			// create a new midi file
 			const testMidi = new Midi();
