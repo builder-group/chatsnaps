@@ -14,7 +14,8 @@ export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = 
 		overlapThreshold = 0,
 		groupByPitch = true,
 		trackNamePattern = '{originalName}_{index}',
-		copyControlChanges: shouldCopyControlChanges = true
+		copyControlChanges: shouldCopyControlChanges = true,
+		initialOffset = 0
 	} = options;
 
 	const newMidi = new Midi();
@@ -41,8 +42,8 @@ export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = 
 
 			// Try to add to existing tracks
 			for (const track of compatibleTracks) {
-				if (!hasOverlappingNotes(track, note, overlapThreshold)) {
-					addNoteToTrack(track, note);
+				if (!hasOverlappingNotes(track, note, overlapThreshold, initialOffset)) {
+					addNoteToTrack(track, note, initialOffset);
 					trackFound = true;
 					break;
 				}
@@ -51,7 +52,7 @@ export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = 
 			// If no existing track works, create a new one
 			if (!trackFound) {
 				const newTrack = createNewTrack(newMidi, originalTrack, tracks.length, trackNamePattern);
-				addNoteToTrack(newTrack, note);
+				addNoteToTrack(newTrack, note, initialOffset);
 				tracks.push(newTrack);
 			}
 		}
@@ -59,7 +60,7 @@ export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = 
 		// Copy control changes to all tracks (since they affect the entire channel)
 		if (shouldCopyControlChanges && originalTrack.controlChanges != null) {
 			for (const track of tracks) {
-				copyControlChanges(originalTrack, track);
+				copyControlChanges(originalTrack, track, initialOffset);
 			}
 		}
 	}
@@ -99,6 +100,12 @@ export interface TSplitNotesOptions {
 	 * Default: true
 	 */
 	copyControlChanges?: boolean;
+
+	/**
+	 * Initial time offset in seconds to add to each track
+	 * Default: 0 (starts immediately)
+	 */
+	initialOffset?: number;
 }
 
 function createNewTrack(
@@ -126,13 +133,15 @@ function createNewTrack(
 function hasOverlappingNotes(
 	track: Track,
 	note: { time: number; duration: number },
-	overlapThreshold: number
+	overlapThreshold: number,
+	initialOffset: number
 ): boolean {
+	const noteStart = note.time + initialOffset;
+	const noteEnd = noteStart + note.duration;
+
 	return track.notes.some((existingNote) => {
-		const noteStart = note.time;
-		const noteEnd = note.time + note.duration;
 		const existingStart = existingNote.time;
-		const existingEnd = existingNote.time + existingNote.duration;
+		const existingEnd = existingStart + existingNote.duration;
 
 		return noteStart - overlapThreshold < existingEnd && noteEnd + overlapThreshold > existingStart;
 	});
@@ -140,23 +149,24 @@ function hasOverlappingNotes(
 
 function addNoteToTrack(
 	track: Track,
-	note: { midi: number; time: number; duration: number; velocity: number }
+	note: { midi: number; time: number; duration: number; velocity: number },
+	initialOffset: number
 ) {
 	track.addNote({
 		midi: note.midi,
-		time: note.time,
+		time: note.time + initialOffset,
 		duration: note.duration,
 		velocity: note.velocity
 	});
 }
 
-function copyControlChanges(originalTrack: Track, newTrack: Track) {
+function copyControlChanges(originalTrack: Track, newTrack: Track, initialOffset: number) {
 	for (const [ccNumber, changes] of Object.entries(originalTrack.controlChanges)) {
 		changes.forEach((cc) => {
 			newTrack.addCC({
 				number: parseInt(ccNumber),
 				value: cc.value,
-				time: cc.time
+				time: cc.time + initialOffset
 			});
 		});
 	}

@@ -1,6 +1,6 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRapier } from '@react-three/rapier';
-import { Midi } from '@tonejs/midi';
+import { Midi, Track } from '@tonejs/midi';
 import React from 'react';
 
 import { Engine } from './engine';
@@ -20,7 +20,7 @@ export const EngineComponent: React.FC<TProps> = () => {
 				return;
 			}
 
-			// const splitMit = splitOverlappingNotes(midi);
+			// const splitMit = splitOverlappingNotes(midi, { initialOffset: 1 });
 			// console.log({ splitMit, midi });
 			// await STUDIO_writeMidi(splitMit, 'static/midi/split/mission-impossible_split3.mid');
 
@@ -61,7 +61,7 @@ export const EngineComponent: React.FC<TProps> = () => {
 				});
 
 			const engine = new Engine(scene, world, { debug: true, seed: 'test' });
-			engine.generate(testTrack);
+			engine.generate(midi.tracks[0] as Track);
 
 			setEngine(engine);
 		})();
