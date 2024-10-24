@@ -57,10 +57,10 @@ export function splitOverlappingNotes(midi: Midi, options: TSplitNotesOptions = 
 		}
 
 		// Copy control changes to all tracks (since they affect the entire channel)
-		if (shouldCopyControlChanges && originalTrack.controlChanges) {
-			tracks.forEach((track) => {
+		if (shouldCopyControlChanges && originalTrack.controlChanges != null) {
+			for (const track of tracks) {
 				copyControlChanges(originalTrack, track);
-			});
+			}
 		}
 	}
 
@@ -115,7 +115,7 @@ function createNewTrack(
 	track.name = trackName;
 	track.channel = originalTrack.channel;
 
-	if (originalTrack.instrument) {
+	if (originalTrack.instrument != null) {
 		track.instrument.number = originalTrack.instrument.number;
 		track.instrument.name = originalTrack.instrument.name;
 	}
@@ -151,7 +151,7 @@ function addNoteToTrack(
 }
 
 function copyControlChanges(originalTrack: Track, newTrack: Track) {
-	Object.entries(originalTrack.controlChanges).forEach(([ccNumber, changes]) => {
+	for (const [ccNumber, changes] of Object.entries(originalTrack.controlChanges)) {
 		changes.forEach((cc) => {
 			newTrack.addCC({
 				number: parseInt(ccNumber),
@@ -159,7 +159,7 @@ function copyControlChanges(originalTrack: Track, newTrack: Track) {
 				time: cc.time
 			});
 		});
-	});
+	}
 }
 
 function findTracksWithSimilarPitch(
