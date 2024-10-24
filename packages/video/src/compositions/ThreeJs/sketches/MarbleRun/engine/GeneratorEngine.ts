@@ -47,8 +47,9 @@ export class GeneratorEngine {
 				velocityWeight: 1.0,
 				directionalChangeWeight: 0.5,
 				pathAlignmentWeight: 1.0,
-				collisionWeight: 10.0,
-				heightLossWeight: 0.5
+				collisionWeight: 1.0,
+				dinstanceTraveledWeight: 1.0
+				// TODO: dinstance to last spawned plank
 			},
 			simulation = {
 				numSimulationsPerPlank: 8,
@@ -67,8 +68,9 @@ export class GeneratorEngine {
 		this._guidePath = new GuidePath({
 			start: new THREE.Vector2(0, 0),
 			width: 100,
-			height: 1000,
-			seed
+			height: 2000,
+			seed,
+			numPoints: 500
 		});
 		this._marble = Marble.init(scene, world, { position: new THREE.Vector3(0, 0, 0), debug });
 		this._planks = [];
@@ -300,8 +302,8 @@ export class GeneratorEngine {
 		const velocityScore = this.calculateVelocityScore(startVelocity);
 		const directionalChangeScore = this.calculateDirectionalChangeScore(startVelocity, endVelocity);
 		const pathAlignmentScore = this.calculatePathAlignmentScore(endPos);
-		const collisionScore = plankHit ? Math.max(0, 1 - collisions / stepCount) : 0; // Zero score if plank wasn't hit at all
-		const heightLossScore = this.calculateHeightLossScore(startPos, endPos);
+		const collisionScore = plankHit ? Math.max(0, 1 - collisions / (stepCount + 1)) : 0;
+		const distanceTraveledScore = this.calculateDistanceTraveledScore(startPos, endPos);
 
 		// Calculate final score based on weights
 		const score =
@@ -309,7 +311,7 @@ export class GeneratorEngine {
 			directionalChangeScore * this._config.scoring.directionalChangeWeight +
 			pathAlignmentScore * this._config.scoring.pathAlignmentWeight +
 			collisionScore * this._config.scoring.collisionWeight +
-			heightLossScore * this._config.scoring.heightLossWeight;
+			distanceTraveledScore * this._config.scoring.dinstanceTraveledWeight;
 
 		return {
 			score,
@@ -318,59 +320,50 @@ export class GeneratorEngine {
 				directionalChangeScore,
 				pathAlignmentScore,
 				collisionScore,
-				heightLossScore
+				distanceTraveledScore
 			}
 		};
 	}
 
 	private calculateVelocityScore(endVelocity: THREE.Vector3): number {
-		const speed = endVelocity.length();
-		const targetSpeed = 10;
-		const maxSpeed = 15;
-
-		if (speed > maxSpeed) {
-			return 0;
-		}
-
-		return 1 - Math.abs(speed - targetSpeed) / targetSpeed;
+		return this.calculateThresholdScore(endVelocity.length(), {
+			min: 5,
+			ideal: 10,
+			max: 15,
+			penaltyFactor: 0.5, // Gentle penalty for being too fast
+			minToIdealPower: 0.8, // Favor faster speeds
+			idealToMaxPower: 0.8
+		});
 	}
 
 	private calculateDirectionalChangeScore(
 		startVelocity: THREE.Vector3,
 		endVelocity: THREE.Vector3
 	): number {
-		const minSpeedThreshold = 0.1;
-		const startSpeed = startVelocity.length();
-		const endSpeed = endVelocity.length();
-
-		if (startSpeed < minSpeedThreshold || endSpeed < minSpeedThreshold) {
-			return 0;
-		}
-
 		const startDir = startVelocity.clone().normalize();
 		const endDir = endVelocity.clone().normalize();
-
 		const dot = Math.max(-1, Math.min(1, startDir.dot(endDir)));
-		const angleChange = Math.acos(dot);
+		const angleDegrees = (Math.acos(dot) * 180) / Math.PI;
 
-		return angleChange / Math.PI;
+		return this.calculateThresholdScore(angleDegrees, {
+			min: 15,
+			ideal: 45,
+			max: 120,
+			penaltyFactor: 1.5,
+			minToIdealPower: 0.8, // Favor sharper turns
+			idealToMaxPower: 0.8
+		});
 	}
 
-	private calculateHeightLossScore(startPos: THREE.Vector3, endPos: THREE.Vector3): number {
-		const heightLoss = startPos.y - endPos.y;
-		const maxHeightLoss = 5;
-
-		// Gaining height is bad
-		if (heightLoss < 0) {
-			return 0;
-		}
-
-		// Losing too much height is bad
-		if (heightLoss > maxHeightLoss) {
-			return 0;
-		}
-
-		return 1 - heightLoss / maxHeightLoss;
+	private calculateDistanceTraveledScore(startPos: THREE.Vector3, endPos: THREE.Vector3): number {
+		return this.calculateThresholdScore(startPos.distanceTo(endPos), {
+			min: 5,
+			ideal: 8,
+			max: 10,
+			penaltyFactor: 0.5,
+			minToIdealPower: 0.8, // Favor further traveled distances
+			idealToMaxPower: 0.8
+		});
 	}
 
 	private calculatePathAlignmentScore(endPos: THREE.Vector3): number {
@@ -379,6 +372,40 @@ export class GeneratorEngine {
 		);
 
 		return deviationScore * 0.7 + progressScore * 0.3;
+	}
+
+	private calculateThresholdScore(
+		value: number,
+		config: {
+			min: number;
+			ideal: number;
+			max: number;
+			penaltyFactor?: number;
+			minToIdealPower?: number; // How quickly score rises (default 0.7)
+			idealToMaxPower?: number; // How quickly score falls (default 0.6)
+		}
+	): number {
+		const { min, ideal, max, penaltyFactor, minToIdealPower = 0.7, idealToMaxPower = 0.6 } = config;
+
+		// Too low
+		if (value < min) {
+			return 0;
+		}
+
+		// Between min and ideal
+		if (value >= min && value <= ideal) {
+			const normalized = (value - min) / (ideal - min);
+			return Math.pow(normalized, minToIdealPower);
+		}
+
+		// Between ideal and max
+		if (value <= max) {
+			const overIdeal = (value - ideal) / (max - ideal);
+			return Math.max(0, 1 - Math.pow(overIdeal, idealToMaxPower));
+		}
+
+		// Above max - apply penalty
+		return penaltyFactor != null ? Math.max(0, 1 - ((value - max) / max) * penaltyFactor) : 0;
 	}
 
 	public clear() {
@@ -398,7 +425,7 @@ export interface TGeneratorEngineConfig {
 		directionalChangeWeight: number;
 		pathAlignmentWeight: number;
 		collisionWeight: number;
-		heightLossWeight: number;
+		dinstanceTraveledWeight: number;
 	};
 	simulation: {
 		numSimulationsPerPlank: number; // Number of placement attempts per plank
@@ -416,6 +443,6 @@ interface TPlankPlacementResult {
 		directionalChangeScore: number;
 		pathAlignmentScore: number;
 		collisionScore: number;
-		heightLossScore: number;
+		distanceTraveledScore: number;
 	};
 }
