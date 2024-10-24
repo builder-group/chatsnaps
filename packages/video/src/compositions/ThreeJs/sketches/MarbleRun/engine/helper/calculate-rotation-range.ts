@@ -5,19 +5,19 @@
  *
  * @param velocityX - X velocity
  * @param velocityY - Y velocity
- * @param rotationRange - Symmetrical rotation range around the optimal rotation in radians (default: π/4 or 45 degrees)
+ * @param rotationThreshold - Symmetrical rotation threshold around the optimal rotation in radians (default: π/4 or 45 degrees)
  */
 export function calculateRotationRange(
 	velocityX: number,
 	velocityY: number,
-	rotationRange: number = Math.PI / 4
+	rotationThreshold: number = Math.PI / 4
 ): TRotationRange {
 	// Calculate optimal rotation in radians based on the velocity direction
 	const optimalRotationRad = Math.atan2(velocityY, velocityX);
 
 	// Ensure the range is symmetrical around the optimal rotation
-	const minRotationRad = optimalRotationRad - rotationRange;
-	const maxRotationRad = optimalRotationRad + rotationRange;
+	const minRotationRad = optimalRotationRad - rotationThreshold;
+	const maxRotationRad = optimalRotationRad + rotationThreshold;
 
 	return {
 		minRotationRad,
@@ -26,7 +26,7 @@ export function calculateRotationRange(
 	};
 }
 
-interface TRotationRange {
+export interface TRotationRange {
 	minRotationRad: number;
 	maxRotationRad: number;
 	optimalRotationRad: number;

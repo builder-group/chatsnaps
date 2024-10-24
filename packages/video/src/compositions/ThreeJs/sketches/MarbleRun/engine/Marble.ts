@@ -45,6 +45,7 @@ export class Marble extends MeshBody {
 			);
 		};
 		const marbleMesh = new THREE.Mesh(marbleGeometry, marbleMaterial);
+		marbleMesh.position.set(position.x, position.y, position.z);
 
 		scene.add(marbleMesh);
 

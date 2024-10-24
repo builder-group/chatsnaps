@@ -18,12 +18,25 @@ export class Plank extends MeshBody {
 
 		// Create visual mesh
 		const plankGeometry = new THREE.BoxGeometry(width, height, depth);
-		const plankMaterial = new THREE.MeshStandardMaterial({
+		const plankBaseMaterial = new THREE.MeshStandardMaterial({
 			color,
 			metalness: 0.1,
 			roughness: 0.7
 		});
-		const plankMesh = new THREE.Mesh(plankGeometry, plankMaterial);
+		const plankTopMaterial = new THREE.MeshStandardMaterial({
+			color: 0xff0000,
+			metalness: 0.1,
+			roughness: 0.7
+		});
+		const plankMesh = new THREE.Mesh(plankGeometry, [
+			plankBaseMaterial,
+			plankBaseMaterial,
+			plankTopMaterial,
+			plankBaseMaterial,
+			plankBaseMaterial,
+			plankBaseMaterial
+		]);
+		plankMesh.position.set(position.x, position.y, position.y);
 
 		scene.add(plankMesh);
 
