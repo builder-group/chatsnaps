@@ -4,7 +4,7 @@ import { Midi, Track } from '@tonejs/midi';
 import React from 'react';
 
 import { Engine } from './engine';
-import { loadMidi } from './load-midi';
+import { loadMidi } from './midi';
 
 export const EngineComponent: React.FC<TProps> = () => {
 	const { world } = useRapier();
