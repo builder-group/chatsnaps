@@ -13,9 +13,9 @@ The system uses physics simulation to generate a playable marble track where:
 - The track follows a general guide path while maintaining playability
 - All movement is purely physics-based without artificial forces
 
-
-### Create MIDI File
-- https://onlinesequencer.net/
+### Get MIDI Files
+- https://www.kunstderfuge.com/
+- https://onlinesequencer.net/sequences
 
 ## Learnings
 - https://discoverthreejs.com/book/first-steps/transformations/

@@ -1,8 +1,8 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import { Track } from '@tonejs/midi';
 import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
-import { TNote } from '../get-note-sequence';
 import { GuidePath } from './GuidePath';
 import { calculateRotationRange } from './helper';
 import { Marble } from './Marble';
@@ -14,7 +14,7 @@ export class GeneratorEngine {
 	private readonly _world: RAPIER.World;
 	private readonly _scene: THREE.Scene;
 
-	private readonly _notes: TNote[];
+	private readonly _track: Track;
 	private _nextNoteIndex = 0;
 
 	private readonly _guidePath: GuidePath;
@@ -29,7 +29,7 @@ export class GeneratorEngine {
 	constructor(
 		scene: THREE.Scene,
 		world: RAPIER.World,
-		notes: TNote[],
+		track: Track,
 		options: TGeneratorEngineOptions = {}
 	) {
 		const {
@@ -49,7 +49,7 @@ export class GeneratorEngine {
 		};
 		this._scene = scene;
 		this._world = world;
-		this._notes = notes;
+		this._track = track;
 		this._guidePath = new GuidePath({ start: new THREE.Vector2(0, 0), width: 100, height: 1000 });
 		this._marble = Marble.init(scene, world, { position: new THREE.Vector3(0, 0, 0), debug });
 		this._planks = [];
@@ -65,14 +65,14 @@ export class GeneratorEngine {
 	}
 
 	public async update(camera: THREE.Camera, deltaTime: number): Promise<void> {
-		if (this._nextNoteIndex >= this._notes.length) {
+		if (this._nextNoteIndex >= this._track.notes.length) {
 			this._completed = true;
 			return;
 		}
 
 		// Check if we need to place a new plank
-		const currentNote = this._notes[this._nextNoteIndex];
-		if (currentNote != null && this._currentTime >= currentNote.timeOfImpact) {
+		const currentNote = this._track.notes[this._nextNoteIndex];
+		if (currentNote != null && this._currentTime >= currentNote.time) {
 			const success = await this.placePlank();
 			if (success) {
 				this._nextNoteIndex++;

@@ -1,10 +1,11 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRapier } from '@react-three/rapier';
+import { Midi } from '@tonejs/midi';
 import React from 'react';
 
 import { Engine } from './engine';
-import { getNoteSequence } from './get-note-sequence';
 import { loadMidi } from './load-midi';
+import { splitOverlappingNotes, STUDIO_writeMidi } from './midi';
 
 export const EngineComponent: React.FC<TProps> = () => {
 	const { world } = useRapier();
@@ -14,50 +15,55 @@ export const EngineComponent: React.FC<TProps> = () => {
 	React.useEffect(() => {
 		(async () => {
 			// Load Midi Notes
-			const midi = await loadMidi('static/midi/simple.mid');
-			if (midi == null || midi.tracks.length === 0) {
+			const midi = await loadMidi('static/midi/mission-impossible.mid');
+			if (midi == null || !midi.tracks.length) {
 				console.warn('Midi is empty', { midi });
 				return;
 			}
-			const notes = getNoteSequence(midi.tracks[0]!);
+			const splitMit = splitOverlappingNotes(midi);
 
-			console.log({ notes, midi });
+			console.log({ splitMit, midi });
 
-			const testNotes = [
-				{
-					timeOfImpact: 1,
+			await STUDIO_writeMidi(splitMit, 'static/midi/split/mission-impossible_split.mid');
+
+			// create a new midi file
+			const testMidi = new Midi();
+			// add a track
+			const testTrack = testMidi.addTrack();
+			testTrack
+				.addNote({
+					time: 1,
 					duration: 1,
 					midi: 77
-				},
-				{
-					timeOfImpact: 2,
+				})
+				.addNote({
+					time: 2,
 					duration: 1,
 					midi: 74
-				},
-				{
-					timeOfImpact: 3,
+				})
+				.addNote({
+					time: 3,
 					duration: 1,
 					midi: 77
-				},
-				{
-					timeOfImpact: 4,
+				})
+				.addNote({
+					time: 4,
 					duration: 1,
 					midi: 74
-				},
-				{
-					timeOfImpact: 5,
+				})
+				.addNote({
+					time: 5,
 					duration: 1,
 					midi: 77
-				},
-				{
-					timeOfImpact: 6,
+				})
+				.addNote({
+					time: 6,
 					duration: 1,
 					midi: 74
-				}
-			];
+				});
 
 			const engine = new Engine(scene, world, { debug: true, seed: 'test' });
-			engine.generate(testNotes);
+			engine.generate(testTrack);
 
 			setEngine(engine);
 		})();

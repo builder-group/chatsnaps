@@ -1,7 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import { Track } from '@tonejs/midi';
 import * as THREE from 'three';
 
-import { TNote } from '../get-note-sequence';
 import { GeneratorEngine } from './GeneratorEngine';
 import { PlaybackEngine } from './PlaybackEngine';
 
@@ -46,8 +46,8 @@ export class Engine {
 		}
 	}
 
-	public generate(notes: TNote[]) {
-		this._generatorEngine = new GeneratorEngine(this._scene, this._world, notes, {
+	public generate(track: Track) {
+		this._generatorEngine = new GeneratorEngine(this._scene, this._world, track, {
 			debug: this._config.debug,
 			seed: this._config.seed
 		});
