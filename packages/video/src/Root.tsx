@@ -1,6 +1,6 @@
 import { Composition } from 'remotion';
 
-import { VideoComp } from './compositions';
+import { ThreeJsComp, VideoComp } from './compositions';
 import defaultProps from './default-props.json';
 
 import './style.css';
@@ -17,6 +17,16 @@ export const Root: React.FC = () => {
 				width={1080} // Set by calculateMetadata
 				height={1920} // Set by calculateMetadata
 				schema={VideoComp.schema}
+				defaultProps={defaultProps.video1 as any}
+			/>
+			<Composition
+				id={ThreeJsComp.id}
+				component={ThreeJsComp}
+				durationInFrames={300}
+				fps={30}
+				width={1080}
+				height={1920}
+				schema={ThreeJsComp.schema}
 				defaultProps={defaultProps.video1 as any}
 			/>
 		</>

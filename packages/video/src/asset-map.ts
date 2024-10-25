@@ -69,6 +69,15 @@ export const assetMap = {
   "static/image/overlay/tiktok.png": {
     "type": "PNG"
   },
+  "static/midi/mission-impossible.mid": {
+    "type": "MID"
+  },
+  "static/midi/mission-impossible_split.mid": {
+    "type": "MID"
+  },
+  "static/midi/simple.mid": {
+    "type": "MID"
+  },
   "static/video/.local/minecraft_1.mp4": {
     "type": "MP4",
     "durationMs": 67666
