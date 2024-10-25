@@ -22,20 +22,19 @@ export class MeshBody {
 		return this._body.handle;
 	}
 
+	public update(deltaTime: number): void {
+		this.syncMesh();
+	}
+
+	// https://youtu.be/ipW-DUyPYlk?t=456
 	private syncMesh(): void {
-		const translation = this._body.translation();
-		this._mesh.position.set(translation.x, translation.y, translation.z);
-		const rotation = this._body.rotation();
-		this._mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+		this._mesh.position.copy(this._body.translation());
+		this._mesh.quaternion.copy(this._body.rotation());
 	}
 
 	public clear(scene: THREE.Scene, world: RAPIER.World): void {
 		scene.remove(this._mesh);
 		world.removeRigidBody(this._body);
-	}
-
-	public update(deltaTime: number): void {
-		this.syncMesh();
 	}
 }
 

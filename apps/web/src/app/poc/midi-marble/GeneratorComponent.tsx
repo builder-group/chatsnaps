@@ -11,7 +11,7 @@ export const GeneratorComponent: React.FC = () => {
 	const { scene } = useThree();
 	const [generator, setGenerator] = React.useState<Generator | null>(null);
 	const { debug } = useControls('generator', {
-		debug: false
+		debug: true
 	});
 
 	React.useEffect(() => {
@@ -31,7 +31,7 @@ export const GeneratorComponent: React.FC = () => {
 			}
 
 			newGenerator = new Generator(scene, world, midi.tracks[0], {
-				debug: true,
+				debug,
 				seed: 'test'
 			});
 			setGenerator(newGenerator);
@@ -42,7 +42,7 @@ export const GeneratorComponent: React.FC = () => {
 		return () => {
 			newGenerator?.clear();
 		};
-	}, [world, scene]);
+	}, [world, scene, debug]);
 
 	useFrame((state, delta) => {
 		generator?.update(state.camera, delta);
