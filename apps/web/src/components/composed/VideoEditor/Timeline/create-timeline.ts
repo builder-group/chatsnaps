@@ -1,4 +1,4 @@
-import { type TProjectCompProps } from '@repo/video';
+import { type TVideoComp } from '@repo/video';
 import { createState } from 'feature-state';
 
 import { createTimelineAction } from './create-timeline-action';
@@ -6,7 +6,7 @@ import { createTimelineTrack } from './create-timeline-track';
 import { parseTimeToPixel } from './helper';
 import { type TPlayState, type TTimeline, type TTimelineCursorInteraction } from './types';
 
-export function createTimeline(project: TProjectCompProps, onChange: () => void): TTimeline {
+export function createTimeline(video: TVideoComp, onChange: () => void): TTimeline {
 	const timeline: TTimeline = {
 		_config: {
 			trackHeight: 50
@@ -23,7 +23,7 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 			interaction: createState<TTimelineCursorInteraction>('NONE')
 		},
 		getTrackAtIndex(this: TTimeline, index) {
-			const trackId = this.trackIds._value[index];
+			const trackId = this.trackIds._v[index];
 			if (trackId == null) {
 				return null;
 			}
@@ -34,31 +34,31 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 			return track;
 		},
 		width(this: TTimeline) {
-			return parseTimeToPixel(this.duration._value, {
-				...timeline.scale._value,
+			return parseTimeToPixel(this.duration._v, {
+				...timeline.scale._v,
 				startLeft: 0
 			});
 		},
 		height(this: TTimeline) {
-			return this.trackIds._value.length * this._config.trackHeight;
+			return this.trackIds._v.length * this._config.trackHeight;
 		}
 	};
 
 	// Load Tracks and Actions
-	for (const trackId of project.timeline.trackIds) {
-		const projectTrack = project.timeline.trackMap[trackId];
+	for (const trackId of video.timeline.trackIds) {
+		const videoTrack = video.timeline.trackMap[trackId];
 
-		if (projectTrack == null) {
+		if (videoTrack == null) {
 			console.warn(`Track with ID ${trackId} not found in trackMap`);
 			continue;
 		}
 
-		timeline.trackIds._value.push(trackId);
+		timeline.trackIds._v.push(trackId);
 
 		// Create and register the track
 		const track = createTimelineTrack(timeline, { id: trackId, actionIds: [] });
 		track.listen(({ value }) => {
-			const pT = project.timeline.trackMap[value.id];
+			const pT = video.timeline.trackMap[value.id];
 			if (pT != null) {
 				pT.actionIds = value.actionIds;
 				onChange();
@@ -67,26 +67,26 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 		timeline._trackMap[trackId] = track;
 
 		// Load and register actions for this track
-		for (const actionId of projectTrack.actionIds) {
-			const projectAction = project.timeline.actionMap[actionId];
-			if (projectAction != null) {
+		for (const actionId of videoTrack.actionIds) {
+			const videoAction = video.timeline.actionMap[actionId];
+			if (videoAction != null) {
 				const action = createTimelineAction(timeline, {
 					id: actionId,
 					trackId,
-					start: projectAction.startFrame / project.fps,
-					duration: projectAction.durationInFrames / project.fps
+					start: videoAction.startFrame / video.fps,
+					duration: videoAction.durationInFrames / video.fps
 				});
 				action.listen(({ value }) => {
-					const pA = project.timeline.actionMap[value.id];
+					const pA = video.timeline.actionMap[value.id];
 					if (pA != null) {
-						pA.durationInFrames = Math.floor(value.duration * project.fps);
-						pA.startFrame = Math.floor(value.start * project.fps);
+						pA.durationInFrames = Math.floor(value.duration * video.fps);
+						pA.startFrame = Math.floor(value.start * video.fps);
 
 						// Only re-render canvas if action is visible
 						if (
 							(pA.type === 'Plugin' && pA.pluginId === 'chat-story') ||
-							(timeline.currentTime._value > value.start &&
-								timeline.currentTime._value < value.start + value.duration)
+							(timeline.currentTime._v > value.start &&
+								timeline.currentTime._v < value.start + value.duration)
 						) {
 							onChange();
 						}
@@ -94,12 +94,12 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 
 					// TODO: Figure out performant way to recompute duration
 					// and introduce fixed and dynamic duration mode
-					// if (value.start + value.duration > timeline.duration._value) {
+					// if (value.start + value.duration > timeline.duration._v) {
 					// 	timeline.duration.set(value.start + value.duration);
 					// }
 				});
 				timeline._actionMap[actionId] = action;
-				track._value.actionIds.push(actionId);
+				track._v.actionIds.push(actionId);
 			} else {
 				console.warn(`Action with ID ${actionId} not found in actionMap`);
 			}
@@ -110,13 +110,13 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 	}
 
 	// Calculate initial duration
-	if (project.durationInFrames != null) {
-		timeline.duration.set(project.durationInFrames / project.fps);
+	if (video.durationInFrames != null) {
+		timeline.duration.set(video.durationInFrames / video.fps);
 	} else {
 		timeline.duration.set(
 			Math.max(
 				...Object.values(timeline._actionMap).map((action) => {
-					return action._value.start + action._value.duration;
+					return action._v.start + action._v.duration;
 				})
 			)
 		);
@@ -125,7 +125,7 @@ export function createTimeline(project: TProjectCompProps, onChange: () => void)
 	// Setup track listener
 	timeline.trackIds._notify();
 	timeline.trackIds.listen(({ value }) => {
-		project.timeline.trackIds = value as string[];
+		video.timeline.trackIds = value as string[];
 		onChange();
 	});
 

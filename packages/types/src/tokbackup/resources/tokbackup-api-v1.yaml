@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: TikTok Data Fetch API
+  version: 1.0.0
+  description: API to fetch TikTok video data and transcripts
+
+servers:
+  - url: https://tt.tokbackup.com
+
+paths:
+  /fetchTikTokData:
+    get:
+      summary: Fetch TikTok video data and transcript
+      description: Retrieves data and optionally the transcript for a specified TikTok video
+      parameters:
+        - name: video
+          in: query
+          required: true
+          description: URL of the TikTok video
+          schema:
+            type: string
+        - name: get_transcript
+          in: query
+          required: false
+          description: Flag to include the video transcript
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Unique identifier of the video
+                      desc:
+                        type: string
+                        description: Video description or caption
+                      createTime:
+                        type: string
+                        description: Timestamp of video creation
+                      locationCreated:
+                        type: string
+                        description: Location where the video was created
+                      video:
+                        type: object
+                        properties:
+                          cover:
+                            type: string
+                            description: URL of the video cover image
+                          playAddr:
+                            type: string
+                            description: URL to play the video
+                          downloadAddr:
+                            type: string
+                            description: URL to download the video
+                          duration:
+                            type: integer
+                            description: Duration of the video in seconds
+                          width:
+                            type: integer
+                            description: Width of the video in pixels
+                          height:
+                            type: integer
+                            description: Height of the video in pixels
+                      author:
+                        type: object
+                        properties:
+                          uniqueId:
+                            type: string
+                            description: TikTok username of the video creator
+                          nickname:
+                            type: string
+                            description: Display name of the video creator
+                          avatarLarger:
+                            type: string
+                            description: URL of the author's large avatar image
+                          signature:
+                            type: string
+                            description: Author's profile signature or bio
+                      music:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the music track
+                          title:
+                            type: string
+                            description: Title of the music track
+                          playUrl:
+                            type: string
+                            description: URL to play the music
+                          coverLarge:
+                            type: string
+                            description: URL of the music's large cover image
+                          authorName:
+                            type: string
+                            description: Display name of the music creator
+                      stats:
+                        type: object
+                        properties:
+                          diggCount:
+                            type: string
+                            description: Number of likes
+                          shareCount:
+                            type: string
+                            description: Number of shares
+                          commentCount:
+                            type: string
+                            description: Number of comments
+                          playCount:
+                            type: string
+                            description: Number of views
+                      textExtra:
+                        type: array
+                        description: Array of hashtags used in the video
+                        items:
+                          type: object
+                          properties:
+                            hashtagName:
+                              type: string
+                  subtitles:
+                    type: string
+                    description: WebVTT format transcript of the video (if requested)
+        '400':
+          description: Bad request
+        '404':
+          description: Video not found
+        '500':
+          description: Internal server error

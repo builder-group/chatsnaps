@@ -47,6 +47,13 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 		}
 	});
 
+	// https://github.com/TanStack/virtual/discussions/852
+	React.useEffect(() => {
+		if (containerRef.current != null) {
+			timeGridVirtualizer.measure();
+		}
+	}, [containerRef, timeGridVirtualizer]);
+
 	// Remeasure all item sizes for the timeGridVirtualizer on scale change
 	React.useEffect(() => {
 		const unsubscribe = timeline.scale.listen(() => {
@@ -63,62 +70,46 @@ export const TimeArea: React.FC<TTimeAreaProps> = (props) => {
 			const position = e.clientX - rect.x;
 			const left = Math.max(position, scaleStartLeft);
 
-			const time = parsePixelToTime(left, timeline.scale._value);
+			const time = parsePixelToTime(left, timeline.scale._v);
 			timeline.playState.set('PAUSED');
-			timeline.currentTime.set(time);
+			timeline.currentTime.set(Math.min(time, timeline.duration._v));
 		},
 		[timeline, scaleStartLeft]
 	);
 
 	return (
-		<div className="absolute h-full">
-			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
-				const isShowScale = virtualItem.index % scaleSplitCount === 0;
-				if (isShowScale) {
-					return (
-						<div
-							key={virtualItem.key}
-							className="absolute top-0 h-full border-r-2 border-white/20"
-							style={{
-								left: virtualItem.start,
-								width: virtualItem.size
-							}}
-						/>
-					);
-				}
-				return null;
-			})}
+		<div className="relative h-full">
 			<div
 				onClick={handleClick}
-				className="relative h-8 cursor-pointer bg-purple-400"
-				style={{ width: timeGridVirtualizer.getTotalSize() }}
-			>
-				{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
-					const isShowScale = showUnit ? virtualItem.index % scaleSplitCount === 0 : true;
-					const item =
-						(showUnit ? virtualItem.index / scaleSplitCount : virtualItem.index) * scaleBaseValue;
+				className="h-8 w-full cursor-pointer bg-purple-400"
+				style={{ minWidth: timeGridVirtualizer.getTotalSize() }}
+			/>
+			{timeGridVirtualizer.getVirtualItems().map((virtualItem) => {
+				const isShowScale = virtualItem.index % scaleSplitCount === 0;
+				const item =
+					(showUnit ? virtualItem.index / scaleSplitCount : virtualItem.index) * scaleBaseValue;
 
-					return (
-						<div
-							key={virtualItem.key}
-							className={cn('absolute bottom-0 border-r-2 border-white/20', {
-								'h-2': isShowScale,
-								'h-1': !isShowScale
-							})}
-							style={{
-								left: virtualItem.start,
-								width: virtualItem.size
-							}}
-						>
-							{isShowScale ? (
-								<div className="absolute right-0 top-0 -translate-y-full translate-x-1/2 text-xs text-white/60">
-									{item}
-								</div>
-							) : null}
-						</div>
-					);
-				})}
-			</div>
+				return (
+					<div
+						key={virtualItem.key}
+						className={cn('pointer-events-none absolute left-0 border-r-2 border-white/20', {
+							'top-6': isShowScale,
+							'top-7': !isShowScale
+						})}
+						style={{
+							transform: `translate(${virtualItem.start.toString()}px, 0)`,
+							width: virtualItem.size,
+							height: isShowScale ? `calc(100% - 1.5rem)` : `0.25rem`
+						}}
+					>
+						{isShowScale ? (
+							<div className="absolute right-0 top-0 -translate-y-full translate-x-1/2 text-xs text-white/60">
+								{item}
+							</div>
+						) : null}
+					</div>
+				);
+			})}
 		</div>
 	);
 };

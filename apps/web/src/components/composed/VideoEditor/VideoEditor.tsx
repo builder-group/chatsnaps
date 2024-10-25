@@ -1,6 +1,6 @@
 'use client';
 
-import { ProjectComp, type TProjectCompProps } from '@repo/video';
+import { VideoComp, type TVideoComp } from '@repo/video';
 
 import '@repo/video/dist/style.css';
 
@@ -23,14 +23,14 @@ import { chatstory } from './mock';
 export const VideoEditor: React.FC = () => {
 	const mediaPlayerRef = React.useRef<MediaPlayerInstance>(null);
 
-	const [project, setProject] = React.useState<TProjectCompProps>(chatstory);
+	const [video, setVideo] = React.useState<TVideoComp>(chatstory);
 	const timeline = React.useMemo(
 		() =>
-			createTimeline(project, () => {
-				// Force re-render to reflect project changes by slightly adjusting player time
+			createTimeline(video, () => {
+				// Force re-render to reflect video changes by slightly adjusting player time
 				mediaPlayerRef.current?.remoteControl.seek(mediaPlayerRef.current.state.currentTime + 1e-9);
 			}),
-		[project]
+		[video]
 	);
 
 	React.useEffect(() => {
@@ -68,13 +68,13 @@ export const VideoEditor: React.FC = () => {
 							src={
 								{
 									type: 'video/remotion',
-									src: ProjectComp as any,
-									durationInFrames: project.durationInFrames,
-									fps: project.fps,
+									src: VideoComp as any,
+									durationInFrames: video.durationInFrames,
+									fps: video.fps,
 									initialFrame: 0,
-									compositionWidth: project.width,
-									compositionHeight: project.height,
-									inputProps: project,
+									compositionWidth: video.width,
+									compositionHeight: video.height,
+									inputProps: video,
 									renderLoading: () => {
 										console.log('RenderLoading');
 										return null;
@@ -94,7 +94,7 @@ export const VideoEditor: React.FC = () => {
 							ref={mediaPlayerRef}
 							playsInline
 							onTimeUpdate={({ currentTime }) => {
-								if (timeline.cursor.interaction._value === 'NONE') {
+								if (timeline.playState._v === 'PLAYING') {
 									timeline.currentTime.set(currentTime, {
 										additionalData: { source: 'media-player' }
 									});

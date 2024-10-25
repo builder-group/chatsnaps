@@ -19,7 +19,7 @@ export function createTimelineTrack(
 			if (index < 0) {
 				return null;
 			}
-			const actionId = this._value.actionIds[index];
+			const actionId = this._v.actionIds[index];
 			if (actionId == null) {
 				return null;
 			}
@@ -30,10 +30,10 @@ export function createTimelineTrack(
 			return action;
 		},
 		sort(this: TTimelineTrack) {
-			this._value.actionIds = this._value.actionIds.sort((a, b) => {
+			this._v.actionIds = this._v.actionIds.sort((a, b) => {
 				const actionA = this._timeline._actionMap[a];
 				const actionB = this._timeline._actionMap[b];
-				return (actionA?._value.start ?? 0) - (actionB?._value.start ?? 0);
+				return (actionA?._v.start ?? 0) - (actionB?._v.start ?? 0);
 			});
 		}
 	};

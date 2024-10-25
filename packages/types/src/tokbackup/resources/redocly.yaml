@@ -1,0 +1,5 @@
+apis:
+  tokbackup@v1:
+    root: ./tokbackup-api-v1.yaml
+    x-openapi-ts:
+      output: ../.openapi/tokbackup-api-v1.ts

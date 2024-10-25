@@ -72,7 +72,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 			const affectedIndices: number[] = [];
 
 			const currAction = currentAction;
-			const currIndex = track._value.actionIds.indexOf(currAction._value.id);
+			const currIndex = track._v.actionIds.indexOf(currAction._v.id);
 			if (currIndex === -1) {
 				return [];
 			}
@@ -82,10 +82,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 			let compareAction = track.getActionAtIndex(compareIndex);
 
 			// Find the correct position to insert the action
-			while (
-				compareAction != null &&
-				comparisonFn(currAction._value.start, compareAction._value.start)
-			) {
+			while (compareAction != null && comparisonFn(currAction._v.start, compareAction._v.start)) {
 				targetIndex = compareIndex;
 				compareIndex += indexStep;
 				compareAction = track.getActionAtIndex(compareIndex);
@@ -94,9 +91,9 @@ export const Action: React.FC<TActionProps> = (props) => {
 			// If the action needs to be moved
 			if (targetIndex !== currIndex) {
 				// Remove the current action and insert it at the new position
-				const [movedActionId] = track._value.actionIds.splice(currIndex, 1);
+				const [movedActionId] = track._v.actionIds.splice(currIndex, 1);
 				if (movedActionId != null) {
-					track._value.actionIds.splice(targetIndex, 0, movedActionId);
+					track._v.actionIds.splice(targetIndex, 0, movedActionId);
 				}
 
 				// Determine the range of affected indices
@@ -120,11 +117,11 @@ export const Action: React.FC<TActionProps> = (props) => {
 	// 2. Don't always include the next action item. e.g. when moving item to the end or start
 	React.useEffect(() => {
 		const unsubscribe = action.interaction.listen(() => {
-			if (action.interaction._value !== 'NONE') {
+			if (action.interaction._v !== 'NONE') {
 				return;
 			}
 
-			// console.log('Before: ', { actionIds: [...track._value.actionIds] });
+			// console.log('Before: ', { actionIds: [...track._v.actionIds] });
 
 			let affectedIndices: number[] = [];
 			const currentAction = action;
@@ -150,7 +147,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 				affectedIndices.push(lastIndex + 1);
 			}
 
-			// console.log('After: ', { affectedIndices, actionIds: [...track._value.actionIds] });
+			// console.log('After: ', { affectedIndices, actionIds: [...track._v.actionIds] });
 
 			// Update virtual list items based on affected indexes
 			if (affectedIndices.length > 0) {
@@ -201,7 +198,7 @@ export const Action: React.FC<TActionProps> = (props) => {
 
 			// Note: 'startLeft' is not relevant to calculate deleta time as its the left offset
 			const deltaTime = parsePixelToTime(deltaX, {
-				...action._timeline.scale._value,
+				...action._timeline.scale._v,
 				startLeft: 0
 			});
 
@@ -277,26 +274,23 @@ export const Action: React.FC<TActionProps> = (props) => {
 		<>
 			{interaction === 'DRAGGING' && (
 				<div
-					className="pointer-events-none absolute border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
+					className="pointer-events-none absolute left-0 top-0 border-2 border-dashed border-blue-400 bg-blue-200 opacity-50"
 					style={{
-						left: action.x(),
-						top: action.y(),
+						transform: `translate(${action.x().toString()}px, ${action.y().toString()}px)`,
 						width: action.width(),
 						height: action.height()
 					}}
 				/>
 			)}
 			<div
-				className={cn('absolute rounded-sm border border-blue-300', {
+				className={cn('absolute left-0 top-0 rounded-sm border border-blue-300', {
 					'z-20 cursor-grabbing bg-blue-600 shadow-lg': interaction === 'DRAGGING',
 					'z-0 cursor-grab bg-blue-500': interaction !== 'DRAGGING'
 				})}
 				style={{
+					transform: `translate(${(interaction === 'DRAGGING' && dragPosition ? dragPosition.x : action.x()).toString()}px, ${(interaction === 'DRAGGING' && dragPosition ? dragPosition.y : action.y()).toString()}px)`,
 					width: action.width(),
-					height: action.height(),
-					// transition: interaction === 'NONE' ? 'all 0.3s ease-out' : 'none',
-					left: interaction === 'DRAGGING' && dragPosition ? dragPosition.x : action.x(),
-					top: interaction === 'DRAGGING' && dragPosition ? dragPosition.y : action.y()
+					height: action.height()
 				}}
 				onMouseDown={(e) => {
 					handleMouseDown(e, 'DRAGGING');

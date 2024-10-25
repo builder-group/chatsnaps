@@ -21,7 +21,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 				return 0;
 			}
 
-			// console.log(`[estimateSize] ${action._value.id} (${index.toString()})`);
+			// console.log(`[estimateSize] ${action._v.id} (${index.toString()})`);
 
 			return calculateVirtualTimelineActionSize(action, track.getActionAtIndex(index - 1));
 		},
@@ -29,6 +29,13 @@ export const Track: React.FC<TTrackProps> = (props) => {
 		overscan: 5,
 		initialOffset: 0
 	});
+
+	// https://github.com/TanStack/virtual/discussions/852
+	React.useEffect(() => {
+		if (containerRef.current != null) {
+			actionVirtualizer.measure();
+		}
+	}, [containerRef, actionVirtualizer]);
 
 	// Remeasure all item sizes for the actionVirtualizer on scale change
 	React.useEffect(() => {
@@ -41,13 +48,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 	}, [actionVirtualizer, track]);
 
 	return (
-		<div
-			className="bg-green-400"
-			style={{
-				width: actionVirtualizer.getTotalSize(),
-				height: track._timeline._config.trackHeight
-			}}
-		>
+		<>
 			{actionVirtualizer.getVirtualItems().map((virtualAction) => {
 				const action = track.getActionAtIndex(virtualAction.index);
 				if (action == null) {
@@ -63,7 +64,7 @@ export const Track: React.FC<TTrackProps> = (props) => {
 					/>
 				);
 			})}
-		</div>
+		</>
 	);
 };
 

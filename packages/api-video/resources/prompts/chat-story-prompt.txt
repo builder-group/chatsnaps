@@ -12,17 +12,23 @@ You will be provided with three key pieces of information:
 {{ORIGINAL_STORY}}
 </original_story>
 
-3. Target Length:
+3. Story Direction:
+<story_direction>
+{{STORY_DIRECTION}}
+</story_direction>
+
+4. Target Length:
 <target_length>
 {{TARGET_LENGTH}}
 </target_length>
 
-Your task is to creatively adapt the story for maximum virality by following these enhanced guidelines:
+Your task is to creatively adapt the story for maximum virality by following these guidelines:
 
 1. Viral-First Adaptation:
    - Identify the central conflict or key moment from the original story
    - Use creative liberty to amplify, dramatize or change elements for maximum virality
    - Amplify emotional beats, conflicts, and surprises
+   - Incorporate the specified story direction to guide the narrative focus and theme
 
 2. Powerful Hook (First 1-2 Messages):
    - Start with an extreme or provocative statement, shocking action, or intriguing question
@@ -71,36 +77,26 @@ Output your adapted viral chat story using the following JSON format:
 <format>
 {
     "title": "Catchy, Intriguing Title That Hooks Instantly",
-    "participants": [
-        {
-            "id": 1,
+    "participants": {
+        "1": {
             "displayName": "Character1",
             "isSelf": false
         },
-        {
-            "id": 2,
+        "2": {
             "displayName": "Character2",
             "isSelf": true
         }
-    ],
+    },
     "events": [
         {
             "type": "Message",
             "content": "Extremely catchy, shocking message that hooks",
-            "participantId": 1
-        },
-        {
-            "type": "Pause",
-            "durationMs": 300
+            "participantId": "1"
         },
         {
             "type": "Message",
             "content": "Escalating response to build tension",
-            "participantId": 2
-        },
-        {
-            "type": "Time",
-            "passedTimeMin": 30
+            "participantId": "2"
         }
     ]
 }
@@ -119,6 +115,7 @@ Before submitting, review this checklist to ensure your story has maximum viral 
 - Audience Interaction: Is there a call-to-action or question to encourage viewer engagement?
 - Format: Are emojis, ALL CAPS, and punctuation used strategically to convey emotion?
 - Potential for Reaction: Does the story naturally encourage duets, stitches, or reaction videos?
+- Story Direction: Does the adaptation effectively incorporate the specified story direction while maintaining viral potential?
 
 Now, adapt the given story or concept with maximum creativity and viral potential, adhering to the target audience's preferences, the provided format, and the specified length. Make it addictive, highly shareable, and impossible to scroll past!
 
