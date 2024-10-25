@@ -7,12 +7,16 @@ import { GuidePath } from './GuidePath';
 import {
 	calculateRotationRange,
 	generateRange,
-	radToDeg,
 	rapierToThreeVector,
 	TRotationRange
 } from './helper';
 import { Marble } from './Marble';
 import { Plank } from './Plank';
+
+// TODO:
+// - Visualize simulation path
+// - Introduce "checkpoints" that are basically world snapshots it can reset to if the marble gets stuck
+// - Improve path algo
 
 export class GeneratorEngine {
 	private readonly _config: TGeneratorEngineConfig;
@@ -32,8 +36,6 @@ export class GeneratorEngine {
 	private _completed = false;
 	private _rng: seedrandom.PRNG;
 
-	private _paused = false; // TODO: REMOVE
-
 	constructor(
 		scene: THREE.Scene,
 		world: RAPIER.World,
@@ -44,17 +46,19 @@ export class GeneratorEngine {
 			debug = false,
 			seed = Math.random().toString(),
 			scoring = {
-				velocityWeight: 1.0,
-				directionalChangeWeight: 0.1,
-				pathAlignmentWeight: 0.5,
-				collisionWeight: 0.5,
-				contactWeight: 2.0,
-				dinstanceTraveledWeight: 0.5
+				marbleVelocityWeight: 2.0,
+				marbleDirectionalChangeWeight: 0.5,
+				marblePathAlignmentWeight: 0.5,
+				marbleCollisionWeight: 0.0,
+				marbleContactWeight: 5.0,
+				marbleDinstanceTraveledWeight: 1.0,
+				plankContactWeight: 5.0
 			},
 			simulation = {
-				numSimulationsPerPlank: 8,
+				numSimulationsPerPlank: 5,
+				lookAheadNotes: 3,
 				minAcceptableScore: 0.1,
-				maxSimulationTime: 2.0
+				maxSimulationTime: 5.0
 			}
 		} = options;
 		this._config = {
@@ -86,10 +90,6 @@ export class GeneratorEngine {
 	}
 
 	public async update(camera: THREE.Camera, deltaTime: number): Promise<void> {
-		if (this._paused) {
-			return;
-		}
-
 		if (this._nextNoteIndex >= this._track.notes.length) {
 			this._completed = true;
 			return;
@@ -100,15 +100,6 @@ export class GeneratorEngine {
 		if (currentNote != null && this._currentTime >= currentNote.time) {
 			const success = await this.placePlank();
 			if (success) {
-				this._paused = true;
-
-				// TODO: REMOVE
-				setTimeout(() => {
-					if (this._nextNoteIndex < 50) {
-						this._paused = false;
-					}
-				}, 1000);
-
 				this._nextNoteIndex++;
 			} else {
 				this._completed = true;
@@ -145,10 +136,10 @@ export class GeneratorEngine {
 		return true;
 	}
 
-	private async findBestPlankPlacement(): Promise<TPlankPlacementResult | null> {
+	private async findBestPlankPlacement(): Promise<TPlankSimulationResult | null> {
 		const worldSnapshot = this._world.takeSnapshot();
 
-		// Calculate to try plank rotations
+		// Calculate initial rotation range
 		const marbleVelocity = this._marble.body.linvel();
 		const { minRotationRad, maxRotationRad } = this.calculateRotationRange(
 			marbleVelocity.x,
@@ -160,16 +151,55 @@ export class GeneratorEngine {
 			this._config.simulation.numSimulationsPerPlank
 		);
 
-		// Calculate simulation time
-		const nextNoteTime = this._track.notes[this._nextNoteIndex + 1]?.time || 0;
-		const simTimeSeconds = Math.min(
-			nextNoteTime - this._currentTime,
-			this._config.simulation.maxSimulationTime
-		);
+		// Start recursive exploration from current state
+		const rootNode = await this.exploreSimulationTree({
+			worldSnapshot,
+			rotations,
+			currentTime: this._currentTime,
+			nextNoteIndex: this._nextNoteIndex,
+			depth: 0,
+			maxDepth: this._config.simulation.lookAheadNotes
+		});
 
-		let bestResult: TPlankPlacementResult | null = null;
-		const resultsForLogging: Record<string, any>[] = []; // TODO: REMOVE
+		// Find path with best total score
+		const bestPath = this.findBestPath(rootNode);
+
+		return bestPath
+			? {
+					rotationRad: bestPath.rotationRad,
+					position: bestPath.position,
+					score: bestPath.score,
+					metrics: bestPath.metrics
+				}
+			: null;
+	}
+
+	private async exploreSimulationTree(config: {
+		worldSnapshot: Uint8Array;
+		rotations: number[];
+		currentTime: number;
+		nextNoteIndex: number;
+		depth: number;
+		maxDepth: number;
+	}): Promise<TSimulationPlankNode[]> {
+		const { worldSnapshot, rotations, currentTime, nextNoteIndex, depth, maxDepth } = config;
+
+		if (depth >= maxDepth) {
+			return [];
+		}
+
+		// Calculate simulation time
+		const nextNoteTime = this._track.notes[nextNoteIndex + 1]?.time ?? 0;
+		const simTimeSeconds = Math.min(nextNoteTime - currentTime, maxDepth);
+		if (simTimeSeconds <= 0) {
+			return [];
+		}
+
+		const nodes: TSimulationPlankNode[] = [];
+
+		// Try each possible rotation
 		for (const rotationRad of rotations) {
+			// Restore world state for this simulation branch
 			const simWorld = RAPIER.World.restoreSnapshot(worldSnapshot);
 			const simMarble = simWorld.getRigidBody(this._marble.body.handle);
 
@@ -188,27 +218,49 @@ export class GeneratorEngine {
 				simTimeSeconds
 			);
 
-			if (bestResult == null || score > bestResult.score) {
-				bestResult = {
-					rotationRad,
-					position,
-					metrics,
-					score
-				};
-			}
-			resultsForLogging.push({
+			const node: TSimulationPlankNode = {
+				rotationRad,
+				position,
 				score,
-				rotationDeg: radToDeg(rotationRad),
-				metrics
+				metrics,
+				children: []
+			};
+
+			// Recursively explore child nodes
+			node.children = await this.exploreSimulationTree({
+				worldSnapshot: simWorld.takeSnapshot(),
+				rotations,
+				currentTime: nextNoteTime,
+				nextNoteIndex: nextNoteIndex + 1,
+				depth: depth + 1,
+				maxDepth
 			});
+
+			nodes.push(node);
 		}
 
-		console.log({
-			bestResult,
-			results: resultsForLogging.sort((result) => result.score)
-		}); // TODO: REMOVE
+		return nodes;
+	}
 
-		return bestResult;
+	private findBestPath(nodes: TSimulationPlankNode[]): TSimulationPlankNode | null {
+		if (!nodes.length) {
+			return null;
+		}
+
+		let bestNode = null;
+		let bestTotalScore = -Infinity;
+
+		for (const node of nodes) {
+			const futureScore = this.findBestPath(node.children)?.score ?? 0;
+			const totalScore = node.score + futureScore * 0.8;
+
+			if (totalScore > bestTotalScore) {
+				bestTotalScore = totalScore;
+				bestNode = node;
+			}
+		}
+
+		return bestNode;
 	}
 
 	private calculateRotationRange(velocityX: number, velocityY: number): TRotationRange {
@@ -253,7 +305,7 @@ export class GeneratorEngine {
 		simMarble: RAPIER.RigidBody,
 		simPlank: RAPIER.RigidBody,
 		duration: number
-	): Promise<{ score: number; metrics: TPlankPlacementResult['metrics'] }> {
+	): Promise<{ score: number; metrics: TPlankSimulationResult['metrics'] }> {
 		const startPos = rapierToThreeVector(simMarble.translation());
 		const startVelocity = rapierToThreeVector(simMarble.linvel());
 		const stepCount = Math.floor(duration / simWorld.timestep);
@@ -266,8 +318,9 @@ export class GeneratorEngine {
 		const plankCollider = simPlank.collider(0);
 		marbleCollider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
 
-		let collisions = 0;
-		let contacts = 0;
+		let marbleCollisions = 0;
+		let marbleContacts = 0;
+		let plankContacts = 0;
 
 		// Run simulation steps
 		for (let i = 0; i < stepCount; i++) {
@@ -286,49 +339,59 @@ export class GeneratorEngine {
 						collider1 !== plankCollider &&
 						collider2 !== plankCollider
 					) {
-						collisions++;
+						marbleCollisions++;
 					}
 				}
 			});
 
 			simWorld.contactPairsWith(marbleCollider, (otherCollider) => {
 				if (otherCollider !== plankCollider) {
-					contacts++;
+					marbleContacts++;
+				}
+			});
+
+			simWorld.contactPairsWith(plankCollider, (otherCollider) => {
+				if (otherCollider !== marbleCollider) {
+					plankContacts++;
 				}
 			});
 		}
-
-		console.log({ contacts, collisions });
 
 		const endPos = rapierToThreeVector(simMarble.translation());
 		const endVelocity = rapierToThreeVector(simMarble.linvel());
 
 		// Calculate scores
-		const velocityScore = this.calculateVelocityScore(startVelocity);
-		const directionalChangeScore = this.calculateDirectionalChangeScore(startVelocity, endVelocity);
-		const pathAlignmentScore = this.calculatePathAlignmentScore(endPos);
-		const collisionScore = this.calculateCollisionScore(collisions);
-		const contactScore = this.calculateContactScore(contacts);
-		const distanceTraveledScore = this.calculateDistanceTraveledScore(startPos, endPos);
+		const marbleVelocityScore = this.calculateVelocityScore(startVelocity);
+		const marbleDirectionalChangeScore = this.calculateDirectionalChangeScore(
+			startVelocity,
+			endVelocity
+		);
+		const marblePathAlignmentScore = this.calculatePathAlignmentScore(endPos);
+		const marbleCollisionScore = this.calculateCollisionScore(marbleCollisions);
+		const marbleContactScore = this.calculateContactScore(marbleContacts);
+		const marbleDistanceTraveledScore = this.calculateDistanceTraveledScore(startPos, endPos);
+		const plankContactScore = this.calculateContactScore(plankContacts);
 
 		// Calculate final score based on weights
 		const score =
-			velocityScore * this._config.scoring.velocityWeight +
-			directionalChangeScore * this._config.scoring.directionalChangeWeight +
-			pathAlignmentScore * this._config.scoring.pathAlignmentWeight +
-			collisionScore * this._config.scoring.collisionWeight +
-			contactScore * this._config.scoring.contactWeight;
-		distanceTraveledScore * this._config.scoring.dinstanceTraveledWeight;
+			marbleVelocityScore * this._config.scoring.marbleVelocityWeight +
+			marbleDirectionalChangeScore * this._config.scoring.marbleDirectionalChangeWeight +
+			marblePathAlignmentScore * this._config.scoring.marblePathAlignmentWeight +
+			marbleCollisionScore * this._config.scoring.marbleCollisionWeight +
+			marbleContactScore * this._config.scoring.marbleContactWeight +
+			marbleDistanceTraveledScore * this._config.scoring.marbleDinstanceTraveledWeight +
+			plankContactScore * this._config.scoring.plankContactWeight;
 
 		return {
 			score,
 			metrics: {
-				velocityScore,
-				directionalChangeScore,
-				pathAlignmentScore,
-				collisionScore,
-				contactScore,
-				distanceTraveledScore
+				marbleVelocityScore,
+				marbleDirectionalChangeScore,
+				marblePathAlignmentScore,
+				marbleCollisionScore,
+				marbleContactScore,
+				marbleDistanceTraveledScore,
+				plankContactScore
 			}
 		};
 	}
@@ -444,30 +507,37 @@ export interface TGeneratorEngineOptions extends Partial<TGeneratorEngineConfig>
 export interface TGeneratorEngineConfig {
 	debug: boolean;
 	scoring: {
-		velocityWeight: number;
-		directionalChangeWeight: number;
-		pathAlignmentWeight: number;
-		collisionWeight: number;
-		contactWeight: number;
-		dinstanceTraveledWeight: number;
+		marbleVelocityWeight: number;
+		marbleDirectionalChangeWeight: number;
+		marblePathAlignmentWeight: number;
+		marbleCollisionWeight: number;
+		marbleContactWeight: number;
+		marbleDinstanceTraveledWeight: number;
+		plankContactWeight: number;
 	};
 	simulation: {
-		numSimulationsPerPlank: number; // Number of placement attempts per plank
-		minAcceptableScore: number; // Minimum score to accept placement (0-1)
-		maxSimulationTime: number; // Max time to simulate forward in seconds
+		numSimulationsPerPlank: number;
+		lookAheadNotes: number;
+		minAcceptableScore: number;
+		maxSimulationTime: number;
 	};
 }
 
-interface TPlankPlacementResult {
+interface TPlankSimulationResult {
 	score: number;
 	position: THREE.Vector3;
 	rotationRad: number;
 	metrics: {
-		velocityScore: number;
-		directionalChangeScore: number;
-		pathAlignmentScore: number;
-		collisionScore: number;
-		contactScore: number;
-		distanceTraveledScore: number;
+		marbleVelocityScore: number;
+		marbleDirectionalChangeScore: number;
+		marblePathAlignmentScore: number;
+		marbleCollisionScore: number;
+		marbleContactScore: number;
+		marbleDistanceTraveledScore: number;
+		plankContactScore: number;
 	};
+}
+
+interface TSimulationPlankNode extends TPlankSimulationResult {
+	children: TSimulationPlankNode[];
 }
