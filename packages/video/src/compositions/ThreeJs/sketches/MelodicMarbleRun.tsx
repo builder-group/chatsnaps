@@ -14,7 +14,6 @@ import {
 	Vector3Tuple
 } from '@react-three/rapier';
 import { ThreeCanvas } from '@remotion/three';
-import { useControls } from 'leva';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useVideoConfig } from 'remotion';
 import * as THREE from 'three';
@@ -159,14 +158,11 @@ const Marble = (props: MarbleProps) => {
 };
 
 export function MelodicMarbleRunSketch() {
-	const { debug } = useControls('note-pillars', {
-		debug: false
-	});
 	const { width, height } = useVideoConfig();
 
 	return (
 		<ThreeCanvas linear width={width} height={height}>
-			<Physics debug={debug} paused gravity={[0, -20, 0]}>
+			<Physics paused gravity={[0, -20, 0]}>
 				<PhysicsWrapper>
 					<Marble position={[-4, 10, 0]} />
 
