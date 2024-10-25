@@ -2,6 +2,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 
+import { syncMeshWithBody } from './helper';
 import { MeshBody } from './MeshBody';
 
 const GLASS_DENSITY = 2500; // kg/m³ (typical glass density)
@@ -20,15 +21,45 @@ export class Marble extends MeshBody {
 	}
 
 	public static init(scene: THREE.Scene, world: RAPIER.World, config: TMarbleConfig): Marble {
+		const { debug = false } = config;
+
+		const marbleMesh = Marble.createMesh(scene, config);
+		const marbleBody = Marble.createBody(world, config);
+
+		syncMeshWithBody(marbleMesh, marbleBody);
+		return new this(marbleMesh, marbleBody, scene, debug);
+	}
+
+	public static createBody(world: RAPIER.World, config: TMarbleBodyConfig): RAPIER.RigidBody {
 		const {
 			position,
 			radius = 1,
 			restitution = 0.85,
 			friction = 0.01,
-			color = 0xffffff,
-			linearDamping = 0.1,
-			debug = false
+			linearDamping = 0.1
 		} = config;
+
+		// Create physics body
+		const marbleDesc = RAPIER.RigidBodyDesc.dynamic()
+			.setTranslation(position.x, position.y, position.z)
+			.setLinearDamping(linearDamping)
+			.enabledTranslations(true, true, false); // Lock z axis
+		const marbleBody = world.createRigidBody(marbleDesc);
+
+		// Create collider
+		const colliderDesc = RAPIER.ColliderDesc.ball(radius)
+			.setDensity(GLASS_DENSITY)
+			.setRestitution(restitution)
+			.setFriction(friction)
+			// https://rapier.rs/docs/user_guides/javascript/colliders#restitution
+			.setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Max);
+		world.createCollider(colliderDesc, marbleBody);
+
+		return marbleBody;
+	}
+
+	public static createMesh(scene: THREE.Scene, config: TMarbleMeshConfig): THREE.Mesh {
+		const { radius = 1, color = 0xffffff } = config;
 
 		// Create visual mesh
 		const marbleGeometry = new THREE.SphereGeometry(radius);
@@ -48,27 +79,9 @@ export class Marble extends MeshBody {
 			);
 		};
 		const marbleMesh = new THREE.Mesh(marbleGeometry, marbleMaterial);
-		marbleMesh.position.set(position.x, position.y, position.z);
-
 		scene.add(marbleMesh);
 
-		// Create physics body
-		const marbleDesc = RAPIER.RigidBodyDesc.dynamic()
-			.setTranslation(position.x, position.y, position.z)
-			.setLinearDamping(linearDamping)
-			.enabledTranslations(true, true, false); // Lock z axis
-		const marbleBody = world.createRigidBody(marbleDesc);
-
-		// Create collider
-		const colliderDesc = RAPIER.ColliderDesc.ball(radius)
-			.setDensity(GLASS_DENSITY)
-			.setRestitution(restitution)
-			.setFriction(friction)
-			// https://rapier.rs/docs/user_guides/javascript/colliders#restitution
-			.setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Max);
-		world.createCollider(colliderDesc, marbleBody);
-
-		return new this(marbleMesh, marbleBody, scene, debug);
+		return marbleMesh;
 	}
 
 	public update(deltaTime: number): void {
@@ -117,14 +130,21 @@ export class Marble extends MeshBody {
 	}
 }
 
-export interface TMarbleConfig {
+export interface TMarbleConfig extends TMarbleBodyConfig, TMarbleMeshConfig {
+	debug?: boolean;
+}
+
+export interface TMarbleMeshConfig {
+	radius?: number;
+	color?: number; // THREE.js color
+}
+
+export interface TMarbleBodyConfig {
 	position: THREE.Vector3;
 	radius?: number;
 	restitution?: number; // Bounciness (0-1)
 	friction?: number;
 	linearDamping?: number; // Air resistance
-	color?: number; // THREE.js color
-	debug?: boolean;
 }
 
 interface TTrail {

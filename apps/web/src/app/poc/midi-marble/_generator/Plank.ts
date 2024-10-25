@@ -1,47 +1,48 @@
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 
+import { syncMeshWithBody } from './helper';
 import { MeshBody } from './MeshBody';
 
 const METAL_DENSITY = 7800; // kg/m³ (typical steel/metal density)
 
 export class Plank extends MeshBody {
-	public static init(scene: THREE.Scene, world: RAPIER.World, config: TMarbleConfig): Plank {
+	public static init(scene: THREE.Scene, world: RAPIER.World, config: TPlankConfig): Plank {
+		const { position, depth = 1, debug = false } = config;
+
+		const plankMesh = Plank.createMesh(scene, config);
+		const plankBody = Plank.createBody(world, config);
+
+		if (debug) {
+			// Create the red dot to represent the origin point
+			const originGeometry = new THREE.SphereGeometry(0.1); // Small sphere
+			const originMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
+			const originMesh = new THREE.Mesh(originGeometry, originMaterial);
+
+			// Set the position of the origin dot to match the plank's position
+			originMesh.position.copy(position);
+
+			// Optionally, set the origin dot to be in front of the plank if needed
+			originMesh.position.z += depth / 2 + 0.1; // Adjust this if needed
+
+			// Add the origin mesh to the scene
+			scene.add(originMesh);
+		}
+
+		syncMeshWithBody(plankMesh, plankBody);
+		return new this(plankMesh, plankBody);
+	}
+
+	public static createBody(world: RAPIER.World, config: TPlankBodyConfig): RAPIER.RigidBody {
 		const {
 			position,
 			angleRad,
-			color = 0x808080,
 			width = 4,
 			height = 1,
 			depth = 1,
 			restitution = 0.9,
-			friction = 0.1,
-			debug = false
+			friction = 0.1
 		} = config;
-
-		// Create visual mesh
-		const plankGeometry = new THREE.BoxGeometry(width, height, depth);
-		const plankBaseMaterial = new THREE.MeshStandardMaterial({
-			color,
-			metalness: 0.1,
-			roughness: 0.7
-		});
-		const plankTopMaterial = new THREE.MeshStandardMaterial({
-			color: 0xff0000,
-			metalness: 0.1,
-			roughness: 0.7
-		});
-		const plankMesh = new THREE.Mesh(plankGeometry, [
-			plankBaseMaterial,
-			plankBaseMaterial,
-			plankTopMaterial,
-			plankBaseMaterial,
-			plankBaseMaterial,
-			plankBaseMaterial
-		]);
-		plankMesh.position.set(position.x, position.y, position.y);
-
-		scene.add(plankMesh);
 
 		// Create rotation quaternion
 		const quaternion = new THREE.Quaternion();
@@ -67,27 +68,51 @@ export class Plank extends MeshBody {
 			.setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Max);
 		world.createCollider(colliderDesc, plankBody);
 
-		if (debug) {
-			// Create the red dot to represent the origin point
-			const originGeometry = new THREE.SphereGeometry(0.1); // Small sphere
-			const originMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
-			const originMesh = new THREE.Mesh(originGeometry, originMaterial);
+		return plankBody;
+	}
 
-			// Set the position of the origin dot to match the plank's position
-			originMesh.position.copy(position);
+	public static createMesh(scene: THREE.Scene, config: TPlankMeshConfig): THREE.Mesh {
+		const { color = 0x808080, width = 4, height = 1, depth = 1 } = config;
 
-			// Optionally, set the origin dot to be in front of the plank if needed
-			originMesh.position.z += depth / 2 + 0.1; // Adjust this if needed
+		// Create visual mesh
+		const plankGeometry = new THREE.BoxGeometry(width, height, depth);
+		const plankBaseMaterial = new THREE.MeshStandardMaterial({
+			color,
+			metalness: 0.1,
+			roughness: 0.7
+		});
+		const plankTopMaterial = new THREE.MeshStandardMaterial({
+			color: 0xff0000,
+			metalness: 0.1,
+			roughness: 0.7
+		});
+		const plankMesh = new THREE.Mesh(plankGeometry, [
+			plankBaseMaterial,
+			plankBaseMaterial,
+			plankTopMaterial,
+			plankBaseMaterial,
+			plankBaseMaterial,
+			plankBaseMaterial
+		]);
 
-			// Add the origin mesh to the scene
-			scene.add(originMesh);
-		}
+		scene.add(plankMesh);
 
-		return new this(plankMesh, plankBody);
+		return plankMesh;
 	}
 }
 
-export interface TMarbleConfig {
+export interface TPlankConfig extends TPlankMeshConfig, TPlankBodyConfig {
+	debug?: boolean;
+}
+
+export interface TPlankMeshConfig {
+	width?: number;
+	height?: number;
+	depth?: number;
+	color?: number; // THREE.js color
+}
+
+export interface TPlankBodyConfig {
 	position: THREE.Vector3;
 	angleRad: number;
 	width?: number;
@@ -95,6 +120,4 @@ export interface TMarbleConfig {
 	depth?: number;
 	restitution?: number; // Bounciness (0-1)
 	friction?: number;
-	color?: number; // THREE.js color
-	debug?: boolean;
 }

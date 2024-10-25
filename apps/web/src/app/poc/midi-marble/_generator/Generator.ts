@@ -206,12 +206,10 @@ export class Generator {
 			const simMarble = simWorld.getRigidBody(this._marble.body.handle);
 
 			const position = this.calculatePlankPosition(rotationRad, simMarble);
-			// TODO: Only show in scene if debug
-			const simPlank = Plank.init(this._scene, simWorld, {
+			const simPlank = Plank.createBody(simWorld, {
 				position,
-				angleRad: rotationRad,
-				debug: false
-			}).body;
+				angleRad: rotationRad
+			});
 
 			const { score, metrics } = this.simulateAndScorePlank(
 				simWorld,

@@ -4,3 +4,4 @@ export * from './generate-2d-path';
 export * from './generate-range';
 export * from './rad-to-deg';
 export * from './rapier-to-three';
+export * from './sync-mesh-with-body';
