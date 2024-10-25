@@ -5,6 +5,7 @@ import {
 	type TFlowEditorNodeConfig,
 	type TFlowEditorNodeData,
 	type TFlowEditorNodeDataTypes,
+	type TFlowEditorNodeHandle,
 	type TSize,
 	type TXYPosition
 } from './types';
@@ -26,6 +27,7 @@ export function createFlowEditorNode<
 		_config: {
 			measureSize
 		},
+		_handles: createState<TFlowEditorNodeHandle[]>([]),
 		type,
 		id,
 		position: createState(position),
