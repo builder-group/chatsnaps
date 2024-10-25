@@ -10,7 +10,8 @@ export const GeneratorComponent: React.FC = () => {
 	const { world } = useRapier();
 	const { scene } = useThree();
 	const [generator, setGenerator] = React.useState<Generator | null>(null);
-	const { debug } = useControls('generator', {
+	const { debug, paused } = useControls('generator', {
+		paused: false,
 		debug: true
 	});
 
@@ -43,6 +44,12 @@ export const GeneratorComponent: React.FC = () => {
 			newGenerator?.clear();
 		};
 	}, [world, scene, debug]);
+
+	React.useEffect(() => {
+		if (generator != null) {
+			generator.paused = paused;
+		}
+	}, [paused, generator]);
 
 	useFrame((state, delta) => {
 		generator?.update(state.camera, delta);

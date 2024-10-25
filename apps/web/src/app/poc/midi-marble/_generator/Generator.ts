@@ -1,5 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat';
 import { type Track } from '@tonejs/midi';
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
@@ -7,6 +8,7 @@ import { GuidePath } from './GuidePath';
 import {
 	calculateRotationRange,
 	generateRange,
+	pointOnCircle,
 	rapierToThreeVector,
 	type TRotationRange
 } from './helper';
@@ -34,6 +36,8 @@ export class Generator {
 
 	private _currentTime = 0;
 	private _completed = false;
+	public paused = false;
+
 	private _rng: seedrandom.PRNG;
 
 	constructor(
@@ -90,6 +94,10 @@ export class Generator {
 	}
 
 	public update(camera: THREE.Camera, deltaTime: number): void {
+		if (this.paused) {
+			return;
+		}
+
 		if (this._nextNoteIndex >= this._track.notes.length) {
 			this._completed = true;
 			return;
@@ -277,22 +285,14 @@ export class Generator {
 		};
 	}
 
-	private calculatePlankPosition(rotationRad: number, simMarble: RAPIER.RigidBody): THREE.Vector3 {
+	private calculatePlankPosition(angleRad: number, simMarble: RAPIER.RigidBody): THREE.Vector3 {
 		const marblePos = simMarble.translation();
-
-		// Step 1: Start from the ball's position
-		// Step 2: Calculate the offset needed to place the plank surface at the ball
-		//         considering the ball's radius and plank's height
 		const marbleRadius = (this._marble.mesh.geometry as THREE.SphereGeometry).parameters.radius;
 		const plankHeight = 1; // TODO: Read from config
-		const surfaceOffset = marbleRadius + plankHeight / 2;
+		const marbleToPlankCenterRadius = marbleRadius + plankHeight / 2;
 
-		// Step 3: Calculate the offset direction based on rotation
-		// When the plank is rotated, we need to move it down and to the side
-		const offsetX = surfaceOffset * Math.sin(rotationRad);
-		const offsetY = surfaceOffset * Math.cos(rotationRad);
+		const { x: offsetX, y: offsetY } = pointOnCircle(marbleToPlankCenterRadius, angleRad);
 
-		// Step 4: Calculate final plank position
 		return new THREE.Vector3(
 			marblePos.x + offsetX,
 			marblePos.y - offsetY, // Subtract because Y grows upward
@@ -322,9 +322,28 @@ export class Generator {
 		let marbleContacts = 0;
 		let plankContacts = 0;
 
+		const points: THREE.Vector3[] = [];
+
+		// Create debug trail visual mesh
+		const debugTrailGeometry = new MeshLineGeometry();
+		debugTrailGeometry.setPoints(points);
+		const trailMaterial = new MeshLineMaterial({
+			color: 0xffc0cb,
+			resolution: new THREE.Vector2(1080, 1920)
+		});
+		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, trailMaterial);
+		this._scene.add(debugTrailMesh);
+
 		// Run simulation steps
 		for (let i = 0; i < stepCount; i++) {
 			simWorld.step(eventQueue);
+
+			// Update debug trail
+			if (this._config.debug) {
+				const nextPos = simMarble.translation();
+				points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.05));
+				debugTrailGeometry.setPoints(points);
+			}
 
 			// Process collision events
 			// eslint-disable-next-line @typescript-eslint/no-loop-func -- Ok
@@ -497,7 +516,7 @@ export class Generator {
 		return penaltyFactor != null ? Math.max(0, 1 - ((value - max) / max) * penaltyFactor) : 0;
 	}
 
-	public clear() {
+	public clear(): void {
 		this._marble.clear(this._scene, this._world);
 		this._planks.forEach((plank) => {
 			plank.clear(this._scene, this._world);

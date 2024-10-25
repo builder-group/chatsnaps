@@ -117,16 +117,15 @@ export class Marble extends MeshBody {
 		}
 
 		// Add new position to the start of the array
-		this._trail.points.unshift(this._mesh.position.clone());
+		const nextPos = this._mesh.position.clone();
+		this._trail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
 
 		// Remove old positions if we exceed the trail length
 		if (this._trail.points.length > 5000) {
 			this._trail.points.pop();
 		}
 
-		// Update the geometry
-		const points = this._trail.points.map((pos) => new THREE.Vector3(pos.x, pos.y, pos.z + 0.05));
-		this._trail.geometry.setPoints(points);
+		this._trail.geometry.setPoints(this._trail.points);
 	}
 }
 
