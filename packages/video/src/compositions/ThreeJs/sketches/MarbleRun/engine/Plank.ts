@@ -3,6 +3,8 @@ import * as THREE from 'three';
 
 import { MeshBody } from './MeshBody';
 
+const METAL_DENSITY = 7800; // kg/m³ (typical steel/metal density)
+
 export class Plank extends MeshBody {
 	public static init(scene: THREE.Scene, world: RAPIER.World, config: TMarbleConfig) {
 		const {
@@ -12,7 +14,8 @@ export class Plank extends MeshBody {
 			width = 4,
 			height = 1,
 			depth = 1,
-			restitution = 1,
+			restitution = 0.9,
+			friction = 0.1,
 			debug = false
 		} = config;
 
@@ -57,8 +60,11 @@ export class Plank extends MeshBody {
 
 		// Create collider
 		const colliderDesc = RAPIER.ColliderDesc.cuboid(width / 2, height / 2, depth / 2)
+			.setDensity(METAL_DENSITY)
 			.setRestitution(restitution)
-			.setFriction(0.7);
+			.setFriction(friction)
+			// https://rapier.rs/docs/user_guides/javascript/colliders#restitution
+			.setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Max);
 		world.createCollider(colliderDesc, plankBody);
 
 		if (debug) {
@@ -88,6 +94,7 @@ export interface TMarbleConfig {
 	height?: number;
 	depth?: number;
 	restitution?: number; // Bounciness (0-1)
+	friction?: number;
 	color?: number; // THREE.js color
 	debug?: boolean;
 }

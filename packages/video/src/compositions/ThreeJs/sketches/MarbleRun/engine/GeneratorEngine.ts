@@ -45,11 +45,11 @@ export class GeneratorEngine {
 			seed = Math.random().toString(),
 			scoring = {
 				velocityWeight: 1.0,
-				directionalChangeWeight: 0.5,
-				pathAlignmentWeight: 1.0,
-				collisionWeight: 1.0,
-				dinstanceTraveledWeight: 1.0
-				// TODO: dinstance to last spawned plank
+				directionalChangeWeight: 0.1,
+				pathAlignmentWeight: 0.5,
+				collisionWeight: 0.5,
+				contactWeight: 2.0,
+				dinstanceTraveledWeight: 0.5
 			},
 			simulation = {
 				numSimulationsPerPlank: 8,
@@ -267,7 +267,7 @@ export class GeneratorEngine {
 		marbleCollider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
 
 		let collisions = 0;
-		let plankHit = false;
+		let contacts = 0;
 
 		// Run simulation steps
 		for (let i = 0; i < stepCount; i++) {
@@ -280,20 +280,25 @@ export class GeneratorEngine {
 					const collider1 = simWorld.getCollider(handle1);
 					const collider2 = simWorld.getCollider(handle2);
 
-					// Check if this is a collision with the plank
-					if (
-						(collider1 === marbleCollider && collider2 === plankCollider) ||
-						(collider2 === marbleCollider && collider1 === plankCollider)
-					) {
-						plankHit = true;
-					}
 					// Count collisions with any other object
-					else if (collider1 === marbleCollider || collider2 === marbleCollider) {
+					if (
+						(collider1 === marbleCollider || collider2 === marbleCollider) &&
+						collider1 !== plankCollider &&
+						collider2 !== plankCollider
+					) {
 						collisions++;
 					}
 				}
 			});
+
+			simWorld.contactPairsWith(marbleCollider, (otherCollider) => {
+				if (otherCollider !== plankCollider) {
+					contacts++;
+				}
+			});
 		}
+
+		console.log({ contacts, collisions });
 
 		const endPos = rapierToThreeVector(simMarble.translation());
 		const endVelocity = rapierToThreeVector(simMarble.linvel());
@@ -302,7 +307,8 @@ export class GeneratorEngine {
 		const velocityScore = this.calculateVelocityScore(startVelocity);
 		const directionalChangeScore = this.calculateDirectionalChangeScore(startVelocity, endVelocity);
 		const pathAlignmentScore = this.calculatePathAlignmentScore(endPos);
-		const collisionScore = plankHit ? Math.max(0, 1 - collisions / (stepCount + 1)) : 0;
+		const collisionScore = this.calculateCollisionScore(collisions);
+		const contactScore = this.calculateContactScore(contacts);
 		const distanceTraveledScore = this.calculateDistanceTraveledScore(startPos, endPos);
 
 		// Calculate final score based on weights
@@ -311,7 +317,8 @@ export class GeneratorEngine {
 			directionalChangeScore * this._config.scoring.directionalChangeWeight +
 			pathAlignmentScore * this._config.scoring.pathAlignmentWeight +
 			collisionScore * this._config.scoring.collisionWeight +
-			distanceTraveledScore * this._config.scoring.dinstanceTraveledWeight;
+			contactScore * this._config.scoring.contactWeight;
+		distanceTraveledScore * this._config.scoring.dinstanceTraveledWeight;
 
 		return {
 			score,
@@ -320,6 +327,7 @@ export class GeneratorEngine {
 				directionalChangeScore,
 				pathAlignmentScore,
 				collisionScore,
+				contactScore,
 				distanceTraveledScore
 			}
 		};
@@ -350,7 +358,7 @@ export class GeneratorEngine {
 			ideal: 45,
 			max: 120,
 			penaltyFactor: 1.5,
-			minToIdealPower: 0.8, // Favor sharper turns
+			minToIdealPower: 0.8,
 			idealToMaxPower: 0.8
 		});
 	}
@@ -361,17 +369,32 @@ export class GeneratorEngine {
 			ideal: 8,
 			max: 10,
 			penaltyFactor: 0.5,
-			minToIdealPower: 0.8, // Favor further traveled distances
+			minToIdealPower: 0.8,
 			idealToMaxPower: 0.8
 		});
 	}
 
 	private calculatePathAlignmentScore(endPos: THREE.Vector3): number {
-		const { deviationScore, progressScore } = this._guidePath.getPathScore(
-			new THREE.Vector2(endPos.x, endPos.y)
-		);
+		const endPos2D = new THREE.Vector2(endPos.x, endPos.y);
+		this._guidePath.updateNextIndex(endPos2D);
 
-		return deviationScore * 0.7 + progressScore * 0.3;
+		const deviation = this._guidePath.getDeviation(endPos2D);
+
+		return this.calculateThresholdScore(deviation, {
+			min: 0,
+			ideal: 0,
+			max: 50,
+			minToIdealPower: 0,
+			idealToMaxPower: 0.8
+		});
+	}
+
+	private calculateCollisionScore(collisions: number): number {
+		return collisions > 1 ? 0 : 1;
+	}
+
+	private calculateContactScore(contacts: number): number {
+		return contacts > 1 ? 0 : 1;
 	}
 
 	private calculateThresholdScore(
@@ -425,6 +448,7 @@ export interface TGeneratorEngineConfig {
 		directionalChangeWeight: number;
 		pathAlignmentWeight: number;
 		collisionWeight: number;
+		contactWeight: number;
 		dinstanceTraveledWeight: number;
 	};
 	simulation: {
@@ -443,6 +467,7 @@ interface TPlankPlacementResult {
 		directionalChangeScore: number;
 		pathAlignmentScore: number;
 		collisionScore: number;
+		contactScore: number;
 		distanceTraveledScore: number;
 	};
 }

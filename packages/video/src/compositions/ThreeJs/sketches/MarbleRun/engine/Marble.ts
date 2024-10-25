@@ -4,6 +4,8 @@ import * as THREE from 'three';
 
 import { MeshBody } from './MeshBody';
 
+const GLASS_DENSITY = 2500; // kg/m³ (typical glass density)
+
 export class Marble extends MeshBody {
 	private _trail?: TTrail;
 	private _debug = false;
@@ -21,7 +23,8 @@ export class Marble extends MeshBody {
 		const {
 			position,
 			radius = 1,
-			restitution = 1,
+			restitution = 0.85,
+			friction = 0.01,
 			color = 0xffffff,
 			linearDamping = 0.1,
 			debug = false
@@ -58,8 +61,11 @@ export class Marble extends MeshBody {
 
 		// Create collider
 		const colliderDesc = RAPIER.ColliderDesc.ball(radius)
+			.setDensity(GLASS_DENSITY)
 			.setRestitution(restitution)
-			.setFriction(0.7);
+			.setFriction(friction)
+			// https://rapier.rs/docs/user_guides/javascript/colliders#restitution
+			.setRestitutionCombineRule(RAPIER.CoefficientCombineRule.Max);
 		world.createCollider(colliderDesc, marbleBody);
 
 		return new this(marbleMesh, marbleBody, scene, debug);
@@ -115,6 +121,7 @@ export interface TMarbleConfig {
 	position: THREE.Vector3;
 	radius?: number;
 	restitution?: number; // Bounciness (0-1)
+	friction?: number;
 	linearDamping?: number; // Air resistance
 	color?: number; // THREE.js color
 	debug?: boolean;

@@ -42,35 +42,7 @@ export class GuidePath {
 		scene.add(lineMesh);
 	}
 
-	/**
-	 * Gets the score for the current marble position, considering both
-	 * path deviation and progress along the path.
-	 */
-	public getPathScore(position: THREE.Vector2): { deviationScore: number; progressScore: number } {
-		this.updateNextIndex(position);
-
-		// Get current and next points
-		const currentPoint = this._path[this._nextIndex];
-		const nextPoint = this._path[this._nextIndex + 1];
-
-		if (currentPoint == null || nextPoint == null) {
-			return { deviationScore: 0, progressScore: 0 }; // End of path
-		}
-
-		// Calculate deviation from current path segment
-		const deviation = this.getDeviation(position);
-		const maxAcceptableDeviation = 50;
-		const deviationScore = Math.max(0, 1 - deviation / maxAcceptableDeviation);
-
-		// Calculate progress score based on how far along current segment we are
-		const progressVector = position.clone().sub(currentPoint);
-		const segmentVector = nextPoint.clone().sub(currentPoint);
-		const progressScore = Math.max(0, progressVector.dot(segmentVector.normalize()));
-
-		return { deviationScore, progressScore };
-	}
-
-	private updateNextIndex(position: THREE.Vector2) {
+	public updateNextIndex(position: THREE.Vector2) {
 		while (
 			this._nextIndex < this._path.length - 2 && // -2 because we need both current and next points
 			this.distanceToPoint(position, this._nextIndex + 1) <
@@ -80,7 +52,7 @@ export class GuidePath {
 		}
 	}
 
-	private getDeviation(position: THREE.Vector2): number {
+	public getDeviation(position: THREE.Vector2): number {
 		const currentPoint = this._path[this._nextIndex];
 		const nextPoint = this._path[this._nextIndex + 1];
 
