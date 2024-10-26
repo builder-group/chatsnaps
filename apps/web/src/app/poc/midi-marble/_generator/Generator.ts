@@ -54,9 +54,9 @@ export class Generator {
 				marbleDirectionalChangeWeight: 0.5,
 				marblePathAlignmentWeight: 0.5,
 				marbleCollisionWeight: 0.0,
-				marbleContactWeight: 5.0,
+				marbleContactWeight: 100.0,
 				marbleDinstanceTraveledWeight: 1.0,
-				plankContactWeight: 5.0
+				plankContactWeight: 100.0
 			},
 			simulation = {
 				numSimulationsPerPlank: 5,
