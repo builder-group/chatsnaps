@@ -10,6 +10,7 @@ import {
 	generateRange,
 	pointOnCircle,
 	rapierToThreeVector,
+	TIME_EXECUTION_MAP,
 	type TRotationRange
 } from './helper';
 import { Marble } from './Marble';
@@ -19,10 +20,7 @@ import { Plank } from './Plank';
 // - Visualize simulation path
 // - Introduce "checkpoints" that are basically world snapshots it can reset to if the marble gets stuck
 // - Improve path algo
-
-// TODO:
-// Memeory leak or something? because it gets slower over time.. first few plank placements are like 80 fps
-// but then it gets slower and slower
+// - Improve performance
 
 export class Generator {
 	private readonly _config: TGeneratorConfig;
@@ -99,12 +97,14 @@ export class Generator {
 	}
 
 	public update(camera: THREE.Camera, deltaTime: number): void {
-		if (this.paused) {
+		if (this.paused || this._completed) {
 			return;
 		}
 
-		if (this._nextNoteIndex >= this._track.notes.length) {
+		// if (this._nextNoteIndex >= this._track.notes.length) {
+		if (this._nextNoteIndex >= 50) {
 			this._completed = true;
+			console.log({ TIME_EXECUTION_MAP });
 			return;
 		}
 
@@ -327,6 +327,7 @@ export class Generator {
 		let marbleContacts = 0;
 		let plankContacts = 0;
 
+		// Note: No DebugTrail as class property because updating a large array of points is very slow
 		let debugTrail: TDebugTrail | null = null;
 		if (this._config.debug) {
 			debugTrail = this.initDebugTrail();

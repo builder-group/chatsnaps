@@ -6,3 +6,4 @@ export * from './point-on-circle';
 export * from './rad-to-deg';
 export * from './rapier-to-three';
 export * from './sync-mesh-with-body';
+export * from './time-execution';
