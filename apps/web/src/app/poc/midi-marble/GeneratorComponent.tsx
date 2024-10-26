@@ -6,13 +6,16 @@ import React from 'react';
 import { Generator } from './_generator';
 import { loadMidi } from './_midi';
 
+const DETERMINISTIC_DELTA_TIME = 1 / 60;
+
 export const GeneratorComponent: React.FC = () => {
 	const { world } = useRapier();
 	const { scene } = useThree();
 	const [generator, setGenerator] = React.useState<Generator | null>(null);
-	const { debug, paused } = useControls('generator', {
+	const { paused, debug, deterministic } = useControls('generator', {
 		paused: false,
-		debug: true
+		debug: false,
+		deterministic: true
 	});
 
 	React.useEffect(() => {
@@ -31,6 +34,10 @@ export const GeneratorComponent: React.FC = () => {
 				return;
 			}
 
+			if (deterministic) {
+				world.timestep = DETERMINISTIC_DELTA_TIME;
+			}
+
 			newGenerator = new Generator(scene, world, midi.tracks[0], {
 				debug,
 				seed: 'test'
@@ -43,7 +50,7 @@ export const GeneratorComponent: React.FC = () => {
 		return () => {
 			newGenerator?.clear();
 		};
-	}, [world, scene, debug]);
+	}, [world, scene, debug, deterministic]);
 
 	React.useEffect(() => {
 		if (generator != null) {
@@ -52,7 +59,7 @@ export const GeneratorComponent: React.FC = () => {
 	}, [paused, generator]);
 
 	useFrame((state, delta) => {
-		generator?.update(state.camera, delta);
+		generator?.update(state.camera, deterministic ? DETERMINISTIC_DELTA_TIME : delta);
 	});
 
 	return null;

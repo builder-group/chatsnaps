@@ -54,9 +54,9 @@ export class Generator {
 				marbleDirectionalChangeWeight: 0.5,
 				marblePathAlignmentWeight: 0.5,
 				marbleCollisionWeight: 0.0,
-				marbleContactWeight: 100.0,
+				marbleContactWeight: 5.0,
 				marbleDinstanceTraveledWeight: 1.0,
-				plankContactWeight: 100.0
+				plankContactWeight: 5.0
 			},
 			simulation = {
 				numSimulationsPerPlank: 5,
@@ -104,13 +104,13 @@ export class Generator {
 		}
 
 		// Check if we need to place a new plank
-		const currentNote = this._track.notes[this._nextNoteIndex];
-		if (currentNote != null && this._currentTime >= currentNote.time) {
+		const nextNote = this._track.notes[this._nextNoteIndex];
+		if (nextNote != null && this._currentTime >= nextNote.time) {
 			const success = this.placePlank();
 			if (success) {
 				this._nextNoteIndex++;
 			} else {
-				this._completed = true;
+				this.paused = true;
 				console.warn('Failed to place plank!');
 			}
 		}
