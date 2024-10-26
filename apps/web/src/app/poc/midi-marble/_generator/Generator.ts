@@ -103,6 +103,9 @@ export class Generator {
 			return;
 		}
 
+		// Ensure world (and simulated world) have same timestep/deltatime as scene
+		this._world.timestep = deltaTime;
+
 		// Check if we need to place a new plank
 		const nextNote = this._track.notes[this._nextNoteIndex];
 		if (nextNote != null && this._currentTime >= nextNote.time) {

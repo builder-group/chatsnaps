@@ -14,7 +14,7 @@ export const GeneratorComponent: React.FC = () => {
 	const [generator, setGenerator] = React.useState<Generator | null>(null);
 	const { paused, debug, deterministic } = useControls('generator', {
 		paused: false,
-		debug: false,
+		debug: true,
 		deterministic: true
 	});
 
