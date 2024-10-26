@@ -8,7 +8,7 @@ import { MeshBody } from './MeshBody';
 const GLASS_DENSITY = 2500; // kg/m³ (typical glass density)
 
 export class Marble extends MeshBody {
-	private _trail?: TTrail;
+	private _debugTrail: TDebugTrail | null = null;
 	private _debug = false;
 
 	private constructor(mesh: THREE.Mesh, body: RAPIER.RigidBody, scene: THREE.Scene, debug = false) {
@@ -16,7 +16,7 @@ export class Marble extends MeshBody {
 		this._debug = debug;
 
 		if (debug) {
-			this.initMarbleTrail(scene);
+			this.initDebugTrail(scene);
 		}
 	}
 
@@ -91,41 +91,38 @@ export class Marble extends MeshBody {
 		}
 	}
 
-	private initMarbleTrail(scene: THREE.Scene): void {
-		const points: THREE.Vector3[] = [];
-
+	private initDebugTrail(scene: THREE.Scene): void {
 		// Create visual mesh
-		const trailGeometry = new MeshLineGeometry();
-		trailGeometry.setPoints(points);
-		const trailMaterial = new MeshLineMaterial({
+		const debugTrailGeometry = new MeshLineGeometry();
+		const debugTrailMaterial = new MeshLineMaterial({
 			color: 0xff0000,
 			resolution: new THREE.Vector2(1080, 1920)
 		});
-		const trailMesh = new THREE.Mesh(trailGeometry, trailMaterial);
+		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, debugTrailMaterial);
 
-		scene.add(trailMesh);
+		scene.add(debugTrailMesh);
 
-		this._trail = {
-			geometry: trailGeometry,
-			points
+		this._debugTrail = {
+			geometry: debugTrailGeometry,
+			points: []
 		};
 	}
 
 	private updateTrail(): void {
-		if (this._trail == null) {
+		if (this._debugTrail == null) {
 			return;
 		}
 
 		// Add new position to the start of the array
 		const nextPos = this._mesh.position.clone();
-		this._trail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
+		this._debugTrail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
 
 		// Remove old positions if we exceed the trail length
-		if (this._trail.points.length > 5000) {
-			this._trail.points.pop();
+		if (this._debugTrail.points.length > 500) {
+			this._debugTrail.points.pop();
 		}
 
-		this._trail.geometry.setPoints(this._trail.points);
+		this._debugTrail.geometry.setPoints(this._debugTrail.points);
 	}
 }
 
@@ -146,7 +143,7 @@ export interface TMarbleBodyConfig {
 	linearDamping?: number; // Air resistance
 }
 
-interface TTrail {
+interface TDebugTrail {
 	geometry: MeshLineGeometry;
 	points: THREE.Vector3[];
 }

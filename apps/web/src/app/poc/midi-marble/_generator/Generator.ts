@@ -20,10 +20,15 @@ import { Plank } from './Plank';
 // - Introduce "checkpoints" that are basically world snapshots it can reset to if the marble gets stuck
 // - Improve path algo
 
+// TODO:
+// Memeory leak or something? because it gets slower over time.. first few plank placements are like 80 fps
+// but then it gets slower and slower
+
 export class Generator {
 	private readonly _config: TGeneratorConfig;
 
 	private readonly _world: RAPIER.World;
+	private readonly _eventQueue = new RAPIER.EventQueue(true);
 	private readonly _scene: THREE.Scene;
 
 	private readonly _track: Track;
@@ -313,9 +318,6 @@ export class Generator {
 		const startVelocity = rapierToThreeVector(simMarble.linvel());
 		const stepCount = Math.floor(duration / simWorld.timestep);
 
-		// Create event queue for collision detection
-		const eventQueue = new RAPIER.EventQueue(true);
-
 		// Enable collision events for marble and plank
 		const marbleCollider = simMarble.collider(0);
 		const plankCollider = simPlank.collider(0);
@@ -325,32 +327,24 @@ export class Generator {
 		let marbleContacts = 0;
 		let plankContacts = 0;
 
-		const points: THREE.Vector3[] = [];
-
-		// Create debug trail visual mesh
-		const debugTrailGeometry = new MeshLineGeometry();
-		debugTrailGeometry.setPoints(points);
-		const trailMaterial = new MeshLineMaterial({
-			color: 0xffc0cb,
-			resolution: new THREE.Vector2(1080, 1920)
-		});
-		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, trailMaterial);
-		this._scene.add(debugTrailMesh);
+		let debugTrail: TDebugTrail | null = null;
+		if (this._config.debug) {
+			debugTrail = this.initDebugTrail();
+		}
 
 		// Run simulation steps
 		for (let i = 0; i < stepCount; i++) {
-			simWorld.step(eventQueue);
+			simWorld.step(this._eventQueue);
 
 			// Update debug trail
-			if (this._config.debug) {
+			if (debugTrail != null) {
 				const nextPos = simMarble.translation();
-				points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.05));
-				debugTrailGeometry.setPoints(points);
+				debugTrail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
 			}
 
 			// Process collision events
 			// eslint-disable-next-line @typescript-eslint/no-loop-func -- Ok
-			eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+			this._eventQueue.drainCollisionEvents((handle1, handle2, started) => {
 				// Only count collision starts, not ends
 				if (started) {
 					const collider1 = simWorld.getCollider(handle1);
@@ -381,6 +375,12 @@ export class Generator {
 				}
 			});
 		}
+
+		if (debugTrail != null) {
+			debugTrail.geometry.setPoints(debugTrail.points);
+		}
+
+		this._eventQueue.clear();
 
 		const endPos = rapierToThreeVector(simMarble.translation());
 		const endVelocity = rapierToThreeVector(simMarble.linvel());
@@ -519,6 +519,20 @@ export class Generator {
 		return penaltyFactor != null ? Math.max(0, 1 - ((value - max) / max) * penaltyFactor) : 0;
 	}
 
+	private initDebugTrail(): TDebugTrail {
+		// Create visual mesh
+		const debugTrailGeometry = new MeshLineGeometry();
+		const debugTrailMaterial = new MeshLineMaterial({
+			color: 0xffc0cb,
+			resolution: new THREE.Vector2(1080, 1920)
+		});
+		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, debugTrailMaterial);
+
+		this._scene.add(debugTrailMesh);
+
+		return { geometry: debugTrailGeometry, points: [] };
+	}
+
 	public clear(): void {
 		this._marble.clear(this._scene, this._world);
 		this._planks.forEach((plank) => {
@@ -567,4 +581,9 @@ interface TPlankSimulationResult {
 
 interface TSimulationPlankNode extends TPlankSimulationResult {
 	children: TSimulationPlankNode[];
+}
+
+interface TDebugTrail {
+	geometry: MeshLineGeometry;
+	points: THREE.Vector3[];
 }
