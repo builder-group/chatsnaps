@@ -193,7 +193,11 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 		originalStory: bodyOrginalStory,
 		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
-		targetLength = '30-60 second conversation with approximately 35-55 messages (2-3k tokens)'
+		targetLength = '30-50 second conversation with approximately 35-55 messages (2-3k tokens)',
+		availableVoices = `- "Elli": American Emotional Young Female Narration
+- "Adam": American Deep Middle aged Male Narration
+- "njdO8OnkBwihvD8DCezH": A valley girl female voice. Great for shorts
+- "TNHbwIMY5QmLqZdvjhNn": Indian Excited Male Middle-Aged`
 	} = c.req.valid('json');
 
 	let originalStory = bodyOrginalStory;
@@ -224,11 +228,12 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 		.replace('{{ORIGINAL_STORY}}', originalStory)
 		.replace('{{STORY_DIRECTION}}', storyDirection)
 		.replace('{{TARGET_AUDIENCE}}', targetAudience)
-		.replace('{{TARGET_LENGTH}}', targetLength);
+		.replace('{{TARGET_LENGTH}}', targetLength)
+		.replace('{{AVAILABLE_VOICES}}', availableVoices);
 
 	const anthropicResponse = await anthropicClient.messages
 		.create({
-			model: 'claude-3-5-sonnet-20240620',
+			model: 'claude-3-5-sonnet-20241022',
 			max_tokens: 8190,
 			messages: [
 				{

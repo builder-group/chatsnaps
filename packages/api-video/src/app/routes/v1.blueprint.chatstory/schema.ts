@@ -86,7 +86,8 @@ export const ChatStoryBlueprintPromptRoute = createRoute({
 				originalStory: z.string(),
 				storyDirection: z.string().optional(),
 				targetAudience: z.string().optional(),
-				targetLength: z.string().optional()
+				targetLength: z.string().optional(),
+				availableVoices: z.string().optional()
 			})
 		)
 	},
