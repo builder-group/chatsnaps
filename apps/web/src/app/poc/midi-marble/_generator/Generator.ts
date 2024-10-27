@@ -4,14 +4,13 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
+import { DEBUG_SNAPSHOT_COLLECTION_MAP } from '../_debug';
 import { GuidePath } from './GuidePath';
 import {
 	calculateRotationRange,
 	generateRange,
 	pointOnCircle,
 	rapierToThreeVector,
-	TIME_EXECUTION_MAP,
-	timeExecution,
 	type TRotationRange
 } from './helper';
 import { Marble } from './Marble';
@@ -57,9 +56,9 @@ export class Generator {
 				marbleVelocityWeight: 2.0,
 				marbleDirectionalChangeWeight: 0.5,
 				marblePathAlignmentWeight: 0.5,
-				marbleCollisionWeight: 0.0,
+				marbleCollisionWeight: 5.0,
 				marbleContactWeight: 5.0,
-				marbleDinstanceTraveledWeight: 1.0,
+				marbleDinstanceTraveledWeight: 2.0,
 				plankContactWeight: 5.0
 			},
 			simulation = {
@@ -99,13 +98,12 @@ export class Generator {
 
 	public update(camera: THREE.Camera, deltaTime: number): void {
 		if (this.paused || this._completed) {
+			console.log({ DEBUG_SNAPSHOT_COLLECTION_MAP });
 			return;
 		}
 
-		// if (this._nextNoteIndex >= this._track.notes.length) {
-		if (this._nextNoteIndex >= 25) {
+		if (this._nextNoteIndex >= this._track.notes.length) {
 			this._completed = true;
-			console.log({ TIME_EXECUTION_MAP });
 			return;
 		}
 
@@ -139,9 +137,15 @@ export class Generator {
 	}
 
 	private placePlank(): boolean {
-		const bestResult = timeExecution('place-plank', () => this.findBestPlankPlacement());
+		const bestResult = this.findBestPlankPlacement();
 		if (bestResult == null || bestResult.score < this._config.simulation.minAcceptableScore) {
 			return false;
+		}
+
+		// Limit to nine because marbles path is downwards
+		if (this._config.debug && this._planks.length > 9) {
+			const plank = this._planks.shift();
+			plank?.clear(this._scene, this._world);
 		}
 
 		this._planks.push(
@@ -171,16 +175,14 @@ export class Generator {
 		);
 
 		// Start recursive exploration from current state
-		const rootNode = timeExecution('simulate-tree', () =>
-			this.exploreSimulationTree({
-				worldSnapshot,
-				rotations,
-				currentTime: this._currentTime,
-				nextNoteIndex: this._nextNoteIndex,
-				depth: 0,
-				maxDepth: this._config.simulation.lookAheadNotes
-			})
-		);
+		const rootNode = this.exploreSimulationTree({
+			worldSnapshot,
+			rotations,
+			currentTime: this._currentTime,
+			nextNoteIndex: this._nextNoteIndex,
+			depth: 0,
+			maxDepth: this._config.simulation.lookAheadNotes
+		});
 
 		// Find path with best total score
 		const bestPath = this.findBestPath(rootNode);

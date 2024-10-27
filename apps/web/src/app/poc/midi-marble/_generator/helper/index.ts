@@ -9,4 +9,3 @@ export * from './shallow-copy-rigid-body';
 export * from './shallow-copy-world';
 export * from './sync-mesh-with-body';
 export * from './sync-rigid-body-state';
-export * from './time-execution';

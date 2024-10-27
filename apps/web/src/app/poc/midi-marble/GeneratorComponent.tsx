@@ -3,8 +3,8 @@ import { useRapier } from '@react-three/rapier';
 import { useControls } from 'leva';
 import React from 'react';
 
+import { timeExecution } from './_debug';
 import { Generator } from './_generator';
-import { timeExecution } from './_generator/helper';
 import { loadMidi } from './_midi';
 
 const DETERMINISTIC_DELTA_TIME = 1 / 60;
