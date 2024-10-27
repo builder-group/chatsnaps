@@ -72,13 +72,13 @@ After creating your story, review this viral potential checklist:
 - Does the story naturally encourage duets, stitches, or reaction videos?
 - Does the adaptation effectively incorporate the specified story direction?
 
-Before writing the final story, analyze the original story, brainstorm viral elements, and outline the structure in <story_analysis> tags:
+Before writing the final story, analyze the original story, brainstorm viral elements.
 1. Break down the original story's key elements (characters, setting, conflict, theme)
 2. List potential viral hooks and plot twists
 3. Outline the story structure, including major plot points and the resolution
 4. Review the outline against the viral potential checklist and refine as needed
 
-Output your viral chat story using the following JSON format in <story> tags:
+Output your viral chat story using the following JSON format:
 
 {
     "title": "Catchy, Intriguing Title That Hooks Instantly",
@@ -110,4 +110,4 @@ Output your viral chat story using the following JSON format in <story> tags:
 
 Ensure your story meets the specified Target Length and incorporates all the elements discussed above to maximize its viral potential.
 
-Only provide the content within <story> and <story_analysis> tags. No additional information.
+Only output the JSON!
