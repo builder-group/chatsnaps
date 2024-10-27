@@ -96,7 +96,8 @@ export class Marble extends MeshBody {
 		const debugTrailGeometry = new MeshLineGeometry();
 		const debugTrailMaterial = new MeshLineMaterial({
 			color: 0xff0000,
-			resolution: new THREE.Vector2(1080, 1920)
+			resolution: new THREE.Vector2(1080, 1920),
+			lineWidth: 0.5
 		});
 		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, debugTrailMaterial);
 
@@ -118,7 +119,7 @@ export class Marble extends MeshBody {
 		this._debugTrail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
 
 		// Remove old positions if we exceed the trail length
-		if (this._debugTrail.points.length > 500) {
+		if (this._debugTrail.points.length > 5000) {
 			this._debugTrail.points.pop();
 		}
 

@@ -11,6 +11,7 @@ import {
 	pointOnCircle,
 	rapierToThreeVector,
 	TIME_EXECUTION_MAP,
+	timeExecution,
 	type TRotationRange
 } from './helper';
 import { Marble } from './Marble';
@@ -102,7 +103,7 @@ export class Generator {
 		}
 
 		// if (this._nextNoteIndex >= this._track.notes.length) {
-		if (this._nextNoteIndex >= 50) {
+		if (this._nextNoteIndex >= 25) {
 			this._completed = true;
 			console.log({ TIME_EXECUTION_MAP });
 			return;
@@ -138,7 +139,7 @@ export class Generator {
 	}
 
 	private placePlank(): boolean {
-		const bestResult = this.findBestPlankPlacement();
+		const bestResult = timeExecution('place-plank', () => this.findBestPlankPlacement());
 		if (bestResult == null || bestResult.score < this._config.simulation.minAcceptableScore) {
 			return false;
 		}
@@ -170,14 +171,16 @@ export class Generator {
 		);
 
 		// Start recursive exploration from current state
-		const rootNode = this.exploreSimulationTree({
-			worldSnapshot,
-			rotations,
-			currentTime: this._currentTime,
-			nextNoteIndex: this._nextNoteIndex,
-			depth: 0,
-			maxDepth: this._config.simulation.lookAheadNotes
-		});
+		const rootNode = timeExecution('simulate-tree', () =>
+			this.exploreSimulationTree({
+				worldSnapshot,
+				rotations,
+				currentTime: this._currentTime,
+				nextNoteIndex: this._nextNoteIndex,
+				depth: 0,
+				maxDepth: this._config.simulation.lookAheadNotes
+			})
+		);
 
 		// Find path with best total score
 		const bestPath = this.findBestPath(rootNode);
@@ -525,7 +528,8 @@ export class Generator {
 		const debugTrailGeometry = new MeshLineGeometry();
 		const debugTrailMaterial = new MeshLineMaterial({
 			color: 0xffc0cb,
-			resolution: new THREE.Vector2(1080, 1920)
+			resolution: new THREE.Vector2(1080, 1920),
+			lineWidth: 0.1
 		});
 		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, debugTrailMaterial);
 

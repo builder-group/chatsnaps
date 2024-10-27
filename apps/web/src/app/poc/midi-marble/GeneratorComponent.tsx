@@ -4,6 +4,7 @@ import { useControls } from 'leva';
 import React from 'react';
 
 import { Generator } from './_generator';
+import { timeExecution } from './_generator/helper';
 import { loadMidi } from './_midi';
 
 const DETERMINISTIC_DELTA_TIME = 1 / 60;
@@ -59,7 +60,9 @@ export const GeneratorComponent: React.FC = () => {
 	}, [paused, generator]);
 
 	useFrame((state, delta) => {
-		generator?.update(state.camera, deterministic ? DETERMINISTIC_DELTA_TIME : delta);
+		timeExecution('update', () =>
+			generator?.update(state.camera, deterministic ? DETERMINISTIC_DELTA_TIME : delta)
+		);
 	});
 
 	return null;
