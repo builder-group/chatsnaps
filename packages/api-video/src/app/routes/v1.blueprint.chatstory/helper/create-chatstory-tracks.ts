@@ -88,9 +88,11 @@ class ChatStoryCreator {
 					contact: {
 						profilePicture: {
 							type: 'Image',
-							src: 'static/image/memoji/1.png'
+							src: 'static/image/ios_contact-image.webp'
 						},
-						name: 'Mom'
+						name:
+							Object.values(this.script.participants).find((participant) => !participant.isSelf)
+								?.displayName ?? 'Unknown'
 					}
 				}
 			},

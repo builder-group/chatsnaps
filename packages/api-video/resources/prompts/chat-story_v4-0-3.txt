@@ -83,13 +83,13 @@ Output your viral chat story using the following JSON format:
 {
     "title": "Catchy, Intriguing Title That Hooks Instantly",
     "participants": {
-        "1": {
-            "displayName": "Character1",
+       "1": {
+            "displayName": "Attention-grabbing contact name that creates instant intrigue (e.g., 'Ex From Hell 😈', 'Sugar Daddy 💎', 'Rich Tinder Match 🔥', 'Stalker 👻')",
             "isSelf": false,
             "voice": "voice_id_or_name"
         },
         "2": {
-            "displayName": "Character2",
+            "displayName": "Usually 'Me' or a name that represents the protagonist's perspective",
             "isSelf": true,
             "voice": "voice_id_or_name"
         }
