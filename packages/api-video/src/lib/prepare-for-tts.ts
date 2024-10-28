@@ -57,6 +57,8 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 
 // TODO: Improve
 // https://elevenlabs.io/docs/speech-synthesis/prompting
+
+// Note: "<break time="0.2s" />" doesn't work with all voices
 export function prepareForTTS(text: string, options: TPrepareForTTSOptions = {}): string {
 	const {
 		processUrls = true,
@@ -100,19 +102,11 @@ export function prepareForTTS(text: string, options: TPrepareForTTSOptions = {})
 			.trim();
 	}
 
+	// Normalize multiple punctuation
 	processed = processed
-		// Normalize multiple punctuation
 		.replace(/!{2,}/g, '!')
 		.replace(/\?{2,}/g, '?!')
-		.replace(/\.{3,}/g, '... <break time="0.2s" />')
-		// Ensure proper spacing after punctuation
-		.replace(/(?<temp1>[.!?])\s*(?<temp2>[a-zA-Z])/g, '$1 <break time="0.2s" /> $2')
-		// Remove space before punctuation
-		.replace(/\s+(?<temp1>[.!?:,])/g, '$1')
-		// Add pause after interjections
-		.replace(/\b(?<temp1>oh|ah|uh|eh|um)\b/gi, '$1 <break time="0.2s" />')
-		// Add pauses for quoted speech
-		.replace(/"(?<temp1>[^"]+)"/g, '<break time="0.2s" /> "$1" <break time="0.2s" />');
+		.replace(/\.{3,}/g, '...');
 
 	return processed;
 }

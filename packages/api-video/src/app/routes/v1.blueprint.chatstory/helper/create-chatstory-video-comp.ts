@@ -3,7 +3,7 @@ import { type TResult } from 'feature-fetch';
 import { type AppError } from '@blgc/openapi-router';
 import { Err, Ok } from '@blgc/utils';
 import { pika } from '@/environment';
-import { calculateElevenLabsPrice, selectRandomVideo } from '@/lib';
+import { calculateElevenLabsPrice, selectSingleVideo } from '@/lib';
 
 import { type TChatStoryScriptDto } from '../schema';
 import { createChatStoryTracks } from './create-chatstory-tracks';
@@ -96,7 +96,7 @@ export async function createChatStoryVideoComp(
 	timeline.trackIds.push(ctaTrackId);
 
 	const backgroundVideo = includeBackgroundVideo
-		? selectRandomVideo(
+		? selectSingleVideo(
 				[
 					{
 						path: getStaticAsset('static/video/.local/steep_1.mp4').path,

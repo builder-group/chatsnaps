@@ -8,6 +8,6 @@ export * from './ms-to-frames';
 export * from './prepare-for-tts';
 export * from './render-video-comp';
 export * from './s3-storage';
-export * from './select-random-video';
+export * from './select-video';
 export * from './sha256';
 export * from './stream-to-buffer';

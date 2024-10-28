@@ -63,6 +63,9 @@ export const assetMap = {
   "static/image/imessage.png": {
     "type": "PNG"
   },
+  "static/image/ios_contact-image.webp": {
+    "type": "WEBP"
+  },
   "static/image/memoji/1.png": {
     "type": "PNG"
   },
