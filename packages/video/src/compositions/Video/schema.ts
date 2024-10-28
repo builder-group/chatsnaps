@@ -81,9 +81,10 @@ export type TTimelineActionMixin = z.infer<typeof STimelineActionMixin>;
 export const SAudioTimelineAction = STimelineActionMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
-	volume: z.number().min(0).max(1),
+	volume: z.number().min(0).max(1).optional(),
 	startFrom: z.number().int().positive().optional(),
-	endAt: z.number().int().positive().optional()
+	endAt: z.number().int().positive().optional(),
+	playbackRate: z.number().min(0.1).max(4).optional()
 });
 export type TAudioTimelineAction = z.infer<typeof SAudioTimelineAction>;
 

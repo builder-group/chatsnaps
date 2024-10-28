@@ -4,7 +4,7 @@ export function selectRandomVideo(
 	videos: TVideo[],
 	config: TSelectRandomVideoConfig
 ): TSelectedVideo | null {
-	const { totalDurationInFrames, fps = 30, startBufferMs = 0, endBufferMs = 0 } = config;
+	const { durationInFrames, fps = 30, startBufferMs = 0, endBufferMs = 0 } = config;
 
 	if (videos.length === 0) {
 		return null;
@@ -20,9 +20,9 @@ export function selectRandomVideo(
 		const effectiveVideoDurationInFrames =
 			videoDurationInFrames - startBufferInFrames - endBufferInFrames;
 
-		// If the effective video duration is long enough to fit within totalDurationInFrames
-		if (effectiveVideoDurationInFrames >= totalDurationInFrames) {
-			const maxStartFrame = effectiveVideoDurationInFrames - totalDurationInFrames;
+		// If the effective video duration is long enough to fit within durationInFrames
+		if (effectiveVideoDurationInFrames >= durationInFrames) {
+			const maxStartFrame = effectiveVideoDurationInFrames - durationInFrames;
 			const randomStartFrameWithinBuffer = Math.floor(Math.random() * (maxStartFrame + 1));
 			const startFrom = startBufferInFrames + randomStartFrameWithinBuffer;
 			return {
@@ -46,7 +46,7 @@ interface TSelectedVideo {
 }
 
 interface TSelectRandomVideoConfig {
-	totalDurationInFrames: number;
+	durationInFrames: number;
 	fps?: number;
 	startBufferMs?: number;
 	endBufferMs?: number;

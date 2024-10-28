@@ -51,7 +51,7 @@ export function createCTATrack(
 	actionMap: TTimeline['actionMap'],
 	config: TAddCTAAnimationsConfig
 ): TTimelineTrack {
-	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even', totalDurationInFrames } = config;
+	const { fps = 30, minSpacingSeconds = 15, spreadType = 'even', durationInFrames } = config;
 	const minSpacingFrames = minSpacingSeconds * fps;
 
 	const track: TTimelineTrack = {
@@ -64,7 +64,7 @@ export function createCTATrack(
 
 	// Calculate total duration of end CTAs and adjust available duration for regular CTAs
 	const endCTAsDuration = endCTAs.reduce((sum, cta) => sum + cta.action.durationInFrames, 0);
-	const availableDurationForRegularCTAs = totalDurationInFrames - endCTAsDuration;
+	const availableDurationForRegularCTAs = durationInFrames - endCTAsDuration;
 
 	// Place CTAs
 	placeRegularCTAs(
@@ -75,7 +75,7 @@ export function createCTATrack(
 		minSpacingFrames,
 		spreadType
 	);
-	placeEndCTAs(endCTAs, track.actionIds, actionMap, totalDurationInFrames);
+	placeEndCTAs(endCTAs, track.actionIds, actionMap, durationInFrames);
 
 	return track;
 }
@@ -84,18 +84,18 @@ function placeEndCTAs(
 	ctas: TCTA[],
 	actionIds: TTimelineTrack['actionIds'],
 	actionMap: TTimeline['actionMap'],
-	totalDurationInFrames: number
+	durationInFrames: number
 ): void {
-	let endPosition = totalDurationInFrames;
+	let endPosition = durationInFrames;
 	for (const cta of ctas.reverse()) {
 		// Reverse to place from end to start
-		const durationInFrames = cta.action.durationInFrames;
+		const ctaDurationInFrames = cta.action.durationInFrames;
 		endPosition -= durationInFrames;
 
 		const id = pika.gen('action');
 		actionMap[id] = {
 			...cta.action,
-			durationInFrames,
+			durationInFrames: ctaDurationInFrames,
 			startFrame: endPosition
 		};
 		actionIds.push(id);
@@ -177,7 +177,7 @@ interface TCTA {
 }
 
 interface TAddCTAAnimationsConfig {
-	totalDurationInFrames: number;
+	durationInFrames: number;
 	spreadType?: 'even' | 'random';
 	minSpacingSeconds?: number;
 	fps?: number;

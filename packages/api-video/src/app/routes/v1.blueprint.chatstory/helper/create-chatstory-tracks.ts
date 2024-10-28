@@ -7,15 +7,21 @@ import {
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
-import { elevenLabsClient, elevenLabsConfig, pika, s3Client, s3Config } from '@/environment';
+import {
+	elevenLabsClient,
+	elevenLabsConfig,
+	logger,
+	pika,
+	s3Client,
+	s3Config
+} from '@/environment';
 import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
-import { logger } from '@/logger';
 
 import {
 	type TChatStoryScriptDto,
 	type TChatStoryScriptEvent,
 	type TChatStoryVideoParticipant
-} from './schema';
+} from '../schema';
 
 export function createChatStoryTracks(
 	script: TChatStoryScriptDto,
@@ -57,12 +63,20 @@ class ChatStoryCreator {
 		actionMap: TTimeline['actionMap'],
 		options: TChatStoryCreatorOptions = {}
 	) {
+		const {
+			fps = 30,
+			voiceover = false,
+			useCached = true,
+			voiceoverPlaybackRate = 1,
+			minMessageDelayMs = options.voiceover ? 0 : 500
+		} = options;
 		this.script = script;
 		this.config = {
-			fps: options.fps ?? 30,
-			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
-			voiceover: options.voiceover ?? false,
-			useCached: options.useCached ?? true
+			fps,
+			minMessageDelayMs,
+			voiceover,
+			useCached,
+			voiceoverPlaybackRate
 		};
 		this.actionMap = actionMap;
 		this.messageTrack = {
@@ -166,7 +180,7 @@ class ChatStoryCreator {
 		}
 
 		this.addMessageToTimeline(item, participant, startFrame);
-		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs);
+		this.currentTimeMs += Math.max(this.config.minMessageDelayMs, voiceDurationMs);
 		return Ok(undefined);
 	}
 
@@ -210,7 +224,9 @@ class ChatStoryCreator {
 			return Err(spokenMessageUrl.error);
 		}
 
-		const durationMs = unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0;
+		const durationMs =
+			(unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0) /
+			this.config.voiceoverPlaybackRate;
 		this.addVoiceoverToTimeline(
 			spokenMessageUrl.value,
 			startFrame,
@@ -314,7 +330,8 @@ class ChatStoryCreator {
 			src,
 			volume: 1,
 			startFrame,
-			durationInFrames: durationInFrames + this.config.fps
+			durationInFrames,
+			playbackRate: this.config.voiceoverPlaybackRate
 		};
 		this.voiceoverTrack.actionIds.push(id);
 	}
@@ -459,9 +476,10 @@ type TExtendedChatStoryScriptEvent = TChatStoryScriptEvent & { index: number };
 
 interface TChatStoryCreatorConfig {
 	fps: number;
-	messageDelayMs: number;
+	minMessageDelayMs: number;
 	voiceover: boolean;
 	useCached: boolean;
+	voiceoverPlaybackRate: number;
 }
 
 type TChatStoryCreatorOptions = Partial<TChatStoryCreatorConfig>;

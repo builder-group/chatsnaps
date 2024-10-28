@@ -14,6 +14,7 @@ export const TimelineAudioAction: React.FC<TProps> = (props) => {
 				startFrom={action.startFrom}
 				endAt={action.endAt}
 				volume={action.volume}
+				playbackRate={action.playbackRate}
 			/>
 		</Sequence>
 	);
