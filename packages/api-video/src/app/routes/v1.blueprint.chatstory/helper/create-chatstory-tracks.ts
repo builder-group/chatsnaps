@@ -15,7 +15,7 @@ import {
 	s3Client,
 	s3Config
 } from '@/environment';
-import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
+import { estimateMp3Duration, msToFrames, prepareForTTS, sha256, streamToBuffer } from '@/lib';
 
 import {
 	type TChatStoryScriptDto,
@@ -250,15 +250,15 @@ class ChatStoryCreator {
 	): Promise<TResult<void, AppError>> {
 		const { previousContent, previousRequestIds } = this.getVoiceContext(voiceId);
 		const previousText = previousContent
-			.map((c) => this.enhanceSpeechText(c))
+			.map((c) => prepareForTTS(c))
 			.join(' - ')
 			.trim();
 		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
 		const nextText = nextContent
-			.map((c) => this.enhanceSpeechText(c))
+			.map((c) => prepareForTTS(c))
 			.join(' - ')
 			.trim();
-		const currentText = this.enhanceSpeechText(item.spokenContent ?? item.content);
+		const currentText = prepareForTTS(item.spokenContent ?? item.content);
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
@@ -413,60 +413,6 @@ class ChatStoryCreator {
 				previousRequestIds: []
 			}
 		);
-	}
-
-	// TODO: Improve
-	// https://elevenlabs.io/docs/speech-synthesis/prompting
-	private enhanceSpeechText(content: string): string {
-		let modifiedContent = content;
-
-		// Remove emojis
-		modifiedContent = modifiedContent
-			.replace(
-				/(?<temp1>[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-				''
-			)
-			.trim();
-
-		// Add emphasis to uppercase words
-		if (/^[^a-z]*$/.test(modifiedContent)) {
-			modifiedContent = `${modifiedContent}!`;
-		}
-
-		// Convert common abbreviations and short forms
-		const abbreviations: Record<string, string> = {
-			'OMG': 'Oh my God',
-			'AF': 'as fuck',
-			'WTF': 'What the fuck',
-			// 'LOL': 'laughing out loud',
-			// 'ROFL': 'rolling on the floor laughing',
-			'ASAP': 'as soon as possible',
-			'TBH': 'to be honest',
-			'IDK': "I don't know",
-			'IMO': 'in my opinion',
-			'IMHO': 'in my humble opinion',
-			'FYI': 'for your information',
-			'TL;DR': "too long; didn't read",
-			'AKA': 'also known as',
-			'e.g.': 'for example',
-			'i.e.': 'that is',
-			'etc.': 'et cetera',
-			'mins': 'minutes',
-			'F\\*\\*\\*': 'FRICK!'
-		};
-
-		// Replace abbreviations with their full forms
-		for (const [abbr, fullForm] of Object.entries(abbreviations)) {
-			const regex = new RegExp(`\\b${abbr}\\b`, 'gi');
-			modifiedContent = modifiedContent.replace(regex, fullForm);
-		}
-
-		// Add pauses after punctuation
-		if (modifiedContent.endsWith('?') || modifiedContent.endsWith('!')) {
-			modifiedContent = `"${modifiedContent}"`;
-		}
-
-		return modifiedContent;
 	}
 
 	private canBeSpoken(text: string): boolean {
