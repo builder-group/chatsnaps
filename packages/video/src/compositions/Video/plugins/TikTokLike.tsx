@@ -1,6 +1,7 @@
 import React from 'react';
 import {
 	Audio,
+	Easing,
 	interpolate,
 	interpolateColors,
 	random,
@@ -49,23 +50,25 @@ registerTimelineActionPlugin({
 			},
 			durationInFrames: enterDuration
 		});
+		const enterScale = interpolate(enterProgress, [0, 1], [0, 1]);
 
-		const exitStart = durationInFrames - exitDuration;
-		const exitProgress = spring({
-			fps,
-			frame: frame - exitStart,
-			config: {
-				damping: 14,
-				stiffness: 160,
-				mass: 0.6
-			},
-			durationInFrames: exitDuration
+		const exitStart = action.durationInFrames - exitDuration;
+		const exitProgress =
+			frame >= exitStart && frame < exitStart + exitDuration
+				? (frame - exitStart) / exitDuration
+				: frame >= exitStart + exitDuration
+					? 1
+					: 0;
+		const easedExitProgress = interpolate(exitProgress, [0, 1], [0, 1], {
+			easing: Easing.inOut(Easing.cubic),
+			extrapolateLeft: 'clamp',
+			extrapolateRight: 'clamp'
 		});
-		const exitScale = interpolate(exitProgress, [0, 0.3, 1], [1, 1.2, 0]);
-		const exitOpacity = interpolate(exitProgress, [0, 1], [1, 0]);
+		const exitScale = interpolate(easedExitProgress, [0, 0.5, 1], [1, 1.2, 0]);
+		const exitOpacity = interpolate(easedExitProgress, [0, 1], [1, 0]);
 
-		const scale =
-			frame < durationInFrames - exitDuration ? enterProgress : enterProgress * exitScale;
+		const scale = frame < action.durationInFrames - exitDuration ? enterScale : exitScale;
+		const opacity = frame < action.durationInFrames - exitDuration ? 1 : exitOpacity;
 
 		const pulseFrequency = 2;
 		const pulseAmplitude = 0.05;
@@ -96,7 +99,7 @@ registerTimelineActionPlugin({
 					<div
 						className="relative"
 						style={{
-							opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity
+							opacity
 						}}
 					>
 						{isLiked &&
@@ -138,7 +141,7 @@ registerTimelineActionPlugin({
 						<div
 							className="mt-16 rounded-xl bg-black px-8 py-4 drop-shadow-lg"
 							style={{
-								opacity: frame < durationInFrames - exitDuration ? 1 : exitOpacity,
+								opacity,
 								transform: `scale(${scale})`
 							}}
 						>
