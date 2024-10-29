@@ -71,11 +71,6 @@ export async function createChatStoryVideoComp(
 	const ctaTrack = createCTATrack(
 		[
 			{
-				action: createFollowCTA(
-					followText[Math.floor(Math.random() * followText.length)] as unknown as string
-				)
-			},
-			{
 				action: createLikeCTA(
 					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
 				)
@@ -84,11 +79,11 @@ export async function createChatStoryVideoComp(
 				action: createFollowCTA(
 					followText[Math.floor(Math.random() * followText.length)] as unknown as string
 				),
-				atEnd: true
+				anchor: 'end'
 			}
 		],
 		timeline.actionMap,
-		{ fps, durationInFrames }
+		{ fps, durationInFrames, spreadType: 'even', minSpacingSeconds: 10 }
 	);
 
 	const ctaTrackId = pika.gen('track');
