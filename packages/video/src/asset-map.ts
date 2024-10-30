@@ -72,71 +72,115 @@ export const assetMap = {
   "static/image/overlay/tiktok.png": {
     "type": "PNG"
   },
-  "static/video/.local/minecraft_1.mp4": {
+  "static/video/.local/baking_MrCakesOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 12100
+  },
+  "static/video/.local/baking_MrCakesOfficial_2.mp4": {
+    "type": "MP4",
+    "durationMs": 8400
+  },
+  "static/video/.local/baking_MrCakesOfficial_3.mp4": {
+    "type": "MP4",
+    "durationMs": 10566
+  },
+  "static/video/.local/baking_SatisfyingCakes_1.mp4": {
+    "type": "MP4",
+    "durationMs": 6033
+  },
+  "static/video/.local/baking_SoTastyOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 6000
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 1233
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_10.mp4": {
+    "type": "MP4",
+    "durationMs": 10766
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_11.mp4": {
+    "type": "MP4",
+    "durationMs": 9900
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_2.mp4": {
+    "type": "MP4",
+    "durationMs": 1700
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_3.mp4": {
+    "type": "MP4",
+    "durationMs": 1900
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_4.mp4": {
+    "type": "MP4",
+    "durationMs": 11533
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_5.mp4": {
+    "type": "MP4",
+    "durationMs": 9200
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_6.mp4": {
+    "type": "MP4",
+    "durationMs": 11933
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_7.mp4": {
+    "type": "MP4",
+    "durationMs": 10633
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_8.mp4": {
+    "type": "MP4",
+    "durationMs": 11600
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_9.mp4": {
+    "type": "MP4",
+    "durationMs": 11933
+  },
+  "static/video/.local/cake-cutting_SatisfyingCakes_1.mp4": {
+    "type": "MP4",
+    "durationMs": 9900
+  },
+  "static/video/.local/cake-cutting_SoTastyOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 8200
+  },
+  "static/video/.local/minecraft_BennoBuilder_1.mp4": {
     "type": "MP4",
     "durationMs": 67666
   },
-  "static/video/.local/steep_1.mp4": {
+  "static/video/.local/steep_BennoBuilder_1.mp4": {
     "type": "MP4",
     "durationMs": 165466
   },
-  "static/video/.local/steep_10.mp4": {
-    "type": "MP4",
-    "durationMs": 122700
-  },
-  "static/video/.local/steep_11.mp4": {
-    "type": "MP4",
-    "durationMs": 106866
-  },
-  "static/video/.local/steep_12.mp4": {
-    "type": "MP4",
-    "durationMs": 162900
-  },
-  "static/video/.local/steep_13.mp4": {
-    "type": "MP4",
-    "durationMs": 136733
-  },
-  "static/video/.local/steep_14.mp4": {
-    "type": "MP4",
-    "durationMs": 119000
-  },
-  "static/video/.local/steep_15.mp4": {
-    "type": "MP4",
-    "durationMs": 141933
-  },
-  "static/video/.local/steep_16.mp4": {
-    "type": "MP4",
-    "durationMs": 209133
-  },
-  "static/video/.local/steep_2.mp4": {
+  "static/video/.local/steep_BennoBuilder_2.mp4": {
     "type": "MP4",
     "durationMs": 85033
   },
-  "static/video/.local/steep_3.mp4": {
+  "static/video/.local/steep_BennoBuilder_3.mp4": {
     "type": "MP4",
     "durationMs": 67566
   },
-  "static/video/.local/steep_4.mp4": {
+  "static/video/.local/steep_BennoBuilder_4.mp4": {
     "type": "MP4",
     "durationMs": 59800
   },
-  "static/video/.local/steep_5.mp4": {
+  "static/video/.local/steep_BennoBuilder_5.mp4": {
     "type": "MP4",
     "durationMs": 205166
   },
-  "static/video/.local/steep_6.mp4": {
+  "static/video/.local/steep_BennoBuilder_6.mp4": {
     "type": "MP4",
     "durationMs": 69033
   },
-  "static/video/.local/steep_7.mp4": {
+  "static/video/.local/steep_BennoBuilder_7.mp4": {
     "type": "MP4",
     "durationMs": 232966
   },
-  "static/video/.local/steep_8.mp4": {
+  "static/video/.local/steep_BennoBuilder_8.mp4": {
     "type": "MP4",
     "durationMs": 100633
   },
-  "static/video/.local/steep_9.mp4": {
+  "static/video/.local/steep_BennoBuilder_9.mp4": {
     "type": "MP4",
     "durationMs": 104933
   }

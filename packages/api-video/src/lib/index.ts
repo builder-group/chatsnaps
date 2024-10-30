@@ -4,6 +4,7 @@ export * from './contains-speakable-char';
 export * from './estimate-mp3-duration';
 export * from './format-file-name';
 export * from './get-resource';
+export * from './get-videos-by-categories';
 export * from './ms-to-frames';
 export * from './prepare-for-tts';
 export * from './render-video-comp';

@@ -1,3 +1,4 @@
+export * from './create-background-track';
 export * from './create-chatstory-tracks';
 export * from './create-chatstory-video-comp';
 export * from './create-cta-track';

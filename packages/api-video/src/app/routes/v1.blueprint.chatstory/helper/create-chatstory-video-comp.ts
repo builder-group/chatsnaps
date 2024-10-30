@@ -1,18 +1,19 @@
-import { getDuration, getStaticAsset, type TTimeline, type TVideoComp } from '@repo/video';
+import { getDuration, type TTimeline, type TVideoComp } from '@repo/video';
 import { type TResult } from 'feature-fetch';
 import { type AppError } from '@blgc/openapi-router';
 import { Err, Ok } from '@blgc/utils';
 import { pika } from '@/environment';
-import { calculateElevenLabsPrice, selectSingleVideo } from '@/lib';
+import { calculateElevenLabsPrice } from '@/lib';
 
 import { type TChatStoryScriptDto } from '../schema';
+import { createBackgroundTrack, type TBackgroundVariant } from './create-background-track';
 import { createChatStoryTracks } from './create-chatstory-tracks';
 import { createCTATrack, createFollowCTA, createLikeCTA } from './create-cta-track';
 
 export async function createChatStoryVideoComp(
 	config: TCreateChatStoryVideoCompConfig
 ): Promise<TResult<TCreateChatStoryVideoComp, AppError>> {
-	const { includeVoiceover, includeBackgroundVideo, useCached, fps, script } = config;
+	const { includeVoiceover, backgroundVariant, useCached, fps, script } = config;
 
 	const timeline: TTimeline = { trackIds: [], trackMap: {}, actionMap: {} };
 
@@ -85,61 +86,20 @@ export async function createChatStoryVideoComp(
 		timeline.actionMap,
 		{ fps, durationInFrames, spreadType: 'even', minSpacingSeconds: 10 }
 	);
-
 	const ctaTrackId = pika.gen('track');
 	timeline.trackMap[ctaTrackId] = ctaTrack;
 	timeline.trackIds.push(ctaTrackId);
 
-	const backgroundVideo = includeBackgroundVideo
-		? selectSingleVideo(
-				[
-					{
-						path: getStaticAsset('static/video/.local/steep_1.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_1.mp4').durationMs
-					},
-					{
-						path: getStaticAsset('static/video/.local/steep_2.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_2.mp4').durationMs
-					},
-					{
-						path: getStaticAsset('static/video/.local/steep_3.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_3.mp4').durationMs
-					}
-				],
-				{
-					durationInFrames,
-					endBufferMs: 2000,
-					startBufferMs: 2000
-				}
-			)
-		: null;
-
-	const backgroundVideoActionId = pika.gen('action');
-	timeline.actionMap[backgroundVideoActionId] = {
-		type: 'Rectangle',
-		width: 1080,
-		height: 1920,
-		startFrame: 0,
+	const backgroundTrack = createBackgroundTrack(timeline.actionMap, {
 		durationInFrames,
-		fill:
-			backgroundVideo != null
-				? {
-						type: 'Video',
-						width: 1080,
-						height: 1920,
-						objectFit: 'cover',
-						src: backgroundVideo.src,
-						startFrom: backgroundVideo.startFrom
-					}
-				: { type: 'Solid', color: '#00b140' }
-	};
-
-	const backgroundVideoTrackId = pika.gen('track');
-	timeline.trackMap[backgroundVideoTrackId] = {
-		type: 'Track',
-		actionIds: [backgroundVideoActionId]
-	};
-	timeline.trackIds.unshift(backgroundVideoTrackId);
+		fps,
+		height: 1920,
+		width: 1080,
+		variant: backgroundVariant
+	}).unwrap();
+	const backgroundTrackId = pika.gen('track');
+	timeline.trackMap[backgroundTrackId] = backgroundTrack;
+	timeline.trackIds.unshift(backgroundTrackId);
 
 	return Ok({
 		video: {
@@ -159,7 +119,7 @@ export async function createChatStoryVideoComp(
 
 interface TCreateChatStoryVideoCompConfig {
 	includeVoiceover: boolean;
-	includeBackgroundVideo: boolean;
+	backgroundVariant: TBackgroundVariant;
 	useCached: boolean;
 	fps: number;
 	script: TChatStoryScriptDto;

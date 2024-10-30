@@ -26,7 +26,9 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 	const { video, usage } = (
 		await createChatStoryVideoComp({
 			includeVoiceover,
-			includeBackgroundVideo,
+			backgroundVariant: includeBackgroundVideo
+				? { type: 'single', categories: ['steep'] }
+				: { type: 'static' },
 			useCached,
 			fps,
 			script: data
@@ -109,7 +111,9 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 
 		const videoCompResult = await createChatStoryVideoComp({
 			includeVoiceover,
-			includeBackgroundVideo,
+			backgroundVariant: includeBackgroundVideo
+				? { type: 'single', categories: ['steep'] }
+				: { type: 'static' },
 			useCached,
 			fps,
 			script

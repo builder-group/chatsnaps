@@ -1,4 +1,5 @@
-import { S3Storage } from '../../lib';
+import { S3Storage } from '@/lib/s3-storage';
+
 import { s3Config } from '../config';
 
 export const s3Client = new S3Storage({

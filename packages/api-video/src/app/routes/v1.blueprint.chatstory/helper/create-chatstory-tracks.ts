@@ -1,13 +1,4 @@
 import {
-	getStaticAsset,
-	type TChatStoryPlugin,
-	type TTimeline,
-	type TTimelineTrack
-} from '@repo/video';
-import { isVoiceId } from 'elevenlabs-client';
-import { AppError } from '@blgc/openapi-router';
-import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
-import {
 	elevenLabsClient,
 	elevenLabsConfig,
 	logger,
@@ -16,6 +7,15 @@ import {
 	s3Config
 } from '@/environment';
 import { estimateMp3Duration, msToFrames, prepareForTTS, sha256, streamToBuffer } from '@/lib';
+import { AppError } from '@blgc/openapi-router';
+import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
+import {
+	getStaticAsset,
+	type TChatStoryPlugin,
+	type TTimeline,
+	type TTimelineTrack
+} from '@repo/video';
+import { isVoiceId } from 'elevenlabs-client';
 
 import {
 	type TChatStoryScriptDto,
@@ -116,9 +116,9 @@ class ChatStoryCreator {
 				if (voiceId != null) {
 					participant.voice = voiceId;
 				} else {
-					throw new AppError(`#ERR_INVALID_VOICE`, 400, {
+					return Err(new AppError(`#ERR_INVALID_VOICE`, 400, {
 						description: `Faild to resolve voice with the id or name: ${participant.voice}`
-					});
+					}));
 				}
 			}
 		}
