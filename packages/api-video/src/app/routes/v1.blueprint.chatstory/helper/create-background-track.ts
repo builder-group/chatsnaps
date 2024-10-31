@@ -87,8 +87,8 @@ function createSingleVideoBackground(
 	variant: TSingleVideoVariant,
 	width: number,
 	height: number,
-	fps: number,
-	durationInFrames: number
+	durationInFrames: number,
+	fps: number
 ): TResult<TTimelineAction, AppError> {
 	const { categories, endBufferMs = 2000, startBufferMs = 2000 } = variant;
 

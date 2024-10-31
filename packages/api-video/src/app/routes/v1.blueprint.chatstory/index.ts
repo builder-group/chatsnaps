@@ -27,7 +27,8 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 		await createChatStoryVideoComp({
 			includeVoiceover,
 			backgroundVariant: includeBackgroundVideo
-				? { type: 'single', categories: ['steep'] }
+				? //	? { type: 'single', categories: ['steep'] }
+					{ type: 'sequence', categories: ['baking', 'cake-cutting'] }
 				: { type: 'static' },
 			useCached,
 			fps,

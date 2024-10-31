@@ -45,7 +45,7 @@ export const SVideoFill = z.object({
 	objectFit: SObjectFit,
 	width: z.number().int().positive(),
 	height: z.number().int().positive(),
-	startFrom: z.number().int().positive().optional(),
+	startFrom: z.number().int().nonnegative().optional(),
 	endAt: z.number().int().positive().optional(),
 	playbackRate: z.number().optional()
 });
@@ -82,7 +82,7 @@ export const SAudioTimelineAction = STimelineActionMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
 	volume: z.number().min(0).max(1).optional(),
-	startFrom: z.number().int().positive().optional(),
+	startFrom: z.number().int().nonnegative().optional(),
 	endAt: z.number().int().positive().optional(),
 	playbackRate: z.number().min(0.1).max(4).optional()
 });
