@@ -5,7 +5,7 @@
 		"height": 1920,
 		"fps": 30,
 		"timeline": {
-			"trackIds": ["t1", "t2"],
+			"trackIds": ["t3", "t1", "t2"],
 			"actionMap": {
 				"a1": {
 					"type": "Rectangle",
@@ -51,11 +51,30 @@
 					"height": 500,
 					"x": 0,
 					"y": 1000
+				},
+				"a4": {
+					"type": "Rectangle",
+					"startFrame": 0,
+					"durationInFrames": 100,
+					"width": 1080,
+					"height": 1920,
+					"x": 0,
+					"y": 0,
+					"fill": {
+						"type": "Video",
+						"src": "https://files.vidstack.io/sprite-fight/720p.mp4",
+						"objectFit": "cover",
+						"endAt": 100,
+						"width": 1080,
+						"height": 1920,
+						"author": "@blender"
+					}
 				}
 			},
 			"trackMap": {
 				"t1": { "type": "Track", "actionIds": ["a1"] },
-				"t2": { "type": "Track", "actionIds": ["a2", "a3"] }
+				"t2": { "type": "Track", "actionIds": ["a2", "a3"] },
+				"t3": { "type": "Track", "actionIds": ["a4"] }
 			}
 		}
 	}

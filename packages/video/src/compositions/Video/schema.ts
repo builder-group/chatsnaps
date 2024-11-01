@@ -42,20 +42,21 @@ export const SOpacityMixin = z.object({
 export const SVideoFill = z.object({
 	type: z.literal('Video'),
 	src: SUrl,
-	objectFit: SObjectFit,
-	width: z.number().int().positive(),
-	height: z.number().int().positive(),
+	objectFit: SObjectFit.optional(),
+	width: z.number().int().positive().optional(),
+	height: z.number().int().positive().optional(),
 	startFrom: z.number().int().nonnegative().optional(),
 	endAt: z.number().int().positive().optional(),
-	playbackRate: z.number().optional()
+	playbackRate: z.number().optional(),
+	author: z.string().optional()
 });
 
 export const SImageFill = z.object({
 	type: z.literal('Image'),
 	src: SUrl,
-	objectFit: SObjectFit,
-	width: z.number().int().positive(),
-	height: z.number().int().positive()
+	objectFit: SObjectFit.optional(),
+	width: z.number().int().positive().optional(),
+	height: z.number().int().positive().optional()
 });
 
 export const SSolidFill = z.object({
