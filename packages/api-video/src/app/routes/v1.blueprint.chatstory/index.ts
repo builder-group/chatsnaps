@@ -12,27 +12,19 @@ import {
 } from './schema';
 
 router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
-	const data = c.req.valid('json');
 	const {
-		includeVoiceover: includeVoiceoverString = 'false',
-		includeBackgroundVideo: includeBackgroundVideoString = 'false',
-		useCached: useCachedString = 'true'
-	} = c.req.valid('query');
-	const includeVoiceover = includeVoiceoverString === 'true';
-	const includeBackgroundVideo = includeBackgroundVideoString === 'true';
-	const useCached = useCachedString === 'true';
-	const fps = 30;
+		script,
+		background = { type: 'Static' },
+		voiceover = { isEnabled: true },
+		fps = 30
+	} = c.req.valid('json');
 
 	const { video, usage } = (
 		await createChatStoryVideoComp({
-			includeVoiceover,
-			backgroundVariant: includeBackgroundVideo
-				? //	? { type: 'single', categories: ['steep'] }
-					{ type: 'sequence', categories: ['baking', 'cake-cutting'] }
-				: { type: 'static' },
-			useCached,
+			background,
+			voiceover,
 			fps,
-			script: data
+			script
 		})
 	).unwrap();
 
@@ -69,16 +61,12 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 });
 
 router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
-	const { stories } = c.req.valid('json');
 	const {
-		includeVoiceover: includeVoiceoverString = 'false',
-		includeBackgroundVideo: includeBackgroundVideoString = 'false',
-		useCached: useCachedString = 'true'
-	} = c.req.valid('query');
-	const includeVoiceover = includeVoiceoverString === 'true';
-	const includeBackgroundVideo = includeBackgroundVideoString === 'true';
-	const useCached = useCachedString === 'true';
-	const fps = 30;
+		stories,
+		background = { type: 'Static' },
+		voiceover = { isEnabled: true },
+		fps = 30
+	} = c.req.valid('json');
 
 	const videoUrls: (string | null)[] = [];
 	let totalUsageUsd = 0;
@@ -111,11 +99,8 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 		const { script, usage: scriptUsage } = scriptResult.value;
 
 		const videoCompResult = await createChatStoryVideoComp({
-			includeVoiceover,
-			backgroundVariant: includeBackgroundVideo
-				? { type: 'single', categories: ['steep'] }
-				: { type: 'static' },
-			useCached,
+			background,
+			voiceover,
 			fps,
 			script
 		});

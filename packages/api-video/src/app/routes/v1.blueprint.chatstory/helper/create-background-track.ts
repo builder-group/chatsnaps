@@ -14,7 +14,7 @@ export function createBackgroundTrack(
 	config: TCreateBackgroundTrackConfig
 ): TResult<TTimelineTrack, AppError> {
 	const {
-		variant = { type: 'static', backgroundColor: '00b140' },
+		variant = { type: 'Static', backgroundColor: '00b140' },
 		durationInFrames,
 		width,
 		height,
@@ -23,14 +23,14 @@ export function createBackgroundTrack(
 	const actionIds: string[] = [];
 
 	switch (variant.type) {
-		case 'static': {
+		case 'Static': {
 			const actionId = pika.gen('action');
 			actionMap[actionId] = createStaticBackground(variant, width, height, durationInFrames);
 			actionIds.push(actionId);
 			break;
 		}
 
-		case 'single': {
+		case 'Single': {
 			const result = createSingleVideoBackground(variant, width, height, durationInFrames, fps);
 
 			if (result.isErr()) {
@@ -43,7 +43,7 @@ export function createBackgroundTrack(
 			break;
 		}
 
-		case 'sequence': {
+		case 'Sequence': {
 			const result = createSequenceVideoBackground(variant, width, height, durationInFrames, fps);
 
 			if (result.isErr()) {
@@ -131,7 +131,8 @@ function createSingleVideoBackground(
 			height,
 			objectFit: 'cover',
 			src: selectedVideo.src,
-			startFrom: selectedVideo.startFrom
+			startFrom: selectedVideo.startFrom,
+			author: selectedVideo.metadata?.author
 		}
 	});
 }
@@ -187,7 +188,8 @@ function createSequenceVideoBackground(
 					height,
 					objectFit: 'cover',
 					src: video.src,
-					startFrom: video.startFrom
+					startFrom: video.startFrom,
+					author: video.metadata?.author
 				}
 			};
 
@@ -199,19 +201,19 @@ function createSequenceVideoBackground(
 }
 
 interface TStaticVariant {
-	type: 'static';
+	type: 'Static';
 	backgroundColor?: string;
 }
 
 interface TSingleVideoVariant {
-	type: 'single';
+	type: 'Single';
 	categories: string[];
 	startBufferMs?: number;
 	endBufferMs?: number;
 }
 
 interface TSequenceVideoVariant {
-	type: 'sequence';
+	type: 'Sequence';
 	categories: string[];
 	startBufferMs?: number;
 	endBufferMs?: number;

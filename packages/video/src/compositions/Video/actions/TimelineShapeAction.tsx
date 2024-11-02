@@ -60,7 +60,7 @@ export const TimelineShapeAction: React.FC<TProps> = (props) => {
 					content = (
 						<div className="relative h-full w-full">
 							{videoComponent}
-							<div className="absolute bottom-4 left-4 rounded-lg bg-black p-2 text-sm text-white opacity-60">
+							<div className="absolute bottom-4 left-4 rounded-lg bg-black px-4 py-2 text-lg text-white opacity-60">
 								{action.fill.author}
 							</div>
 						</div>

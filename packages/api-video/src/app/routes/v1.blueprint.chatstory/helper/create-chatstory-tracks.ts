@@ -1,4 +1,13 @@
 import {
+	getStaticAsset,
+	type TChatStoryPlugin,
+	type TTimeline,
+	type TTimelineTrack
+} from '@repo/video';
+import { isVoiceId } from 'elevenlabs-client';
+import { AppError } from '@blgc/openapi-router';
+import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
+import {
 	elevenLabsClient,
 	elevenLabsConfig,
 	logger,
@@ -7,15 +16,6 @@ import {
 	s3Config
 } from '@/environment';
 import { estimateMp3Duration, msToFrames, prepareForTTS, sha256, streamToBuffer } from '@/lib';
-import { AppError } from '@blgc/openapi-router';
-import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
-import {
-	getStaticAsset,
-	type TChatStoryPlugin,
-	type TTimeline,
-	type TTimelineTrack
-} from '@repo/video';
-import { isVoiceId } from 'elevenlabs-client';
 
 import {
 	type TChatStoryScriptDto,
@@ -63,20 +63,23 @@ class ChatStoryCreator {
 		actionMap: TTimeline['actionMap'],
 		options: TChatStoryCreatorOptions = {}
 	) {
+		const { fps = 30, voiceover = {} } = options;
 		const {
-			fps = 30,
-			voiceover = false,
-			useCached = true,
-			voiceoverPlaybackRate = 1,
-			minMessageDelayMs = options.voiceover ? 0 : 500
-		} = options;
+			isEnabled: voiceoverIsEnabled = true,
+			playbackRate: voiceoverPlaybackRate = 1.2,
+			usePrerecorded: voiceoverUsePrerecorded = false
+		} = voiceover;
+		const minMessageDelayMs = options.minMessageDelayMs ?? (voiceoverIsEnabled ? 0 : 500);
+
 		this.script = script;
 		this.config = {
 			fps,
 			minMessageDelayMs,
-			voiceover,
-			useCached,
-			voiceoverPlaybackRate
+			voiceover: {
+				isEnabled: voiceoverIsEnabled,
+				playbackRate: voiceoverPlaybackRate,
+				usePrerecorded: voiceoverUsePrerecorded
+			}
 		};
 		this.actionMap = actionMap;
 		this.messageTrack = {
@@ -116,9 +119,11 @@ class ChatStoryCreator {
 				if (voiceId != null) {
 					participant.voice = voiceId;
 				} else {
-					return Err(new AppError(`#ERR_INVALID_VOICE`, 400, {
-						description: `Faild to resolve voice with the id or name: ${participant.voice}`
-					}));
+					return Err(
+						new AppError(`#ERR_INVALID_VOICE`, 400, {
+							description: `Faild to resolve voice with the id or name: ${participant.voice}`
+						})
+					);
 				}
 			}
 		}
@@ -173,7 +178,11 @@ class ChatStoryCreator {
 		this.addNotificationSound(participant, startFrame);
 
 		let voiceDurationMs = 0;
-		if (this.config.voiceover && participant.voice != null && this.canBeSpoken(item.content)) {
+		if (
+			this.config.voiceover.isEnabled &&
+			participant.voice != null &&
+			this.canBeSpoken(item.content)
+		) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
 			if (voiceResult.isErr()) {
 				return Err(voiceResult.error);
@@ -209,7 +218,8 @@ class ChatStoryCreator {
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
 		const isSpokenMessageCached =
-			this.config.useCached && (await this.checkSpokenMessageCache(spokenMessageFilename));
+			this.config.voiceover.usePrerecorded &&
+			(await this.checkSpokenMessageCache(spokenMessageFilename));
 		if (!isSpokenMessageCached) {
 			const generateResult = await this.generateAndUploadVoiceover(
 				item,
@@ -228,7 +238,7 @@ class ChatStoryCreator {
 
 		const durationMs =
 			(unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0) /
-			this.config.voiceoverPlaybackRate;
+			this.config.voiceover.playbackRate;
 		this.addVoiceoverToTimeline(
 			spokenMessageUrl.value,
 			startFrame,
@@ -333,7 +343,7 @@ class ChatStoryCreator {
 			volume: 1,
 			startFrame,
 			durationInFrames,
-			playbackRate: this.config.voiceoverPlaybackRate
+			playbackRate: this.config.voiceover.playbackRate
 		};
 		this.voiceoverTrack.actionIds.push(id);
 	}
@@ -425,12 +435,20 @@ type TExtendedChatStoryScriptEvent = TChatStoryScriptEvent & { index: number };
 interface TChatStoryCreatorConfig {
 	fps: number;
 	minMessageDelayMs: number;
-	voiceover: boolean;
-	useCached: boolean;
-	voiceoverPlaybackRate: number;
+	voiceover: TChatStoryVoiceover;
 }
 
-type TChatStoryCreatorOptions = Partial<TChatStoryCreatorConfig>;
+export interface TChatStoryVoiceover {
+	isEnabled: boolean;
+	usePrerecorded: boolean;
+	playbackRate: number;
+}
+
+interface TChatStoryCreatorOptions {
+	fps?: TChatStoryCreatorConfig['fps'];
+	minMessageDelayMs?: TChatStoryCreatorConfig['minMessageDelayMs'];
+	voiceover?: Partial<TChatStoryCreatorConfig['voiceover']>;
+}
 
 interface TChatStoryCreatorCreateResponse {
 	messageTrack: TChatStoryPlugin;

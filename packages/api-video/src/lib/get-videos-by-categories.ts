@@ -5,15 +5,15 @@ function parseVideoMetadata(filename: string): TVideoAssetMetadata | null {
 	if (match == null) {
 		return null;
 	}
-	const [_, category, creator, stringifiedIndex = '0'] = match;
+	const [_, category, author, stringifiedIndex = '0'] = match;
 	const index = parseInt(stringifiedIndex, 10);
-	if (category == null || creator == null || isNaN(index)) {
+	if (category == null || author == null || isNaN(index)) {
 		return null;
 	}
 
 	return {
 		category,
-		creator,
+		author: author.replace('--', '_'),
 		index
 	};
 }
@@ -41,38 +41,38 @@ export function getVideoCategories(): string[] {
 	return Array.from(new Set(getAllVideoAssets().map((asset) => asset.metadata.category))).sort();
 }
 
-// Group videos by category, calculating creators and total duration per group
+// Group videos by category, calculating authors and total duration per group
 export function getVideosByCategories(categories: string[]): Record<string, TVideoAssetGroup> {
 	const filteredAssets = getAllVideoAssets().filter((asset) =>
 		categories.includes(asset.metadata.category)
 	);
 
 	return filteredAssets.reduce<Record<string, TVideoAssetGroup>>((acc, asset) => {
-		const { category, creator } = asset.metadata;
+		const { category, author } = asset.metadata;
 
 		if (!acc[category]) {
-			acc[category] = { category, videos: [], creators: [], totalDuration: 0 };
+			acc[category] = { category, videos: [], authors: [], totalDuration: 0 };
 		}
 
 		acc[category].videos.push(asset);
-		if (!acc[category].creators.includes(creator)) {
-			acc[category].creators.push(creator);
+		if (!acc[category].authors.includes(author)) {
+			acc[category].authors.push(author);
 		}
 		acc[category].totalDuration += asset.durationMs;
 
-		// Sort videos and creators in each category group
+		// Sort videos and authors in each category group
 		acc[category].videos.sort((a, b) => a.metadata.index - b.metadata.index);
-		acc[category].creators.sort();
+		acc[category].authors.sort();
 
 		return acc;
 	}, {});
 }
 
-// Filter videos by creator and specified categories
-export function getVideosByCreator(categories: string[], creator: string): TVideoAsset[] {
+// Filter videos by author and specified categories
+export function getVideosByAuthor(categories: string[], author: string): TVideoAsset[] {
 	return getAllVideoAssets()
 		.filter(
-			(asset) => categories.includes(asset.metadata.category) && asset.metadata.creator === creator
+			(asset) => categories.includes(asset.metadata.category) && asset.metadata.author === author
 		)
 		.sort((a, b) => a.metadata.index - b.metadata.index);
 }
@@ -86,13 +86,13 @@ export interface TVideoAsset {
 
 export interface TVideoAssetMetadata {
 	category: string;
-	creator: string;
+	author: string;
 	index: number;
 }
 
 export interface TVideoAssetGroup {
 	category: string;
 	videos: TVideoAsset[];
-	creators: string[];
+	authors: string[];
 	totalDuration: number;
 }

@@ -1,3 +1,4 @@
+import { type TVideoAssetMetadata } from './get-videos-by-categories';
 import { msToFrames } from './ms-to-frames';
 
 export function selectSingleVideo(
@@ -28,7 +29,8 @@ export function selectSingleVideo(
 				src: video.path,
 				startFrom,
 				endAt: startFrom + durationInFrames,
-				durationInFrames
+				durationInFrames,
+				metadata: video.metadata
 			};
 		}
 	}
@@ -92,7 +94,8 @@ export function selectVideoSequence(
 			src: selectedVideo.path,
 			startFrom: startBufferFrames, // Start after the buffer
 			endAt: startBufferFrames + clipDurationInFrames, // End respecting the buffer
-			durationInFrames: clipDurationInFrames
+			durationInFrames: clipDurationInFrames,
+			metadata: selectedVideo.metadata
 		});
 
 		usedVideoIndices.add(selectedIndex);
@@ -105,6 +108,7 @@ export function selectVideoSequence(
 interface TVideo {
 	path: string;
 	durationMs: number;
+	metadata?: TVideoAssetMetadata;
 }
 
 interface TSelectedVideo {
@@ -112,6 +116,7 @@ interface TSelectedVideo {
 	startFrom: number;
 	endAt: number;
 	durationInFrames: number;
+	metadata?: TVideoAssetMetadata;
 }
 
 interface TSelectVideoConfig {

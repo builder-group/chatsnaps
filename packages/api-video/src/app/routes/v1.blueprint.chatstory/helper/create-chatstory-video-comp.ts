@@ -7,22 +7,20 @@ import { calculateElevenLabsPrice } from '@/lib';
 
 import { type TChatStoryScriptDto } from '../schema';
 import { createBackgroundTrack, type TBackgroundVariant } from './create-background-track';
-import { createChatStoryTracks } from './create-chatstory-tracks';
+import { createChatStoryTracks, type TChatStoryVoiceover } from './create-chatstory-tracks';
 import { createCTATrack, createFollowCTA, createLikeCTA } from './create-cta-track';
 
 export async function createChatStoryVideoComp(
 	config: TCreateChatStoryVideoCompConfig
 ): Promise<TResult<TCreateChatStoryVideoComp, AppError>> {
-	const { includeVoiceover, backgroundVariant, useCached, fps, script } = config;
+	const { background, voiceover, fps, script } = config;
 
 	const timeline: TTimeline = { trackIds: [], trackMap: {}, actionMap: {} };
 
 	const chatStoryTracksResult = await createChatStoryTracks(script, timeline.actionMap, {
-		voiceover: includeVoiceover,
+		voiceover,
 		fps,
-		minMessageDelayMs: 500,
-		useCached,
-		voiceoverPlaybackRate: 1.2
+		minMessageDelayMs: 500
 	});
 	if (chatStoryTracksResult.isErr()) {
 		return Err(chatStoryTracksResult.error);
@@ -95,7 +93,7 @@ export async function createChatStoryVideoComp(
 		fps,
 		height: 1920,
 		width: 1080,
-		variant: backgroundVariant
+		variant: background
 	}).unwrap();
 	const backgroundTrackId = pika.gen('track');
 	timeline.trackMap[backgroundTrackId] = backgroundTrack;
@@ -118,9 +116,8 @@ export async function createChatStoryVideoComp(
 }
 
 interface TCreateChatStoryVideoCompConfig {
-	includeVoiceover: boolean;
-	backgroundVariant: TBackgroundVariant;
-	useCached: boolean;
+	voiceover: Partial<TChatStoryVoiceover>;
+	background: TBackgroundVariant;
 	fps: number;
 	script: TChatStoryScriptDto;
 }

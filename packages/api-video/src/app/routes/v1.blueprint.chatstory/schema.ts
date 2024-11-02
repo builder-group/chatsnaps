@@ -50,18 +50,51 @@ export const SElevenLabsUsage = z.object({
 });
 export type TElevenLabsUsage = z.infer<typeof SElevenLabsUsage>;
 
+export const SStaticVariant = z.object({
+	type: z.literal('Static'),
+	backgroundColor: z.string().optional()
+});
+
+export const SSingleVideoVariant = z.object({
+	type: z.literal('Single'),
+	categories: z.array(z.string()),
+	startBufferMs: z.number().optional(),
+	endBufferMs: z.number().optional()
+});
+
+export const SSequenceVideoVariant = z.object({
+	type: z.literal('Sequence'),
+	categories: z.array(z.string()),
+	startBufferMs: z.number().optional(),
+	endBufferMs: z.number().optional()
+});
+
+export const SBackgroundVariant = z.discriminatedUnion('type', [
+	SStaticVariant,
+	SSingleVideoVariant,
+	SSequenceVideoVariant
+]);
+
+export const SVoiceover = z.object({
+	isEnabled: z.boolean(),
+	usePrerecorded: z.boolean().optional(),
+	playbackRate: z.number().positive().optional()
+});
+
 export const ChatStoryBlueprintVideoRoute = createRoute({
 	method: 'post',
 	path: '/v1/blueprint/chatstory/video',
 	tags: ['blueprint'],
 	operationId: 'chatStoryBlueprintVideo',
 	request: {
-		body: JsonRequestBody(SChatStoryScriptDto),
-		query: z.object({
-			includeVoiceover: z.enum(['true', 'false']).optional(),
-			includeBackgroundVideo: z.enum(['true', 'false']).optional(),
-			useCached: z.enum(['true', 'false']).optional()
-		})
+		body: JsonRequestBody(
+			z.object({
+				script: SChatStoryScriptDto,
+				background: SBackgroundVariant.optional(),
+				voiceover: SVoiceover.optional(),
+				fps: z.number().positive().optional()
+			})
+		)
 	},
 	responses: {
 		200: JsonSuccessResponse(
@@ -109,12 +142,14 @@ export const ChatStoryBlueprintFactoryRoute = createRoute({
 	tags: ['blueprint'],
 	operationId: 'chatStoryBlueprintFactory',
 	request: {
-		body: JsonRequestBody(z.object({ stories: z.array(z.string()) })),
-		query: z.object({
-			includeVoiceover: z.enum(['true', 'false']).optional(),
-			includeBackgroundVideo: z.enum(['true', 'false']).optional(),
-			useCached: z.enum(['true', 'false']).optional()
-		})
+		body: JsonRequestBody(
+			z.object({
+				stories: z.array(z.string()),
+				background: SBackgroundVariant.optional(),
+				voiceover: SVoiceover.optional(),
+				fps: z.number().positive().optional()
+			})
+		)
 	},
 	responses: {
 		200: JsonSuccessResponse(

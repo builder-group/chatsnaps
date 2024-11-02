@@ -144,119 +144,119 @@ export const assetMap = {
     "type": "MP4",
     "durationMs": 8200
   },
-  "static/video/.local/hydraulic-press_hpc-official-26.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official-26.mp4": {
     "type": "MP4",
     "durationMs": 5300
   },
-  "static/video/.local/hydraulic-press_hpc-official-27.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official-27.mp4": {
     "type": "MP4",
     "durationMs": 8800
   },
-  "static/video/.local/hydraulic-press_hpc-official-28.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official-28.mp4": {
     "type": "MP4",
     "durationMs": 7233
   },
-  "static/video/.local/hydraulic-press_hpc-official-29.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official-29.mp4": {
     "type": "MP4",
     "durationMs": 3466
   },
-  "static/video/.local/hydraulic-press_hpc-official_1.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_1.mp4": {
     "type": "MP4",
     "durationMs": 2900
   },
-  "static/video/.local/hydraulic-press_hpc-official_10.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_10.mp4": {
     "type": "MP4",
     "durationMs": 5733
   },
-  "static/video/.local/hydraulic-press_hpc-official_11.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_11.mp4": {
     "type": "MP4",
     "durationMs": 3566
   },
-  "static/video/.local/hydraulic-press_hpc-official_12.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_12.mp4": {
     "type": "MP4",
     "durationMs": 2333
   },
-  "static/video/.local/hydraulic-press_hpc-official_13.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_13.mp4": {
     "type": "MP4",
     "durationMs": 2733
   },
-  "static/video/.local/hydraulic-press_hpc-official_14.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_14.mp4": {
     "type": "MP4",
     "durationMs": 3600
   },
-  "static/video/.local/hydraulic-press_hpc-official_15.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_15.mp4": {
     "type": "MP4",
     "durationMs": 2600
   },
-  "static/video/.local/hydraulic-press_hpc-official_16.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_16.mp4": {
     "type": "MP4",
     "durationMs": 4400
   },
-  "static/video/.local/hydraulic-press_hpc-official_17.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_17.mp4": {
     "type": "MP4",
     "durationMs": 1900
   },
-  "static/video/.local/hydraulic-press_hpc-official_18.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_18.mp4": {
     "type": "MP4",
     "durationMs": 2600
   },
-  "static/video/.local/hydraulic-press_hpc-official_19.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_19.mp4": {
     "type": "MP4",
     "durationMs": 3766
   },
-  "static/video/.local/hydraulic-press_hpc-official_2.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_2.mp4": {
     "type": "MP4",
     "durationMs": 3400
   },
-  "static/video/.local/hydraulic-press_hpc-official_20.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_20.mp4": {
     "type": "MP4",
     "durationMs": 5100
   },
-  "static/video/.local/hydraulic-press_hpc-official_21.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_21.mp4": {
     "type": "MP4",
     "durationMs": 5566
   },
-  "static/video/.local/hydraulic-press_hpc-official_22.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_22.mp4": {
     "type": "MP4",
     "durationMs": 2166
   },
-  "static/video/.local/hydraulic-press_hpc-official_23.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_23.mp4": {
     "type": "MP4",
     "durationMs": 3000
   },
-  "static/video/.local/hydraulic-press_hpc-official_24.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_24.mp4": {
     "type": "MP4",
     "durationMs": 3800
   },
-  "static/video/.local/hydraulic-press_hpc-official_25.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_25.mp4": {
     "type": "MP4",
     "durationMs": 1933
   },
-  "static/video/.local/hydraulic-press_hpc-official_3.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_3.mp4": {
     "type": "MP4",
     "durationMs": 13833
   },
-  "static/video/.local/hydraulic-press_hpc-official_4.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_4.mp4": {
     "type": "MP4",
     "durationMs": 14000
   },
-  "static/video/.local/hydraulic-press_hpc-official_5.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_5.mp4": {
     "type": "MP4",
     "durationMs": 8200
   },
-  "static/video/.local/hydraulic-press_hpc-official_6.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_6.mp4": {
     "type": "MP4",
     "durationMs": 2733
   },
-  "static/video/.local/hydraulic-press_hpc-official_7.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_7.mp4": {
     "type": "MP4",
     "durationMs": 1700
   },
-  "static/video/.local/hydraulic-press_hpc-official_8.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_8.mp4": {
     "type": "MP4",
     "durationMs": 3033
   },
-  "static/video/.local/hydraulic-press_hpc-official_9.mp4": {
+  "static/video/.local/hydraulic-press_hpc--official_9.mp4": {
     "type": "MP4",
     "durationMs": 2800
   },
