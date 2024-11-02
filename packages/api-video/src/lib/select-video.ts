@@ -50,8 +50,12 @@ export function selectVideoSequence(
 		endBufferMs = 0,
 		overlapFrames = 5,
 		startAnchors = [],
-		endAnchors = []
+		endAnchors = [],
+		minVideoPercentage = 0.8,
+		maxAttempts = 50
 	} = config;
+	const startBufferFrames = msToFrames(startBufferMs, fps);
+	const endBufferFrames = msToFrames(endBufferMs, fps);
 
 	if (videos.length === 0) {
 		return null;
@@ -71,54 +75,53 @@ export function selectVideoSequence(
 			? findVideoByFilename(endAnchors[Math.floor(Math.random() * endAnchors.length)])
 			: null;
 
-	const shuffledVideos = videos
-		.filter(
-			(v) =>
-				!startAnchors.includes(getFilename(v.path)) && !endAnchors.includes(getFilename(v.path))
-		)
-		.sort(() => Math.random() - 0.5);
-	const selectedVideos: TSelectedVideo[] = [];
 	const usedVideoIndices = new Set<number>();
-	const startBufferFrames = msToFrames(startBufferMs, fps);
-	const endBufferFrames = msToFrames(endBufferMs, fps);
+	const videosWithoutAnchoredVideos = videos.filter(
+		(v) => !startAnchors.includes(getFilename(v.path)) && !endAnchors.includes(getFilename(v.path))
+	);
 
-	// Add start anchor if specified
-	if (startVideo != null) {
-		const videoDurationInFrames = msToFrames(startVideo.durationMs, fps);
-		const effectiveDurationInFrames = videoDurationInFrames - startBufferFrames - endBufferFrames;
-		selectedVideos.push({
-			src: startVideo.path,
-			startFrom: startBufferFrames,
-			endAt: startBufferFrames + effectiveDurationInFrames,
-			durationInFrames: effectiveDurationInFrames,
-			metadata: startVideo.metadata,
-			startFrame: 0
-		});
-	}
+	for (let attempt = 0; attempt < maxAttempts; attempt++) {
+		usedVideoIndices.clear();
+		let isValidSequence = true;
+		const shuffledVideos = [...videosWithoutAnchoredVideos].sort(() => Math.random() - 0.5);
+		const selectedVideos: TSelectedVideo[] = [];
 
-	let currentStartFrame =
-		// @ts-expect-error -- If we have a start video there has to be one selected video
-		startVideo != null ? selectedVideos[0].durationInFrames - overlapFrames : 0;
+		// Add start anchor if specified
+		if (startVideo != null) {
+			const videoDurationInFrames = msToFrames(startVideo.durationMs, fps);
+			const effectiveDurationInFrames = videoDurationInFrames - startBufferFrames - endBufferFrames;
+			selectedVideos.push({
+				src: startVideo.path,
+				startFrom: startBufferFrames,
+				endAt: startBufferFrames + effectiveDurationInFrames,
+				durationInFrames: effectiveDurationInFrames,
+				metadata: startVideo.metadata,
+				startFrame: 0
+			});
+		}
 
-	// Fill the middle section
-	while (
-		currentStartFrame <
-		durationInFrames - (endVideo != null ? msToFrames(endVideo.durationMs, fps) : 0)
-	) {
-		let selectedIndex = -1;
-		let selectedVideo: TVideo | null = null;
-		let smallestDurationDifference = Infinity;
+		let currentStartFrame =
+			// @ts-expect-error -- If we have a start video there has to be one selected video
+			startVideo != null ? selectedVideos[0].durationInFrames - overlapFrames : 0;
+		const endFrame =
+			durationInFrames - (endVideo != null ? msToFrames(endVideo.durationMs, fps) : 0);
 
-		// Find a video that hasn't been used and has the best fit
-		for (let i = 0; i < shuffledVideos.length; i++) {
-			if (!usedVideoIndices.has(i)) {
+		// Fill the middle section
+		while (currentStartFrame < endFrame) {
+			let selectedIndex = -1;
+			let selectedVideo: TVideo | null = null;
+			let smallestDurationDifference = Infinity;
+
+			// Find a video that hasn't been used and has the best fit
+			for (let i = 0; i < shuffledVideos.length; i++) {
+				if (usedVideoIndices.has(i)) {
+					continue;
+				}
+
 				const video = shuffledVideos[i] as unknown as TVideo;
-				const videoDurationInFrames = msToFrames(video.durationMs, fps);
 				const effectiveDurationInFrames =
-					videoDurationInFrames - startBufferFrames - endBufferFrames;
-
-				// Check if video fits within remaining duration
-				const remainingDurationInFrames = durationInFrames - currentStartFrame;
+					msToFrames(video.durationMs, fps) - startBufferFrames - endBufferFrames;
+				const remainingDurationInFrames = endFrame - currentStartFrame;
 
 				// If we find a perfect fit, use it immediately
 				if (effectiveDurationInFrames <= remainingDurationInFrames) {
@@ -127,55 +130,62 @@ export function selectVideoSequence(
 					break;
 				}
 				// Calculate how much we'd need to cut from this video
-				else {
-					const durationDifference = effectiveDurationInFrames - remainingDurationInFrames;
-					if (durationDifference < smallestDurationDifference) {
-						smallestDurationDifference = durationDifference;
-						selectedIndex = i;
-						selectedVideo = video;
-					}
+				else if (
+					effectiveDurationInFrames * minVideoPercentage <= remainingDurationInFrames &&
+					effectiveDurationInFrames - remainingDurationInFrames < smallestDurationDifference
+				) {
+					smallestDurationDifference = effectiveDurationInFrames - remainingDurationInFrames;
+					selectedIndex = i;
+					selectedVideo = video;
 				}
 			}
+
+			// Exit if no suitable video is found
+			if (selectedVideo == null) {
+				isValidSequence = false;
+				break;
+			}
+
+			const effectiveDurationInFrames =
+				msToFrames(selectedVideo.durationMs, fps) - startBufferFrames - endBufferFrames;
+			const remainingDurationInFrames = durationInFrames - currentStartFrame;
+			const clipDurationInFrames = Math.min(effectiveDurationInFrames, remainingDurationInFrames);
+
+			selectedVideos.push({
+				src: selectedVideo.path,
+				startFrom: startBufferFrames,
+				endAt: startBufferFrames + clipDurationInFrames,
+				durationInFrames: clipDurationInFrames,
+				metadata: selectedVideo.metadata,
+				startFrame: currentStartFrame
+			});
+
+			usedVideoIndices.add(selectedIndex);
+			currentStartFrame += clipDurationInFrames - overlapFrames;
 		}
 
-		// Exit if no suitable video is found
-		if (selectedVideo == null) {
-			break;
+		if (!isValidSequence) {
+			continue;
 		}
 
-		const videoDurationInFrames = msToFrames(selectedVideo.durationMs, fps);
-		const effectiveDurationInFrames = videoDurationInFrames - startBufferFrames - endBufferFrames;
-		const remainingDurationInFrames = durationInFrames - currentStartFrame;
-		const clipDurationInFrames = Math.min(effectiveDurationInFrames, remainingDurationInFrames);
+		// Add end anchor if specified
+		if (endVideo != null) {
+			const videoDurationInFrames = msToFrames(endVideo.durationMs, fps);
+			const effectiveDurationInFrames = videoDurationInFrames - startBufferFrames - endBufferFrames;
+			selectedVideos.push({
+				src: endVideo.path,
+				startFrom: startBufferFrames,
+				endAt: startBufferFrames + effectiveDurationInFrames,
+				durationInFrames: effectiveDurationInFrames,
+				metadata: endVideo.metadata,
+				startFrame: durationInFrames - effectiveDurationInFrames
+			});
+		}
 
-		selectedVideos.push({
-			src: selectedVideo.path,
-			startFrom: startBufferFrames,
-			endAt: startBufferFrames + clipDurationInFrames,
-			durationInFrames: clipDurationInFrames,
-			metadata: selectedVideo.metadata,
-			startFrame: currentStartFrame
-		});
-
-		usedVideoIndices.add(selectedIndex);
-		currentStartFrame += clipDurationInFrames - overlapFrames;
+		return selectedVideos;
 	}
 
-	// Add end anchor if specified
-	if (endVideo != null) {
-		const videoDurationInFrames = msToFrames(endVideo.durationMs, fps);
-		const effectiveDurationInFrames = videoDurationInFrames - startBufferFrames - endBufferFrames;
-		selectedVideos.push({
-			src: endVideo.path,
-			startFrom: startBufferFrames,
-			endAt: startBufferFrames + effectiveDurationInFrames,
-			durationInFrames: effectiveDurationInFrames,
-			metadata: endVideo.metadata,
-			startFrame: durationInFrames - effectiveDurationInFrames
-		});
-	}
-
-	return selectedVideos.length > 0 ? selectedVideos : null;
+	return null;
 }
 
 function getFilename(path: string): string {
@@ -208,4 +218,6 @@ interface TSelectVideoSequenceConfig extends TSelectVideoConfig {
 	overlapFrames?: number;
 	startAnchors?: string[];
 	endAnchors?: string[];
+	minVideoPercentage?: number;
+	maxAttempts?: number;
 }
