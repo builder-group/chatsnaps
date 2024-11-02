@@ -66,7 +66,10 @@ export const SSequenceVideoVariant = z.object({
 	type: z.literal('Sequence'),
 	categories: z.array(z.string()),
 	startBufferMs: z.number().optional(),
-	endBufferMs: z.number().optional()
+	endBufferMs: z.number().optional(),
+	overlapFrames: z.number().optional(),
+	startAnchors: z.array(z.string()).optional(),
+	endAnchors: z.array(z.string()).optional()
 });
 
 export const SBackgroundVariant = z.discriminatedUnion('type', [

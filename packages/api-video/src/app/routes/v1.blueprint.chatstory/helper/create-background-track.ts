@@ -144,7 +144,14 @@ function createSequenceVideoBackground(
 	durationInFrames: number,
 	fps: number
 ): TResult<TTimelineAction[], AppError> {
-	const { categories, endBufferMs = 0, startBufferMs = 0 } = variant;
+	const {
+		categories,
+		endBufferMs = 0,
+		startBufferMs = 0,
+		overlapFrames = 5,
+		startAnchors = [],
+		endAnchors = []
+	} = variant;
 
 	// Get videos from specified categories
 	const videoGroups = getVideosByCategories(categories);
@@ -162,7 +169,10 @@ function createSequenceVideoBackground(
 		durationInFrames,
 		fps,
 		startBufferMs,
-		endBufferMs
+		endBufferMs,
+		overlapFrames,
+		startAnchors,
+		endAnchors
 	});
 
 	if (!selectedVideos?.length) {
@@ -173,30 +183,23 @@ function createSequenceVideoBackground(
 		);
 	}
 
-	let startFrame = 0;
 	return Ok(
-		selectedVideos.map((video) => {
-			const action: TTimelineAction = {
-				type: 'Rectangle',
+		selectedVideos.map((video) => ({
+			type: 'Rectangle',
+			width,
+			height,
+			startFrame: video.startFrame,
+			durationInFrames: video.durationInFrames,
+			fill: {
+				type: 'Video',
 				width,
 				height,
-				startFrame,
-				durationInFrames: video.durationInFrames,
-				fill: {
-					type: 'Video',
-					width,
-					height,
-					objectFit: 'cover',
-					src: video.src,
-					startFrom: video.startFrom,
-					author: video.metadata?.author
-				}
-			};
-
-			startFrame += video.durationInFrames;
-
-			return action;
-		})
+				objectFit: 'cover',
+				src: video.src,
+				startFrom: video.startFrom,
+				author: video.metadata?.author
+			}
+		}))
 	);
 }
 
@@ -217,6 +220,9 @@ interface TSequenceVideoVariant {
 	categories: string[];
 	startBufferMs?: number;
 	endBufferMs?: number;
+	overlapFrames?: number;
+	startAnchors?: string[];
+	endAnchors?: string[];
 }
 
 export type TBackgroundVariant = TStaticVariant | TSingleVideoVariant | TSequenceVideoVariant;
