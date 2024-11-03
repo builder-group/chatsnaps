@@ -16,8 +16,9 @@ export async function generateScriptFromStory(
 		targetLength = '40-60 seconds conversation with approximately 40-60 messages (3-4k tokens)',
 		availableVoices = `- "Elli": American Emotional Young Female Narration
 - "Adam": American Deep Middle aged Male Narration
-- "njdO8OnkBwihvD8DCezH": A valley girl female voice. Great for shorts
-- "TNHbwIMY5QmLqZdvjhNn": Indian Excited Male Middle-Aged`
+- "njdO8OnkBwihvD8DCezH": A valley girl female voice
+- "TNHbwIMY5QmLqZdvjhNn": Indian Excited Male Middle-Aged
+- "3UAi4d8d9eHnWSAvDIB6": American Confident Middle-Aged Male Deep Voice`
 	} = config;
 
 	const promptResult = mapErr(

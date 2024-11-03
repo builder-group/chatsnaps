@@ -154,7 +154,7 @@ export const assetMap = {
   },
   "static/video/.local/hydraulic-press_hpc--official-28.mp4": {
     "type": "MP4",
-    "durationMs": 7233
+    "durationMs": 2500
   },
   "static/video/.local/hydraulic-press_hpc--official-29.mp4": {
     "type": "MP4",
@@ -178,7 +178,7 @@ export const assetMap = {
   },
   "static/video/.local/hydraulic-press_hpc--official_13.mp4": {
     "type": "MP4",
-    "durationMs": 2733
+    "durationMs": 2500
   },
   "static/video/.local/hydraulic-press_hpc--official_14.mp4": {
     "type": "MP4",
@@ -220,45 +220,29 @@ export const assetMap = {
     "type": "MP4",
     "durationMs": 2166
   },
-  "static/video/.local/hydraulic-press_hpc--official_23.mp4": {
-    "type": "MP4",
-    "durationMs": 3000
-  },
   "static/video/.local/hydraulic-press_hpc--official_24.mp4": {
     "type": "MP4",
     "durationMs": 3800
   },
-  "static/video/.local/hydraulic-press_hpc--official_25.mp4": {
-    "type": "MP4",
-    "durationMs": 1933
-  },
   "static/video/.local/hydraulic-press_hpc--official_3.mp4": {
     "type": "MP4",
-    "durationMs": 13833
+    "durationMs": 9500
   },
   "static/video/.local/hydraulic-press_hpc--official_4.mp4": {
     "type": "MP4",
-    "durationMs": 14000
+    "durationMs": 7133
   },
   "static/video/.local/hydraulic-press_hpc--official_5.mp4": {
     "type": "MP4",
-    "durationMs": 8200
+    "durationMs": 5300
   },
   "static/video/.local/hydraulic-press_hpc--official_6.mp4": {
     "type": "MP4",
     "durationMs": 2733
   },
-  "static/video/.local/hydraulic-press_hpc--official_7.mp4": {
-    "type": "MP4",
-    "durationMs": 1700
-  },
   "static/video/.local/hydraulic-press_hpc--official_8.mp4": {
     "type": "MP4",
     "durationMs": 3033
-  },
-  "static/video/.local/hydraulic-press_hpc--official_9.mp4": {
-    "type": "MP4",
-    "durationMs": 2800
   },
   "static/video/.local/minecraft_BennoBuilder_1.mp4": {
     "type": "MP4",
