@@ -172,9 +172,7 @@ function createSequenceVideoBackground(
 		endBufferMs,
 		overlapFrames,
 		startAnchors,
-		endAnchors,
-		minVideoPercentage: 0.9,
-		maxAttempts: 500
+		endAnchors
 	});
 
 	if (!selectedVideos?.length) {
