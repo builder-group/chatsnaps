@@ -98,6 +98,8 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 		}
 		const { script, usage: scriptUsage } = scriptResult.value;
 
+		logger.info('Generated script: ', { script, usage: scriptUsage });
+
 		const videoCompResult = await createChatStoryVideoComp({
 			background,
 			voiceover,
@@ -113,6 +115,8 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 			continue;
 		}
 		const { video, usage: videoCompUsage } = videoCompResult.value;
+
+		logger.info('Generated video: ', { usage: videoCompUsage });
 
 		const videoResult = await renderVideoComp(video, videoId);
 		if (videoResult.isErr()) {

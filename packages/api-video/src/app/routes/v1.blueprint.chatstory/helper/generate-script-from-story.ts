@@ -13,7 +13,7 @@ export async function generateScriptFromStory(
 		originalStory,
 		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
-		targetLength = '40-60 seconds conversation with approximately 50-60 messages (3-4k tokens)',
+		targetLength = '40-60 seconds conversation with approximately 40-60 messages (3-4k tokens)',
 		availableVoices = `- "Elli": American Emotional Young Female Narration
 - "Adam": American Deep Middle aged Male Narration
 - "njdO8OnkBwihvD8DCezH": A valley girl female voice. Great for shorts
