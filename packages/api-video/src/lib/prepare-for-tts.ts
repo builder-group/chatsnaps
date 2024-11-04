@@ -16,6 +16,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\btbh\\b': 'to be honest,',
 	'\\bfyi\\b': 'just so you know,',
 	'\\bbtw\\b': 'by the way',
+	'\\bsm\\b': 'some what',
 
 	// Common contractions
 	'\\bu\\b': 'you',
