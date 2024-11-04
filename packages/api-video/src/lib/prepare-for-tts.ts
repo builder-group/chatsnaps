@@ -1,8 +1,9 @@
 const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	// Emotional expressions - with emphasis
 	'\\bOMG\\b': 'Oh my God!',
-	'\\bWTF\\b': 'WHAT the FUCK?!',
-	'\\bAF\\b': ' as fuck!',
+	'\\bWTF\\b': 'WHAT the FRICK!',
+	'\\bAF\\b': ' as frick!',
+	'\\btf\\b': 'the frick!',
 	'\\bWTH\\b': 'What the heck?!',
 	'\\bLMAO\\b': 'Haha!', // TODO: Figure out how to make voice laugh
 	'\\bLOL\\b': 'Haha!', // TODO: Figure out how to make voice laugh
