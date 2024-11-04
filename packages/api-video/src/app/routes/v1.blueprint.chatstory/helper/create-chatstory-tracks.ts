@@ -7,15 +7,21 @@ import {
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
 import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
-import { elevenLabsClient, elevenLabsConfig, pika, s3Client, s3Config } from '@/environment';
-import { estimateMp3Duration, msToFrames, sha256, streamToBuffer } from '@/lib';
-import { logger } from '@/logger';
+import {
+	elevenLabsClient,
+	elevenLabsConfig,
+	logger,
+	pika,
+	s3Client,
+	s3Config
+} from '@/environment';
+import { estimateMp3Duration, msToFrames, prepareForTTS, sha256, streamToBuffer } from '@/lib';
 
 import {
 	type TChatStoryScriptDto,
 	type TChatStoryScriptEvent,
 	type TChatStoryVideoParticipant
-} from './schema';
+} from '../schema';
 
 export function createChatStoryTracks(
 	script: TChatStoryScriptDto,
@@ -57,12 +63,23 @@ class ChatStoryCreator {
 		actionMap: TTimeline['actionMap'],
 		options: TChatStoryCreatorOptions = {}
 	) {
+		const { fps = 30, voiceover = {} } = options;
+		const {
+			isEnabled: voiceoverIsEnabled = true,
+			playbackRate: voiceoverPlaybackRate = 1.2,
+			usePrerecorded: voiceoverUsePrerecorded = false
+		} = voiceover;
+		const minMessageDelayMs = options.minMessageDelayMs ?? (voiceoverIsEnabled ? 0 : 500);
+
 		this.script = script;
 		this.config = {
-			fps: options.fps ?? 30,
-			messageDelayMs: options.messageDelayMs ?? (options.voiceover ? 0 : 500),
-			voiceover: options.voiceover ?? false,
-			useCached: options.useCached ?? true
+			fps,
+			minMessageDelayMs,
+			voiceover: {
+				isEnabled: voiceoverIsEnabled,
+				playbackRate: voiceoverPlaybackRate,
+				usePrerecorded: voiceoverUsePrerecorded
+			}
 		};
 		this.actionMap = actionMap;
 		this.messageTrack = {
@@ -74,9 +91,11 @@ class ChatStoryCreator {
 					contact: {
 						profilePicture: {
 							type: 'Image',
-							src: 'static/image/memoji/1.png'
+							src: 'static/image/ios_contact-image.webp'
 						},
-						name: 'Mom'
+						name:
+							Object.values(this.script.participants).find((participant) => !participant.isSelf)
+								?.displayName ?? 'Unknown'
 					}
 				}
 			},
@@ -100,9 +119,11 @@ class ChatStoryCreator {
 				if (voiceId != null) {
 					participant.voice = voiceId;
 				} else {
-					throw new AppError(`#ERR_INVALID_VOICE`, 400, {
-						description: `Faild to resolve voice with the id or name: ${participant.voice}`
-					});
+					return Err(
+						new AppError(`#ERR_INVALID_VOICE`, 400, {
+							description: `Faild to resolve voice with the id or name: ${participant.voice}`
+						})
+					);
 				}
 			}
 		}
@@ -157,7 +178,11 @@ class ChatStoryCreator {
 		this.addNotificationSound(participant, startFrame);
 
 		let voiceDurationMs = 0;
-		if (this.config.voiceover && participant.voice != null && this.canBeSpoken(item.content)) {
+		if (
+			this.config.voiceover.isEnabled &&
+			participant.voice != null &&
+			this.canBeSpoken(item.content)
+		) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
 			if (voiceResult.isErr()) {
 				return Err(voiceResult.error);
@@ -166,7 +191,7 @@ class ChatStoryCreator {
 		}
 
 		this.addMessageToTimeline(item, participant, startFrame);
-		this.currentTimeMs += Math.max(this.config.messageDelayMs, voiceDurationMs);
+		this.currentTimeMs += Math.max(this.config.minMessageDelayMs, voiceDurationMs);
 		return Ok(undefined);
 	}
 
@@ -193,7 +218,8 @@ class ChatStoryCreator {
 		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
 
 		const isSpokenMessageCached =
-			this.config.useCached && (await this.checkSpokenMessageCache(spokenMessageFilename));
+			this.config.voiceover.usePrerecorded &&
+			(await this.checkSpokenMessageCache(spokenMessageFilename));
 		if (!isSpokenMessageCached) {
 			const generateResult = await this.generateAndUploadVoiceover(
 				item,
@@ -210,7 +236,9 @@ class ChatStoryCreator {
 			return Err(spokenMessageUrl.error);
 		}
 
-		const durationMs = unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0;
+		const durationMs =
+			(unwrapOrNull(await estimateMp3Duration(spokenMessageUrl.value)) ?? 0) /
+			this.config.voiceover.playbackRate;
 		this.addVoiceoverToTimeline(
 			spokenMessageUrl.value,
 			startFrame,
@@ -232,15 +260,15 @@ class ChatStoryCreator {
 	): Promise<TResult<void, AppError>> {
 		const { previousContent, previousRequestIds } = this.getVoiceContext(voiceId);
 		const previousText = previousContent
-			.map((c) => this.enhanceSpeechText(c))
+			.map((c) => prepareForTTS(c))
 			.join(' - ')
 			.trim();
 		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
 		const nextText = nextContent
-			.map((c) => this.enhanceSpeechText(c))
+			.map((c) => prepareForTTS(c))
 			.join(' - ')
 			.trim();
-		const currentText = this.enhanceSpeechText(item.spokenContent ?? item.content);
+		const currentText = prepareForTTS(item.spokenContent ?? item.content);
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
@@ -314,7 +342,8 @@ class ChatStoryCreator {
 			src,
 			volume: 1,
 			startFrame,
-			durationInFrames: durationInFrames + this.config.fps
+			durationInFrames,
+			playbackRate: this.config.voiceover.playbackRate
 		};
 		this.voiceoverTrack.actionIds.push(id);
 	}
@@ -396,60 +425,6 @@ class ChatStoryCreator {
 		);
 	}
 
-	// TODO: Improve
-	// https://elevenlabs.io/docs/speech-synthesis/prompting
-	private enhanceSpeechText(content: string): string {
-		let modifiedContent = content;
-
-		// Remove emojis
-		modifiedContent = modifiedContent
-			.replace(
-				/(?<temp1>[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-				''
-			)
-			.trim();
-
-		// Add emphasis to uppercase words
-		if (/^[^a-z]*$/.test(modifiedContent)) {
-			modifiedContent = `${modifiedContent}!`;
-		}
-
-		// Convert common abbreviations and short forms
-		const abbreviations: Record<string, string> = {
-			'OMG': 'Oh my God',
-			'AF': 'as fuck',
-			'WTF': 'What the fuck',
-			// 'LOL': 'laughing out loud',
-			// 'ROFL': 'rolling on the floor laughing',
-			'ASAP': 'as soon as possible',
-			'TBH': 'to be honest',
-			'IDK': "I don't know",
-			'IMO': 'in my opinion',
-			'IMHO': 'in my humble opinion',
-			'FYI': 'for your information',
-			'TL;DR': "too long; didn't read",
-			'AKA': 'also known as',
-			'e.g.': 'for example',
-			'i.e.': 'that is',
-			'etc.': 'et cetera',
-			'mins': 'minutes',
-			'F\\*\\*\\*': 'FRICK!'
-		};
-
-		// Replace abbreviations with their full forms
-		for (const [abbr, fullForm] of Object.entries(abbreviations)) {
-			const regex = new RegExp(`\\b${abbr}\\b`, 'gi');
-			modifiedContent = modifiedContent.replace(regex, fullForm);
-		}
-
-		// Add pauses after punctuation
-		if (modifiedContent.endsWith('?') || modifiedContent.endsWith('!')) {
-			modifiedContent = `"${modifiedContent}"`;
-		}
-
-		return modifiedContent;
-	}
-
 	private canBeSpoken(text: string): boolean {
 		return /[a-zA-Z0-9]/.test(text);
 	}
@@ -459,12 +434,21 @@ type TExtendedChatStoryScriptEvent = TChatStoryScriptEvent & { index: number };
 
 interface TChatStoryCreatorConfig {
 	fps: number;
-	messageDelayMs: number;
-	voiceover: boolean;
-	useCached: boolean;
+	minMessageDelayMs: number;
+	voiceover: TChatStoryVoiceover;
 }
 
-type TChatStoryCreatorOptions = Partial<TChatStoryCreatorConfig>;
+export interface TChatStoryVoiceover {
+	isEnabled: boolean;
+	usePrerecorded: boolean;
+	playbackRate: number;
+}
+
+interface TChatStoryCreatorOptions {
+	fps?: TChatStoryCreatorConfig['fps'];
+	minMessageDelayMs?: TChatStoryCreatorConfig['minMessageDelayMs'];
+	voiceover?: Partial<TChatStoryCreatorConfig['voiceover']>;
+}
 
 interface TChatStoryCreatorCreateResponse {
 	messageTrack: TChatStoryPlugin;

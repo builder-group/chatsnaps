@@ -2,7 +2,7 @@
 
 /* eslint-disable react/no-unknown-property -- ThreeJs */
 import sunsetEnvironment from '@pmndrs/assets/hdri/sunset.exr';
-import { Environment, PerspectiveCamera, Plane } from '@react-three/drei';
+import { Environment, PerspectiveCamera, Plane, Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import React from 'react';
@@ -27,6 +27,7 @@ const Page: React.FC = () => {
 				</Physics>
 				<PerspectiveCamera makeDefault position={[0, 45, 100]} />
 				<Environment files={sunsetEnvironment} />
+				<Stats />
 			</Canvas>
 		</div>
 	);

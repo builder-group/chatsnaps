@@ -1,0 +1,38 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		// https://nextjs.org/docs/pages/building-your-application/configuring/debugging
+		{
+			"name": "[web] Debug server-side",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "pnpm start:dev",
+			"cwd": "${workspaceFolder}/apps/web/"
+		},
+		// https://nextjs.org/docs/pages/building-your-application/configuring/debugging
+		{
+			"name": "[web] Debug client-side",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/apps/web",
+		},
+		// https://nextjs.org/docs/pages/building-your-application/configuring/debugging
+		{
+			"name": "[web] Debug full stack",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/apps/web/node_modules/.bin/next",
+			"runtimeArgs": ["--inspect"],
+			"skipFiles": ["<node_internals>/**"],
+            "cwd": "${workspaceFolder}/apps/web",
+			"serverReadyAction": {
+				"action": "debugWithEdge",
+				"killOnServerStop": true,
+				"pattern": "- Local:.+(https?://.+)",
+				"uriFormat": "%s",
+				"webRoot": "${workspaceFolder}/apps/web"
+			}
+		}
+	]
+}

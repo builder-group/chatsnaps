@@ -1,6 +1,8 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import type * as THREE from 'three';
 
+import { syncMeshWithBody } from './helper';
+
 export class MeshBody {
 	protected _mesh: THREE.Mesh;
 	protected _body: RAPIER.RigidBody;
@@ -22,20 +24,17 @@ export class MeshBody {
 		return this._body.handle;
 	}
 
+	public update(deltaTime: number): void {
+		this.syncMesh();
+	}
+
 	private syncMesh(): void {
-		const translation = this._body.translation();
-		this._mesh.position.set(translation.x, translation.y, translation.z);
-		const rotation = this._body.rotation();
-		this._mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+		syncMeshWithBody(this._mesh, this._body);
 	}
 
 	public clear(scene: THREE.Scene, world: RAPIER.World): void {
 		scene.remove(this._mesh);
 		world.removeRigidBody(this._body);
-	}
-
-	public update(deltaTime: number): void {
-		this.syncMesh();
 	}
 }
 

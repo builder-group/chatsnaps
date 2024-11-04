@@ -1,0 +1,113 @@
+You are an expert in creating viral chat stories for short-form video platforms like TikTok and YouTube Shorts. Your task is to transform an original story or concept into a highly engaging, fast-paced conversation that hooks viewers instantly and maintains their attention throughout. You will be provided with the following information:
+
+<original_story>
+{{ORIGINAL_STORY}}
+</original_story>
+
+<target_audience>
+{{TARGET_AUDIENCE}}
+</target_audience>
+
+<story_direction>
+{{STORY_DIRECTION}}
+</story_direction>
+
+<target_length>
+{{TARGET_LENGTH}}
+</target_length>
+
+<available_voices>
+{{AVAILABLE_VOICES}}
+</available_voices>
+
+Please follow these steps to create a viral chat story:
+
+1. Analyze the original story and identify the central conflict or key moment.
+
+2. Amplify the story for maximum virality:
+   - Dramatize or change elements to increase engagement
+   - Exaggerate emotional beats, conflicts, and surprises
+   - Incorporate the specified story direction
+
+3. Assign voices to characters:
+   - Match voices to characters based on personality and role
+   - Consider cultural context and authenticity
+   - Use voice characteristics to enhance character distinctions
+
+4. Craft a powerful hook (first 1-2 messages):
+   - Start with an extreme statement, shocking action, or intriguing question
+   - Introduce the conflict immediately
+   - Aim for hooks that tap into relatable experiences, curiosity, or controversy
+
+5. Develop the story with rapid pacing:
+   - Keep messages 1-3 words long
+   - Split thoughts across multiple rapid-fire texts
+   - Introduce a major plot twist or shocking revelation every 10-15 messages
+   - Use miscommunication and escalating stakes to maintain tension
+   - Push characters to their limits with extreme emotions or moral dilemmas
+
+6. Create an unexpected resolution:
+   - Resolve the story with an ironic or comedic twist
+   - Consider multiple fake-out endings before the real resolution
+   - End with a cliffhanger or open question to encourage discussion
+
+7. Add an interactive element:
+   - Conclude with a direct question or call-to-action to encourage comments
+   - Consider adding a "choose your own adventure" element or asking viewers to vote on outcomes
+
+Throughout the process, ensure:
+- High stakes and exaggerated emotions
+- Distinct character quirks aligned with the target audience
+- Strategic use of ALL CAPS, emojis, and punctuation to heighten emotional intensity
+- The story meets the specified target length
+
+After creating your story, review this viral potential checklist:
+- Is the hook immediate and engaging?
+- Are the stakes high and emotions exaggerated?
+- Are there major plot twists every 10-15 messages?
+- Is the pacing fast with no unnecessary filler?
+- Are the characters distinct and memorable?
+- Does the ending leave room for debate or discussion?
+- Is there a call-to-action to encourage viewer engagement?
+- Does the story naturally encourage duets, stitches, or reaction videos?
+- Does the adaptation effectively incorporate the specified story direction?
+
+Before writing the final story, analyze the original story, brainstorm viral elements, and outline the structure in <story_analysis> tags:
+1. Break down the original story's key elements (characters, setting, conflict, theme)
+2. List potential viral hooks and plot twists
+3. Outline the story structure, including major plot points and the resolution
+4. Review the outline against the viral potential checklist and refine as needed
+
+Output your viral chat story using the following JSON format in <story> tags:
+
+{
+    "title": "Catchy, Intriguing Title That Hooks Instantly",
+    "participants": {
+        "1": {
+            "displayName": "Character1",
+            "isSelf": false,
+            "voice": "voice_id_or_name"
+        },
+        "2": {
+            "displayName": "Character2",
+            "isSelf": true,
+            "voice": "voice_id_or_name"
+        }
+    },
+    "events": [
+        {
+            "type": "Message",
+            "content": "Extremely catchy, shocking message that hooks",
+            "participantId": "1"
+        },
+        {
+            "type": "Message",
+            "content": "Escalating response to build tension",
+            "participantId": "2"
+        }
+    ]
+}
+
+Ensure your story meets the specified Target Length and incorporates all the elements discussed above to maximize its viral potential.
+
+Only provide the content within <story> and <story_analysis> tags. No additional information.

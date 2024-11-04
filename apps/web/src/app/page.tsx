@@ -1,12 +1,7 @@
 import React from 'react';
-import { VideoEditor } from '@/components';
 
 const Page: React.FC = () => {
-	return (
-		<main>
-			<VideoEditor />
-		</main>
-	);
+	return <main>Hello World</main>;
 };
 
 export default Page;

@@ -42,20 +42,21 @@ export const SOpacityMixin = z.object({
 export const SVideoFill = z.object({
 	type: z.literal('Video'),
 	src: SUrl,
-	objectFit: SObjectFit,
-	width: z.number().int().positive(),
-	height: z.number().int().positive(),
-	startFrom: z.number().int().positive().optional(),
+	objectFit: SObjectFit.optional(),
+	width: z.number().int().positive().optional(),
+	height: z.number().int().positive().optional(),
+	startFrom: z.number().int().nonnegative().optional(),
 	endAt: z.number().int().positive().optional(),
-	playbackRate: z.number().optional()
+	playbackRate: z.number().optional(),
+	author: z.string().optional()
 });
 
 export const SImageFill = z.object({
 	type: z.literal('Image'),
 	src: SUrl,
-	objectFit: SObjectFit,
-	width: z.number().int().positive(),
-	height: z.number().int().positive()
+	objectFit: SObjectFit.optional(),
+	width: z.number().int().positive().optional(),
+	height: z.number().int().positive().optional()
 });
 
 export const SSolidFill = z.object({
@@ -81,9 +82,10 @@ export type TTimelineActionMixin = z.infer<typeof STimelineActionMixin>;
 export const SAudioTimelineAction = STimelineActionMixin.extend({
 	type: z.literal('Audio'),
 	src: SUrl,
-	volume: z.number().min(0).max(1),
-	startFrom: z.number().int().positive().optional(),
-	endAt: z.number().int().positive().optional()
+	volume: z.number().min(0).max(1).optional(),
+	startFrom: z.number().int().nonnegative().optional(),
+	endAt: z.number().int().positive().optional(),
+	playbackRate: z.number().min(0.1).max(4).optional()
 });
 export type TAudioTimelineAction = z.infer<typeof SAudioTimelineAction>;
 

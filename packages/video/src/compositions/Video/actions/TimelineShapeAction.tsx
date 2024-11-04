@@ -38,10 +38,11 @@ export const TimelineShapeAction: React.FC<TProps> = (props) => {
 	if (hasOpacityMixin(action)) {
 		style.opacity = getInterpolatedValue(action.opacity, frame);
 	}
+
 	if (hasFillMixin(action)) {
 		switch (action.fill.type) {
 			case 'Video': {
-				content = (
+				const videoComponent = (
 					<OffthreadVideo
 						src={getStaticSrc(action.fill.src)}
 						style={{
@@ -54,6 +55,20 @@ export const TimelineShapeAction: React.FC<TProps> = (props) => {
 						playbackRate={action.fill.playbackRate}
 					/>
 				);
+
+				if (action.fill.author != null) {
+					content = (
+						<div className="relative h-full w-full">
+							{videoComponent}
+							<div className="absolute bottom-4 left-4 rounded-lg bg-black px-4 py-2 text-lg text-white opacity-60">
+								{action.fill.author}
+							</div>
+						</div>
+					);
+				} else {
+					content = videoComponent;
+				}
+
 				break;
 			}
 			case 'Image': {

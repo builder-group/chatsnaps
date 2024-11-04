@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { logger as loggerMiddleware } from 'hono/logger';
+import { logger } from '@/environment';
 
-import { logger } from '../logger';
 import { errorHandler, invalidPathHandler } from './handlers';
 import { router } from './router';
 

@@ -1,12 +1,15 @@
 import RAPIER from '@dimforge/rapier3d-compat';
 import { type Track } from '@tonejs/midi';
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import seedrandom from 'seedrandom';
 import * as THREE from 'three';
 
+import { DEBUG_SNAPSHOT_COLLECTION_MAP } from '../_debug';
 import { GuidePath } from './GuidePath';
 import {
 	calculateRotationRange,
 	generateRange,
+	pointOnCircle,
 	rapierToThreeVector,
 	type TRotationRange
 } from './helper';
@@ -17,11 +20,13 @@ import { Plank } from './Plank';
 // - Visualize simulation path
 // - Introduce "checkpoints" that are basically world snapshots it can reset to if the marble gets stuck
 // - Improve path algo
+// - Improve performance
 
 export class Generator {
 	private readonly _config: TGeneratorConfig;
 
 	private readonly _world: RAPIER.World;
+	private readonly _eventQueue = new RAPIER.EventQueue(true);
 	private readonly _scene: THREE.Scene;
 
 	private readonly _track: Track;
@@ -34,6 +39,8 @@ export class Generator {
 
 	private _currentTime = 0;
 	private _completed = false;
+	public paused = false;
+
 	private _rng: seedrandom.PRNG;
 
 	constructor(
@@ -49,9 +56,9 @@ export class Generator {
 				marbleVelocityWeight: 2.0,
 				marbleDirectionalChangeWeight: 0.5,
 				marblePathAlignmentWeight: 0.5,
-				marbleCollisionWeight: 0.0,
+				marbleCollisionWeight: 5.0,
 				marbleContactWeight: 5.0,
-				marbleDinstanceTraveledWeight: 1.0,
+				marbleDinstanceTraveledWeight: 2.0,
 				plankContactWeight: 5.0
 			},
 			simulation = {
@@ -90,19 +97,27 @@ export class Generator {
 	}
 
 	public update(camera: THREE.Camera, deltaTime: number): void {
+		if (this.paused || this._completed) {
+			console.log({ DEBUG_SNAPSHOT_COLLECTION_MAP });
+			return;
+		}
+
 		if (this._nextNoteIndex >= this._track.notes.length) {
 			this._completed = true;
 			return;
 		}
 
+		// Ensure world (and simulated world) have same timestep/deltatime as scene
+		this._world.timestep = deltaTime;
+
 		// Check if we need to place a new plank
-		const currentNote = this._track.notes[this._nextNoteIndex];
-		if (currentNote != null && this._currentTime >= currentNote.time) {
+		const nextNote = this._track.notes[this._nextNoteIndex];
+		if (nextNote != null && this._currentTime >= nextNote.time) {
 			const success = this.placePlank();
 			if (success) {
 				this._nextNoteIndex++;
 			} else {
-				this._completed = true;
+				this.paused = true;
 				console.warn('Failed to place plank!');
 			}
 		}
@@ -125,6 +140,12 @@ export class Generator {
 		const bestResult = this.findBestPlankPlacement();
 		if (bestResult == null || bestResult.score < this._config.simulation.minAcceptableScore) {
 			return false;
+		}
+
+		// Limit to nine because marbles path is downwards
+		if (this._config.debug && this._planks.length > 9) {
+			const plank = this._planks.shift();
+			plank?.clear(this._scene, this._world);
 		}
 
 		this._planks.push(
@@ -206,12 +227,10 @@ export class Generator {
 			const simMarble = simWorld.getRigidBody(this._marble.body.handle);
 
 			const position = this.calculatePlankPosition(rotationRad, simMarble);
-			// TODO: Only show in scene if debug
-			const simPlank = Plank.init(this._scene, simWorld, {
+			const simPlank = Plank.createBody(simWorld, {
 				position,
-				angleRad: rotationRad,
-				debug: false
-			}).body;
+				angleRad: rotationRad
+			});
 
 			const { score, metrics } = this.simulateAndScorePlank(
 				simWorld,
@@ -279,22 +298,14 @@ export class Generator {
 		};
 	}
 
-	private calculatePlankPosition(rotationRad: number, simMarble: RAPIER.RigidBody): THREE.Vector3 {
+	private calculatePlankPosition(angleRad: number, simMarble: RAPIER.RigidBody): THREE.Vector3 {
 		const marblePos = simMarble.translation();
-
-		// Step 1: Start from the ball's position
-		// Step 2: Calculate the offset needed to place the plank surface at the ball
-		//         considering the ball's radius and plank's height
 		const marbleRadius = (this._marble.mesh.geometry as THREE.SphereGeometry).parameters.radius;
 		const plankHeight = 1; // TODO: Read from config
-		const surfaceOffset = marbleRadius + plankHeight / 2;
+		const marbleToPlankCenterRadius = marbleRadius + plankHeight / 2;
 
-		// Step 3: Calculate the offset direction based on rotation
-		// When the plank is rotated, we need to move it down and to the side
-		const offsetX = surfaceOffset * Math.sin(rotationRad);
-		const offsetY = surfaceOffset * Math.cos(rotationRad);
+		const { x: offsetX, y: offsetY } = pointOnCircle(marbleToPlankCenterRadius, angleRad);
 
-		// Step 4: Calculate final plank position
 		return new THREE.Vector3(
 			marblePos.x + offsetX,
 			marblePos.y - offsetY, // Subtract because Y grows upward
@@ -312,9 +323,6 @@ export class Generator {
 		const startVelocity = rapierToThreeVector(simMarble.linvel());
 		const stepCount = Math.floor(duration / simWorld.timestep);
 
-		// Create event queue for collision detection
-		const eventQueue = new RAPIER.EventQueue(true);
-
 		// Enable collision events for marble and plank
 		const marbleCollider = simMarble.collider(0);
 		const plankCollider = simPlank.collider(0);
@@ -324,13 +332,25 @@ export class Generator {
 		let marbleContacts = 0;
 		let plankContacts = 0;
 
+		// Note: No DebugTrail as class property because updating a large array of points is very slow
+		let debugTrail: TDebugTrail | null = null;
+		if (this._config.debug) {
+			debugTrail = this.initDebugTrail();
+		}
+
 		// Run simulation steps
 		for (let i = 0; i < stepCount; i++) {
-			simWorld.step(eventQueue);
+			simWorld.step(this._eventQueue);
+
+			// Update debug trail
+			if (debugTrail != null) {
+				const nextPos = simMarble.translation();
+				debugTrail.points.unshift(new THREE.Vector3(nextPos.x, nextPos.y, nextPos.z + 0.1));
+			}
 
 			// Process collision events
 			// eslint-disable-next-line @typescript-eslint/no-loop-func -- Ok
-			eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+			this._eventQueue.drainCollisionEvents((handle1, handle2, started) => {
 				// Only count collision starts, not ends
 				if (started) {
 					const collider1 = simWorld.getCollider(handle1);
@@ -361,6 +381,12 @@ export class Generator {
 				}
 			});
 		}
+
+		if (debugTrail != null) {
+			debugTrail.geometry.setPoints(debugTrail.points);
+		}
+
+		this._eventQueue.clear();
 
 		const endPos = rapierToThreeVector(simMarble.translation());
 		const endVelocity = rapierToThreeVector(simMarble.linvel());
@@ -499,7 +525,22 @@ export class Generator {
 		return penaltyFactor != null ? Math.max(0, 1 - ((value - max) / max) * penaltyFactor) : 0;
 	}
 
-	public clear() {
+	private initDebugTrail(): TDebugTrail {
+		// Create visual mesh
+		const debugTrailGeometry = new MeshLineGeometry();
+		const debugTrailMaterial = new MeshLineMaterial({
+			color: 0xffc0cb,
+			resolution: new THREE.Vector2(1080, 1920),
+			lineWidth: 0.1
+		});
+		const debugTrailMesh = new THREE.Mesh(debugTrailGeometry, debugTrailMaterial);
+
+		this._scene.add(debugTrailMesh);
+
+		return { geometry: debugTrailGeometry, points: [] };
+	}
+
+	public clear(): void {
 		this._marble.clear(this._scene, this._world);
 		this._planks.forEach((plank) => {
 			plank.clear(this._scene, this._world);
@@ -547,4 +588,9 @@ interface TPlankSimulationResult {
 
 interface TSimulationPlankNode extends TPlankSimulationResult {
 	children: TSimulationPlankNode[];
+}
+
+interface TDebugTrail {
+	geometry: MeshLineGeometry;
+	points: THREE.Vector3[];
 }

@@ -63,86 +63,224 @@ export const assetMap = {
   "static/image/imessage.png": {
     "type": "PNG"
   },
+  "static/image/ios_contact-image.webp": {
+    "type": "WEBP"
+  },
   "static/image/memoji/1.png": {
     "type": "PNG"
   },
   "static/image/overlay/tiktok.png": {
     "type": "PNG"
   },
-  "static/midi/mission-impossible.mid": {
-    "type": "MID"
+  "static/video/.local/baking_MrCakesOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 12100
   },
-  "static/midi/mission-impossible_split.mid": {
-    "type": "MID"
+  "static/video/.local/baking_MrCakesOfficial_2.mp4": {
+    "type": "MP4",
+    "durationMs": 8400
   },
-  "static/midi/simple.mid": {
-    "type": "MID"
+  "static/video/.local/baking_MrCakesOfficial_3.mp4": {
+    "type": "MP4",
+    "durationMs": 10566
   },
-  "static/video/.local/minecraft_1.mp4": {
+  "static/video/.local/baking_SatisfyingCakes_1.mp4": {
+    "type": "MP4",
+    "durationMs": 6033
+  },
+  "static/video/.local/baking_SoTastyOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 6000
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 1233
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_10.mp4": {
+    "type": "MP4",
+    "durationMs": 10766
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_11.mp4": {
+    "type": "MP4",
+    "durationMs": 9900
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_2.mp4": {
+    "type": "MP4",
+    "durationMs": 1700
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_3.mp4": {
+    "type": "MP4",
+    "durationMs": 1900
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_4.mp4": {
+    "type": "MP4",
+    "durationMs": 11533
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_5.mp4": {
+    "type": "MP4",
+    "durationMs": 9200
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_6.mp4": {
+    "type": "MP4",
+    "durationMs": 11933
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_7.mp4": {
+    "type": "MP4",
+    "durationMs": 10633
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_8.mp4": {
+    "type": "MP4",
+    "durationMs": 11600
+  },
+  "static/video/.local/cake-cutting_MrCakesOfficial_9.mp4": {
+    "type": "MP4",
+    "durationMs": 11933
+  },
+  "static/video/.local/cake-cutting_SatisfyingCakes_1.mp4": {
+    "type": "MP4",
+    "durationMs": 9900
+  },
+  "static/video/.local/cake-cutting_SoTastyOfficial_1.mp4": {
+    "type": "MP4",
+    "durationMs": 8200
+  },
+  "static/video/.local/hydraulic-press_hpc--official-26.mp4": {
+    "type": "MP4",
+    "durationMs": 5300
+  },
+  "static/video/.local/hydraulic-press_hpc--official-27.mp4": {
+    "type": "MP4",
+    "durationMs": 8800
+  },
+  "static/video/.local/hydraulic-press_hpc--official-28.mp4": {
+    "type": "MP4",
+    "durationMs": 2500
+  },
+  "static/video/.local/hydraulic-press_hpc--official-29.mp4": {
+    "type": "MP4",
+    "durationMs": 3466
+  },
+  "static/video/.local/hydraulic-press_hpc--official_1.mp4": {
+    "type": "MP4",
+    "durationMs": 2900
+  },
+  "static/video/.local/hydraulic-press_hpc--official_10.mp4": {
+    "type": "MP4",
+    "durationMs": 5733
+  },
+  "static/video/.local/hydraulic-press_hpc--official_11.mp4": {
+    "type": "MP4",
+    "durationMs": 3566
+  },
+  "static/video/.local/hydraulic-press_hpc--official_12.mp4": {
+    "type": "MP4",
+    "durationMs": 2333
+  },
+  "static/video/.local/hydraulic-press_hpc--official_13.mp4": {
+    "type": "MP4",
+    "durationMs": 2500
+  },
+  "static/video/.local/hydraulic-press_hpc--official_14.mp4": {
+    "type": "MP4",
+    "durationMs": 3600
+  },
+  "static/video/.local/hydraulic-press_hpc--official_15.mp4": {
+    "type": "MP4",
+    "durationMs": 2600
+  },
+  "static/video/.local/hydraulic-press_hpc--official_16.mp4": {
+    "type": "MP4",
+    "durationMs": 4400
+  },
+  "static/video/.local/hydraulic-press_hpc--official_17.mp4": {
+    "type": "MP4",
+    "durationMs": 1900
+  },
+  "static/video/.local/hydraulic-press_hpc--official_18.mp4": {
+    "type": "MP4",
+    "durationMs": 2600
+  },
+  "static/video/.local/hydraulic-press_hpc--official_19.mp4": {
+    "type": "MP4",
+    "durationMs": 3766
+  },
+  "static/video/.local/hydraulic-press_hpc--official_2.mp4": {
+    "type": "MP4",
+    "durationMs": 3400
+  },
+  "static/video/.local/hydraulic-press_hpc--official_20.mp4": {
+    "type": "MP4",
+    "durationMs": 5100
+  },
+  "static/video/.local/hydraulic-press_hpc--official_21.mp4": {
+    "type": "MP4",
+    "durationMs": 5566
+  },
+  "static/video/.local/hydraulic-press_hpc--official_22.mp4": {
+    "type": "MP4",
+    "durationMs": 2166
+  },
+  "static/video/.local/hydraulic-press_hpc--official_24.mp4": {
+    "type": "MP4",
+    "durationMs": 3800
+  },
+  "static/video/.local/hydraulic-press_hpc--official_3.mp4": {
+    "type": "MP4",
+    "durationMs": 9500
+  },
+  "static/video/.local/hydraulic-press_hpc--official_4.mp4": {
+    "type": "MP4",
+    "durationMs": 7133
+  },
+  "static/video/.local/hydraulic-press_hpc--official_5.mp4": {
+    "type": "MP4",
+    "durationMs": 5300
+  },
+  "static/video/.local/hydraulic-press_hpc--official_6.mp4": {
+    "type": "MP4",
+    "durationMs": 2733
+  },
+  "static/video/.local/hydraulic-press_hpc--official_8.mp4": {
+    "type": "MP4",
+    "durationMs": 3033
+  },
+  "static/video/.local/minecraft_BennoBuilder_1.mp4": {
     "type": "MP4",
     "durationMs": 67666
   },
-  "static/video/.local/steep_1.mp4": {
+  "static/video/.local/steep_BennoBuilder_1.mp4": {
     "type": "MP4",
     "durationMs": 165466
   },
-  "static/video/.local/steep_10.mp4": {
-    "type": "MP4",
-    "durationMs": 122700
-  },
-  "static/video/.local/steep_11.mp4": {
-    "type": "MP4",
-    "durationMs": 106866
-  },
-  "static/video/.local/steep_12.mp4": {
-    "type": "MP4",
-    "durationMs": 162900
-  },
-  "static/video/.local/steep_13.mp4": {
-    "type": "MP4",
-    "durationMs": 136733
-  },
-  "static/video/.local/steep_14.mp4": {
-    "type": "MP4",
-    "durationMs": 119000
-  },
-  "static/video/.local/steep_15.mp4": {
-    "type": "MP4",
-    "durationMs": 141933
-  },
-  "static/video/.local/steep_16.mp4": {
-    "type": "MP4",
-    "durationMs": 209133
-  },
-  "static/video/.local/steep_2.mp4": {
+  "static/video/.local/steep_BennoBuilder_2.mp4": {
     "type": "MP4",
     "durationMs": 85033
   },
-  "static/video/.local/steep_3.mp4": {
+  "static/video/.local/steep_BennoBuilder_3.mp4": {
     "type": "MP4",
     "durationMs": 67566
   },
-  "static/video/.local/steep_4.mp4": {
+  "static/video/.local/steep_BennoBuilder_4.mp4": {
     "type": "MP4",
     "durationMs": 59800
   },
-  "static/video/.local/steep_5.mp4": {
+  "static/video/.local/steep_BennoBuilder_5.mp4": {
     "type": "MP4",
     "durationMs": 205166
   },
-  "static/video/.local/steep_6.mp4": {
+  "static/video/.local/steep_BennoBuilder_6.mp4": {
     "type": "MP4",
     "durationMs": 69033
   },
-  "static/video/.local/steep_7.mp4": {
+  "static/video/.local/steep_BennoBuilder_7.mp4": {
     "type": "MP4",
     "durationMs": 232966
   },
-  "static/video/.local/steep_8.mp4": {
+  "static/video/.local/steep_BennoBuilder_8.mp4": {
     "type": "MP4",
     "durationMs": 100633
   },
-  "static/video/.local/steep_9.mp4": {
+  "static/video/.local/steep_BennoBuilder_9.mp4": {
     "type": "MP4",
     "durationMs": 104933
   }

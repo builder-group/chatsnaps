@@ -36,7 +36,8 @@ export class GuidePath {
 		lineGeometry.setPoints(points);
 		const lineMaterial = new MeshLineMaterial({
 			color: 0x00ffff,
-			resolution: new THREE.Vector2(1080, 1920)
+			resolution: new THREE.Vector2(1080, 1920),
+			lineWidth: 0.5
 		});
 		const lineMesh = new THREE.Mesh(lineGeometry, lineMaterial);
 		scene.add(lineMesh);

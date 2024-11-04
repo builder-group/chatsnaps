@@ -1,188 +1,37 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { getDuration, getStaticAsset, type TTimeline } from '@repo/video';
-import { AppError } from '@blgc/openapi-router';
-import { extractErrorData, mapErr } from '@blgc/utils';
-import { anthropicClient, pika, tokbackupClient } from '@/environment';
-import {
-	calculateAnthropicPrice,
-	calculateElevenLabsPrice,
-	getResource,
-	selectRandomVideo
-} from '@/lib';
-import { logger } from '@/logger';
+import { logger, pika } from '@/environment';
+import { renderVideoComp } from '@/lib';
 
 import { router } from '../../router';
-import { createChatStoryTracks } from './create-chatstory-tracks';
-import { createCTATrack, createFollowCTA, createLikeCTA } from './create-cta-track';
-import { formatSubtitles } from './format-subtitles';
+import { createChatStoryVideoComp } from './helper/create-chatstory-video-comp';
+import { generateScriptFromStory } from './helper/generate-script-from-story';
+import { resolveStory } from './helper/resolve-story';
 import {
+	ChatStoryBlueprintFactoryRoute,
 	ChatStoryBlueprintPromptRoute,
-	ChatStoryBlueprintVideoRoute,
-	isChatStoryScriptDto,
-	type TAnthropicUsage
+	ChatStoryBlueprintVideoRoute
 } from './schema';
 
 router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
-	const data = c.req.valid('json');
 	const {
-		includeVoiceover: includeVoiceoverString = 'false',
-		includeBackgroundVideo: includeBackgroundVideoString = 'false',
-		useCached: useCachedString = 'true'
-	} = c.req.valid('query');
-	const includeVoiceover = includeVoiceoverString === 'true';
-	const includeBackgroundVideo = includeBackgroundVideoString === 'true';
-	const useCached = useCachedString === 'true';
-	const fps = 30;
+		script,
+		background = { type: 'Static' },
+		voiceover = { isEnabled: true },
+		fps = 30
+	} = c.req.valid('json');
 
-	const timeline: TTimeline = { trackIds: [], trackMap: {}, actionMap: {} };
-
-	const { messageTrack, voiceoverTrack, notificationTrack, creditsSpent } = (
-		await createChatStoryTracks(data, timeline.actionMap, {
-			voiceover: includeVoiceover,
+	const { video, usage } = (
+		await createChatStoryVideoComp({
+			background,
+			voiceover,
 			fps,
-			messageDelayMs: 500,
-			useCached
+			script
 		})
 	).unwrap();
-	const durationInFrames = getDuration(Object.values(timeline.actionMap));
-
-	const messageTrackId = pika.gen('track');
-	timeline.trackMap[messageTrackId] = messageTrack;
-	timeline.trackIds.push(messageTrackId);
-
-	if (voiceoverTrack.actionIds.length > 0) {
-		const voiceoverTrackId = pika.gen('track');
-		timeline.trackMap[voiceoverTrackId] = voiceoverTrack;
-		timeline.trackIds.push(voiceoverTrackId);
-	}
-
-	const notificationTrackId = pika.gen('track');
-	timeline.trackMap[notificationTrackId] = notificationTrack;
-	timeline.trackIds.push(notificationTrackId);
-
-	const likeText = [
-		'Like this! ❤️',
-		'Tap to like! 🔥',
-		'Hit like! 💥',
-		'Show love! 💬',
-		'Like if you agree! 😉',
-		'Drop a like! ❤️',
-		'Tap for feels! 😲',
-		'Smash like! 💣',
-		'Feeling it? 👍',
-		'Love this? ❤️'
-	];
-	const followText = [
-		'Follow for more! 🔥',
-		'Don’t miss out! 👀',
-		'Tap follow! 📲',
-		'Hit follow! 💬',
-		'Follow now! 🚀',
-		'More? Follow! 🎯',
-		'Stay tuned—follow! 🔥',
-		'Join us! 👊',
-		'Follow for updates! 📱',
-		'Want more? Follow! 💥'
-	];
-	const ctaTrack = createCTATrack(
-		[
-			{
-				action: createLikeCTA(
-					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
-				)
-			},
-			{
-				action: createFollowCTA(
-					followText[Math.floor(Math.random() * followText.length)] as unknown as string
-				)
-			},
-			{
-				action: createLikeCTA(
-					likeText[Math.floor(Math.random() * likeText.length)] as unknown as string
-				)
-			},
-			{
-				action: createFollowCTA(
-					followText[Math.floor(Math.random() * followText.length)] as unknown as string
-				),
-				atEnd: true
-			}
-		],
-		timeline.actionMap,
-		{ fps, totalDurationInFrames: durationInFrames }
-	);
-
-	const ctaTrackId = pika.gen('track');
-	timeline.trackMap[ctaTrackId] = ctaTrack;
-	timeline.trackIds.push(ctaTrackId);
-
-	const backgroundVideo = includeBackgroundVideo
-		? selectRandomVideo(
-				[
-					{
-						path: getStaticAsset('static/video/.local/steep_1.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_1.mp4').durationMs
-					},
-					{
-						path: getStaticAsset('static/video/.local/steep_2.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_2.mp4').durationMs
-					},
-					{
-						path: getStaticAsset('static/video/.local/steep_3.mp4').path,
-						durationMs: getStaticAsset('static/video/.local/steep_3.mp4').durationMs
-					}
-				],
-				{
-					totalDurationInFrames: durationInFrames,
-					endBufferMs: 2000,
-					startBufferMs: 2000
-				}
-			)
-		: null;
-
-	const backgroundVideoActionId = pika.gen('action');
-	timeline.actionMap[backgroundVideoActionId] = {
-		type: 'Rectangle',
-		width: 1080,
-		height: 1920,
-		startFrame: 0,
-		durationInFrames,
-		fill:
-			backgroundVideo != null
-				? {
-						type: 'Video',
-						width: 1080,
-						height: 1920,
-						objectFit: 'cover',
-						src: backgroundVideo.src,
-						startFrom: backgroundVideo.startFrom
-					}
-				: { type: 'Solid', color: '#00b140' }
-	};
-
-	const backgroundVideoTrackId = pika.gen('track');
-	timeline.trackMap[backgroundVideoTrackId] = {
-		type: 'Track',
-		actionIds: [backgroundVideoActionId]
-	};
-	timeline.trackIds.unshift(backgroundVideoTrackId);
-
-	logger.info(`Total credits spent: ${creditsSpent.toString()}`);
 
 	return c.json(
 		{
-			video: {
-				name: data.title,
-				timeline,
-				durationInFrames,
-				fps,
-				width: 1080,
-				height: 1920
-			},
-			usage: {
-				credits: creditsSpent,
-				usd: calculateElevenLabsPrice({ credits: creditsSpent, plan: 'Creator' })
-			}
+			video,
+			usage
 		},
 		200
 	);
@@ -191,95 +40,107 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	const {
 		originalStory: bodyOrginalStory,
-		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
-		targetAudience = 'Gen Z and young millennials (ages 13-25)',
-		targetLength = '30-60 second conversation with approximately 35-55 messages (2-3k tokens)'
+		storyDirection,
+		targetAudience,
+		targetLength,
+		availableVoices
 	} = c.req.valid('json');
 
-	let originalStory = bodyOrginalStory;
-	if (originalStory.startsWith('http') && originalStory.includes('tiktok.com')) {
-		const tokbackupResult = await tokbackupClient.get('/fetchTikTokData', {
-			queryParams: {
-				video: originalStory,
-				get_transcript: true
-			}
-		});
-		const { data, subtitles } = tokbackupResult.unwrap().data;
-		if (subtitles == null || !subtitles || data?.desc == null || data.textExtra == null) {
-			throw new AppError('#ERR_SUBTITLES', 500);
+	const originalStory = (await resolveStory(bodyOrginalStory)).unwrap();
+	const { script, usage } = (
+		await generateScriptFromStory({
+			originalStory,
+			storyDirection,
+			targetAudience,
+			targetLength,
+			availableVoices
+		})
+	).unwrap();
+
+	return c.json({ script, usage }, 200);
+});
+
+router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
+	const {
+		stories,
+		background = { type: 'Static' },
+		voiceover = { isEnabled: true },
+		fps = 30
+	} = c.req.valid('json');
+
+	const videoUrls: (string | null)[] = [];
+	let totalUsageUsd = 0;
+	let totalTimeMs = 0;
+
+	for (const story of stories) {
+		const videoId = pika.gen('video');
+		const startTimeMs = performance.now();
+
+		logger.info(`${videoId}: Started creating ChatStory video`);
+
+		const originalStoryResult = await resolveStory(story);
+		if (originalStoryResult.isErr()) {
+			logger.error(`${videoId}: Failed to resolve story`, originalStoryResult.error);
+			videoUrls.push(null);
+			continue;
 		}
-		// Note:
-		// - Not including description because its often like "The end [emoji]", ..
-		// - Not including hashtags (textExtra) because its often like "#minecraftparkour", "#text"
-		originalStory = `Script:\n${formatSubtitles(subtitles)}`;
 
-		logger.info('Orginal Story: ', originalStory);
-	}
-
-	const prompt = mapErr(
-		await getResource('prompts/chat-story-prompt.txt'),
-		(err) => new AppError(`#ERR_READ_PROMPT`, 500, { description: err.message, throwable: err })
-	)
-		.unwrap()
-		.replace('{{ORIGINAL_STORY}}', originalStory)
-		.replace('{{STORY_DIRECTION}}', storyDirection)
-		.replace('{{TARGET_AUDIENCE}}', targetAudience)
-		.replace('{{TARGET_LENGTH}}', targetLength);
-
-	const anthropicResponse = await anthropicClient.messages
-		.create({
-			model: 'claude-3-5-sonnet-20240620',
-			max_tokens: 8190,
-			messages: [
-				{
-					role: 'user',
-					content: [
-						{
-							type: 'text',
-							text: prompt
-						}
-					]
-				}
-			],
-			temperature: 0.0 // So that it strictly follows the prompt and doesn't get too creative and comes up with secret agents, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
-		})
-		.catch((err: unknown) => {
-			if (err instanceof Anthropic.APIError) {
-				throw new AppError('#ERR_ANTHROPIC', 500, { description: err.message, throwable: err });
-			} else {
-				throw new AppError('#ERR_ANTHROPIC', 500);
-			}
+		const scriptResult = await generateScriptFromStory({
+			originalStory: originalStoryResult.value
 		});
+		if (scriptResult.isErr()) {
+			logger.error(
+				`${videoId}: Failed to generate Chat Story script from story`,
+				scriptResult.error
+			);
+			videoUrls.push(null);
+			continue;
+		}
+		const { script, usage: scriptUsage } = scriptResult.value;
 
-	const content = anthropicResponse.content[0];
-	const usage: TAnthropicUsage = {
-		inputTokens: anthropicResponse.usage.input_tokens,
-		outputTokens: anthropicResponse.usage.output_tokens,
-		usd: calculateAnthropicPrice({
-			inputTokens: anthropicResponse.usage.input_tokens,
-			outputTokens: anthropicResponse.usage.output_tokens
-		})
-	};
+		logger.info('Generated script: ', { script, usage: scriptUsage });
 
-	if (content == null || content.type !== 'text') {
-		throw new AppError('#ERR_ANTHROPIC', 500, { description: 'Invalid content response' });
-	}
+		const videoCompResult = await createChatStoryVideoComp({
+			background,
+			voiceover,
+			fps,
+			script
+		});
+		if (videoCompResult.isErr()) {
+			logger.error(
+				`${videoId}: Failed to generate Chat Story video composition`,
+				videoCompResult.error
+			);
+			videoUrls.push(null);
+			continue;
+		}
+		const { video, usage: videoCompUsage } = videoCompResult.value;
 
-	let parsedContent: unknown;
-	try {
-		parsedContent = JSON.parse(content.text);
-	} catch (e) {
-		const { error, message } = extractErrorData(e);
-		throw new AppError('#ERR_ANTHROPIC', 500, {
-			description: `Invalid content response: ${message}`,
-			throwable: error ?? undefined,
-			additionalErrors: [{ content: content.text }]
+		logger.info('Generated video: ', { usage: videoCompUsage });
+
+		const videoResult = await renderVideoComp(video, videoId);
+		if (videoResult.isErr()) {
+			logger.error(`${videoId}: Failed to render video`, videoResult.error);
+			videoUrls.push(null);
+			continue;
+		}
+		const videoUrl = videoResult.value;
+
+		videoUrls.push(videoUrl);
+
+		const usageUsd = scriptUsage.usd + videoCompUsage.usd;
+		totalUsageUsd += usageUsd;
+
+		const endTimeMs = performance.now();
+		const timeMs = endTimeMs - startTimeMs;
+		totalTimeMs += timeMs;
+
+		logger.info(`${videoId}: Completed creating ChatStory video 🎉`, {
+			usageUsd,
+			timeMs,
+			url: videoUrl
 		});
 	}
 
-	if (!isChatStoryScriptDto(parsedContent)) {
-		throw new AppError('#ERR_ANTHROPIC', 500, { description: 'Invalid content response' });
-	}
-
-	return c.json({ script: parsedContent, usage }, 200);
+	return c.json({ urls: videoUrls, usageUsd: totalUsageUsd, timeMs: totalTimeMs }, 200);
 });

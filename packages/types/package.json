@@ -4,7 +4,8 @@
 	"description": "Shared Typescript types",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && pnpm run openapi:generate && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle -b typesonly",
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle -b typesonly",
+		"build:generate": "pnpm run openapi:generate && pnpm build",
 		"openapi:generate": "pnpm run openapi:generate:api && pnpm run openapi:generate:tokbackup",
 		"openapi:generate:api": "npx openapi-typescript --redocly ./src/api/resources/redocly.yaml",
 		"openapi:generate:tokbackup": "npx openapi-typescript --redocly ./src/tokbackup/resources/redocly.yaml",
