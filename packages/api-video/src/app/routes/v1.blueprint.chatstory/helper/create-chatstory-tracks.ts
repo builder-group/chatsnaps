@@ -63,12 +63,14 @@ class ChatStoryCreator {
 		actionMap: TTimeline['actionMap'],
 		options: TChatStoryCreatorOptions = {}
 	) {
-		const { fps = 30, voiceover = {} } = options;
+		const { fps = 30, voiceover = {}, notification = {} } = options;
 		const {
 			isEnabled: voiceoverIsEnabled = true,
 			playbackRate: voiceoverPlaybackRate = 1.2,
 			usePrerecorded: voiceoverUsePrerecorded = false
 		} = voiceover;
+		const { isEnabled: notificationIsEnabled = true, volume: notificationVolume = 0.75 } =
+			notification;
 		const minMessageDelayMs = options.minMessageDelayMs ?? (voiceoverIsEnabled ? 0 : 500);
 
 		this.script = script;
@@ -79,6 +81,10 @@ class ChatStoryCreator {
 				isEnabled: voiceoverIsEnabled,
 				playbackRate: voiceoverPlaybackRate,
 				usePrerecorded: voiceoverUsePrerecorded
+			},
+			notification: {
+				isEnabled: notificationIsEnabled,
+				volume: notificationVolume
 			}
 		};
 		this.actionMap = actionMap;
@@ -175,7 +181,9 @@ class ChatStoryCreator {
 			return Ok(undefined);
 		}
 
-		this.addNotificationSound(participant, startFrame);
+		if (this.config.notification.isEnabled) {
+			this.addNotificationSound(participant, startFrame);
+		}
 
 		let voiceDurationMs = 0;
 		if (
@@ -203,7 +211,7 @@ class ChatStoryCreator {
 		this.actionMap[id] = {
 			type: 'Audio',
 			src: audio.path,
-			volume: 1,
+			volume: this.config.notification.volume,
 			startFrame,
 			durationInFrames: msToFrames(audio.durationMs, this.config.fps)
 		};
@@ -436,6 +444,7 @@ interface TChatStoryCreatorConfig {
 	fps: number;
 	minMessageDelayMs: number;
 	voiceover: TChatStoryVoiceover;
+	notification: TChatStoryNotification;
 }
 
 export interface TChatStoryVoiceover {
@@ -444,10 +453,16 @@ export interface TChatStoryVoiceover {
 	playbackRate: number;
 }
 
+export interface TChatStoryNotification {
+	isEnabled: boolean;
+	volume: number;
+}
+
 interface TChatStoryCreatorOptions {
 	fps?: TChatStoryCreatorConfig['fps'];
 	minMessageDelayMs?: TChatStoryCreatorConfig['minMessageDelayMs'];
 	voiceover?: Partial<TChatStoryCreatorConfig['voiceover']>;
+	notification?: Partial<TChatStoryCreatorConfig['notification']>;
 }
 
 interface TChatStoryCreatorCreateResponse {
