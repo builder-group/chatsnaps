@@ -3,7 +3,6 @@ import { useRapier } from '@react-three/rapier';
 import { useControls } from 'leva';
 import React from 'react';
 
-import { timeExecution } from './_debug';
 import { Generator } from './_generator';
 import { loadMidi } from './_midi';
 
@@ -60,9 +59,7 @@ export const GeneratorComponent: React.FC = () => {
 	}, [paused, generator]);
 
 	useFrame((state, delta) => {
-		timeExecution('update', () =>
-			generator?.update(state.camera, deterministic ? DETERMINISTIC_DELTA_TIME : delta)
-		);
+		generator?.update(state.camera, deterministic ? DETERMINISTIC_DELTA_TIME : delta);
 	});
 
 	return null;
