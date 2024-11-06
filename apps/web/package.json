@@ -71,6 +71,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "^0.0.25",
+		"@react-three/eslint-plugin": "^0.1.1",
 		"@repo/types": "workspace:*",
 		"@types/node": "^22.9.0",
 		"@types/react": "^18.3.12",
