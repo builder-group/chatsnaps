@@ -27,6 +27,8 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\bw/\\b': 'with',
 	'\\bk\\b': 'okay',
 	'\\bkk\\b': 'okay, okay',
+	'\\byh\\b': 'yeah',
+	'\\bbf\\b': 'boyfriend',
 
 	// Exclamations and emotions
 	'\\bsry\\b': 'sorry!',

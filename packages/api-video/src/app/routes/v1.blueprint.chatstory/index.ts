@@ -47,6 +47,7 @@ router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	} = c.req.valid('json');
 
 	const originalStory = (await resolveStory(bodyOrginalStory)).unwrap();
+	logger.info('Resolved orginalStory', { originalStory });
 	const { script, usage } = (
 		await generateScriptFromStory({
 			originalStory,
