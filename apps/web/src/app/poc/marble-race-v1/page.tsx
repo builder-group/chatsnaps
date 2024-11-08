@@ -1,7 +1,15 @@
 'use client';
 
-import { Cloud, Clouds, Environment, OrbitControls, Sky, useGLTF } from '@react-three/drei';
-import { Canvas, MeshProps, useFrame, useLoader } from '@react-three/fiber';
+import {
+	Cloud,
+	Clouds,
+	Environment,
+	OrbitControls,
+	Sky,
+	useGLTF,
+	useTexture
+} from '@react-three/drei';
+import { Canvas, MeshProps } from '@react-three/fiber';
 import { Physics, RigidBody } from '@react-three/rapier';
 import { useControls } from 'leva';
 import React from 'react';
@@ -30,14 +38,13 @@ const Page = () => {
 					<Environment preset="city" />
 					<Sky />
 					<Physics debug={debug} colliders={false}>
-						<group position={[2, 3, 0]}>
-							<TrackPart046 />
-							<Sphere position={[-12, 13, 0]} />
-							<Sphere position={[-9, 13, 0]} />
-							<Sphere position={[-6, 13, 0]} />
-						</group>
+						<TrackPart046 />
+						<TrackPart046WithMaterial />
+						<Sphere position={[-12, 13, 0]} />
+						<Sphere position={[-9, 13, 0]} />
+						<Sphere position={[-6, 13, 0]} />
 					</Physics>
-					<OrbitControls />
+					<OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
 				</React.Suspense>
 			</Canvas>
 		</div>
@@ -46,22 +53,18 @@ const Page = () => {
 
 export default Page;
 
-const TrackPart046 = (props: MeshProps) => {
+const TrackPart046WithMaterial = (props: MeshProps) => {
 	const { nodes, materials } = useGLTF(
 		'/static/3d/mesh/.local/marble-race_track-part_046_material.glb'
 	);
 	const geometry = (nodes.Plane046 as any).geometry;
-	const [colorMap, normalMap] = useLoader(THREE.TextureLoader, [
-		'/static/3d/texture/wood_albedo_color.jpg',
-		'/static/3d/texture/wood_albedo_normal.jpg'
-	]);
-	const material = React.useRef<THREE.MeshPhysicalMaterial>(null);
 
-	useFrame(() => {
-		console.log({ material: material.current });
-	});
-
-	console.log({ nodes, materials });
+	React.useEffect(() => {
+		console.log('Part046 with Material', {
+			plane046: nodes.Plane046,
+			wood: materials.Wood
+		});
+	}, []);
 
 	return (
 		<RigidBody colliders="trimesh" type="fixed">
@@ -69,17 +72,62 @@ const TrackPart046 = (props: MeshProps) => {
 				geometry={geometry}
 				material={materials.Wood}
 				dispose={null}
-				position={[0, 0, 0]}
-				// scale={10}
+				position={[3, 0, 0]}
+				scale={10}
 				{...props}
-			>
+			></mesh>
+		</RigidBody>
+	);
+};
+
+const TrackPart046 = (props: MeshProps) => {
+	const { nodes } = useGLTF('/static/3d/mesh/.local/marble-race_track-part_046.glb');
+	const geometry = (nodes.Plane046 as any).geometry;
+	const [colorMap, normalMap] = useTexture(
+		['/static/3d/texture/wood_albedo_color.jpg', '/static/3d/texture/wood_albedo_normal.jpg'],
+		([cM, nM]) => {
+			if (cM != null) {
+				cM.repeat.set(1.5, 1.5);
+				cM.offset.set(0, -0.5);
+				cM.flipY = false;
+				cM.wrapS = 1000;
+				cM.wrapT = 1000;
+				cM.colorSpace = 'srgb';
+			}
+			if (nM != null) {
+				nM.repeat.set(1.5, 1.5);
+				nM.offset.set(0, -0.5);
+				nM.flipY = false;
+				nM.wrapS = 1000;
+				nM.wrapT = 1000;
+				nM.colorSpace = '';
+			}
+		}
+	);
+	const material = React.useRef<THREE.MeshPhysicalMaterial>(null);
+
+	React.useEffect(() => {
+		console.log('Part046', {
+			plane046: nodes.Plane046,
+			wood: material.current
+		});
+	}, [material.current]);
+
+	return (
+		<RigidBody colliders="trimesh" type="fixed">
+			<mesh geometry={geometry} dispose={null} position={[0, 0, 0]} scale={10} {...props}>
 				<meshPhysicalMaterial
 					ref={material}
 					map={colorMap}
 					normalMap={normalMap}
+					roughness={0.7}
+					specularIntensity={0}
+					normalScale={new THREE.Vector2(0.15, -0.15)}
+					reflectivity={0.45}
+					// vertexColors={true}
 					side={2}
-					clearcoat={0.0024999999441206455}
-					clearcoatRoughness={0.05000000074505806}
+					clearcoat={0.0025}
+					clearcoatRoughness={0.05}
 				/>
 			</mesh>
 		</RigidBody>
