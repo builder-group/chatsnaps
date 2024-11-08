@@ -4,6 +4,9 @@ import {
 	Cloud,
 	Clouds,
 	Environment,
+	GizmoHelper,
+	GizmoViewport,
+	Grid,
 	OrbitControls,
 	Sky,
 	useGLTF,
@@ -43,8 +46,13 @@ const Page = () => {
 						<Sphere position={[-12, 13, 0]} />
 						<Sphere position={[-9, 13, 0]} />
 						<Sphere position={[-6, 13, 0]} />
+						<PhysicsGridFloor />
 					</Physics>
+
 					<OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+					<GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+						<GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
+					</GizmoHelper>
 				</React.Suspense>
 			</Canvas>
 		</div>
@@ -52,6 +60,32 @@ const Page = () => {
 };
 
 export default Page;
+
+// https://codesandbox.io/p/sandbox/19uq2u?file=%2Fsrc%2FApp.js%3A1%2C1-64%2C1
+const PhysicsGridFloor: React.FC = () => {
+	return (
+		<group>
+			{/* Visual infinite grid */}
+			<Grid
+				position={[0, 0, 0]}
+				args={[100, 100]}
+				infiniteGrid
+				cellSize={1}
+				sectionSize={5}
+				sectionColor={'#9d4b4b'}
+				cellColor={'#6f6f6f'}
+			/>
+
+			{/* Physical floor */}
+			<RigidBody type="fixed" colliders="cuboid">
+				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
+					<planeGeometry args={[100, 100]} />
+					<meshBasicMaterial color="white" opacity={0.5} transparent />
+				</mesh>
+			</RigidBody>
+		</group>
+	);
+};
 
 const TrackPart046WithMaterial = (props: MeshProps) => {
 	const { nodes, materials } = useGLTF(
