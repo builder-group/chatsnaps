@@ -223,7 +223,7 @@ class ChatStoryCreator {
 		voiceId: string,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
-		const spokenMessageFilename = `${sha256(`${voiceId}:${item.content}`)}.mp3`;
+		const spokenMessageFilename = `${sha256(`${voiceId}:${item.spokenContent ?? item.content}`)}.mp3`;
 
 		const isSpokenMessageCached =
 			this.config.voiceover.usePrerecorded &&

@@ -10,6 +10,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 
 	// Questions and statements
 	'\\bwya\\b': 'where are you at?',
+	'\\bwdym\\b': 'what do you mean?',
 	'\\bidk\\b': "I don't know...",
 	'\\brn\\b': 'right now',
 	'\\bimo\\b': 'in my opinion,',
