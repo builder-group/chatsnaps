@@ -13,6 +13,7 @@ const SChatStoryScriptEvent = z.union([
 		type: z.literal('Message'),
 		content: z.string(),
 		spokenContent: z.string().optional(),
+		voiceover: z.boolean().optional(),
 		participantId: z.string()
 	}),
 	z.object({

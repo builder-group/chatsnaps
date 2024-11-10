@@ -189,6 +189,7 @@ class ChatStoryCreator {
 		if (
 			this.config.voiceover.isEnabled &&
 			participant.voice != null &&
+			(item.voiceover == null || item.voiceover) &&
 			this.canBeSpoken(item.content)
 		) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
@@ -282,7 +283,7 @@ class ChatStoryCreator {
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
 			text: currentText,
-			modelId: elevenLabsConfig.models.eleven_turbo_v2.id, // TODO: Using turbo for speed/cost. Compare quality with 'eleven_multilingual_v2'.
+			modelId: elevenLabsConfig.models.eleven_multilingual_v2.id, // TODO: Using turbo for speed/cost. Compare quality with 'eleven_multilingual_v2'.
 			// modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
 			// nextText: nextText.length > 0 ? nextText : undefined, // TODO: Disabled. Can cause audio overlap and partial inclusion of a cut off start from the next text with some voices (see 'out/voice-lab').
 			previousText: previousText.length > 0 ? previousText : undefined,
