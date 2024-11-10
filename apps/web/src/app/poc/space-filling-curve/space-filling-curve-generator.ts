@@ -1,40 +1,65 @@
+/**
+ * Generates space-filling curves using a random spanning tree approach.
+ * The algorithm works by:
+ * 1. Creating a coarse grid of nodes
+ * 2. Generating a random spanning tree
+ * 3. Creating intersection points
+ * 4. Converting to a bitmask representation
+ * 5. Generating the final path
+ */
 export class SpaceFillingCurveGenerator {
-	private readonly config: TSpaceFillingCurveGeneratorConfig;
+	private static readonly SUB_GRID_SIZE = 2;
 
-	private static readonly DIRECTIONS = [
-		[0, -2], // Up
-		[2, 0], // Right
-		[0, 2], // Down
-		[-2, 0] // Left
-	] as const;
+	// Pre-computed direction vectors for grid traversal
+	// Using 2-unit steps to account for the subgrid structure
+	private static readonly DIRECTIONS = Object.freeze([
+		[0, -SpaceFillingCurveGenerator.SUB_GRID_SIZE], // Up
+		[SpaceFillingCurveGenerator.SUB_GRID_SIZE, 0], // Right
+		[0, SpaceFillingCurveGenerator.SUB_GRID_SIZE], // Down
+		[-SpaceFillingCurveGenerator.SUB_GRID_SIZE, 0] // Left
+	] as const);
+
+	// Maps bitmask patterns to directional movement
+	// Each number represents a specific configuration of connected points
+	private static readonly BITMASK_TO_DIRECTION: Record<number, TDirection> = {
+		// Patterns indicating northward movement
+		2: 'N',
+		6: 'N',
+		14: 'N',
+		// Patterns indicating eastward movement
+		4: 'E',
+		12: 'E',
+		13: 'E',
+		// Patterns indicating southward movement
+		8: 'S',
+		9: 'S',
+		11: 'S',
+		// Patterns indicating westward movement
+		1: 'W',
+		3: 'W',
+		7: 'W'
+	};
+
+	private readonly config: Required<TSpaceFillingCurveGeneratorConfig>;
+	private readonly gridSize: number;
 
 	constructor(options: TSpaceFillingCurveGeneratorOptions = {}) {
-		const { cols = 8, rows = 8, subGridSize = 2 } = options;
 		this.config = {
-			cols,
-			rows,
-			subGridSize
+			cols: options.cols ?? 8,
+			rows: options.rows ?? 8
 		};
-		this.validateConfig();
-	}
-
-	private validateConfig(): void {
-		const { cols, rows, subGridSize } = this.config;
-		if (cols % subGridSize !== 0 || rows % subGridSize !== 0) {
-			throw new Error('Grid dimensions must be divisible by subGridSize');
-		}
+		this.gridSize = this.config.cols * this.config.rows;
 	}
 
 	/**
-	 * Generates a complete space-filling curve with all intermediate results
-	 * @returns All components needed to visualize or use the space-filling curve
+	 * Generates all components needed to construct and visualize the space-filling curve.
 	 */
 	public generate(): TGeneratorResult {
 		const nodes = this.generateCoarseGridNodes();
 		const spanningTree = this.generateSpanningTree(nodes);
 		const intersectionPoints = this.generateIntersectionPoints(spanningTree);
 		const bitmaskValues = this.calculateBitmaskValues(nodes, intersectionPoints);
-		const path = this.generatePath();
+		const path = this.generatePathFromBitmask(bitmaskValues);
 
 		return {
 			nodes,
@@ -46,42 +71,50 @@ export class SpaceFillingCurveGenerator {
 	}
 
 	/**
-	 * Generates only the final space-filling curve path
-	 * @returns Array of [x, y] coordinates representing the path
+	 * Generates only the final path of the space-filling curve.
 	 */
-	public generatePath(): [number, number][] {
-		const nodes = this.generateCoarseGridNodes();
-		const spanningTree = this.generateSpanningTree(nodes);
-		const intersectionPoints = this.generateIntersectionPoints(spanningTree);
-		const bitmaskValues = this.calculateBitmaskValues(nodes, intersectionPoints);
-		return this.generatePathFromBitmask(bitmaskValues);
+	public generatePath(): TPoint[] {
+		return this.generatePathFromBitmask(
+			this.calculateBitmaskValues(
+				this.generateCoarseGridNodes(),
+				this.generateIntersectionPoints(this.generateSpanningTree(this.generateCoarseGridNodes()))
+			)
+		);
 	}
 
+	/**
+	 * Creates the initial coarse grid nodes that will be connected by the spanning tree.
+	 * These nodes are placed at the center of each subgrid.
+	 */
 	private generateCoarseGridNodes(): TPoint[] {
-		const { cols, rows, subGridSize } = this.config;
+		const { cols, rows } = this.config;
 		const nodes: TPoint[] = [];
 
-		for (let i = 0; i < cols; i += subGridSize) {
-			for (let j = 0; j < rows; j += subGridSize) {
+		for (let i = 0; i < cols; i += SpaceFillingCurveGenerator.SUB_GRID_SIZE) {
+			for (let j = 0; j < rows; j += SpaceFillingCurveGenerator.SUB_GRID_SIZE) {
 				nodes.push({ x: i + 1, y: j + 1 });
 			}
 		}
+
 		return nodes;
 	}
 
+	/**
+	 * Generates a random spanning tree connecting the coarse grid nodes.
+	 * Uses a depth-first search approach with randomized neighbor selection.
+	 */
 	private generateSpanningTree(nodes: TPoint[]): TSpanningTreeEdge[] {
-		const stack: TPoint[] = [];
 		const visited = new Set<string>();
 		const spanningTree: TSpanningTreeEdge[] = [];
+		const stack: TPoint[] = [];
 
 		const startNode = nodes[Math.floor(Math.random() * nodes.length)] as TPoint;
 		stack.push(startNode);
 		visited.add(this.pointToString(startNode));
 
 		while (stack.length > 0) {
-			const current = stack.pop()!;
-			const neighbors = this.getNeighbors(current);
-			const unvisitedNeighbors = neighbors.filter((n) => !visited.has(this.pointToString(n)));
+			const current = stack.pop() as TPoint;
+			const unvisitedNeighbors = this.getUnvisitedNeighbors(current, visited);
 
 			if (unvisitedNeighbors.length > 0) {
 				stack.push(current);
@@ -97,142 +130,162 @@ export class SpaceFillingCurveGenerator {
 		return spanningTree;
 	}
 
-	private getNeighbors(node: TPoint): TPoint[] {
+	/**
+	 * Finds all unvisited neighboring nodes within the grid bounds.
+	 * Used during spanning tree generation to ensure proper connectivity.
+	 */
+	private getUnvisitedNeighbors(node: TPoint, visited: Set<string>): TPoint[] {
 		const { cols, rows } = this.config;
+		const neighbors: TPoint[] = [];
 
-		return SpaceFillingCurveGenerator.DIRECTIONS.map(([dx, dy]) => ({
-			x: node.x + dx,
-			y: node.y + dy
-		})).filter((n) => n.x >= 1 && n.x < cols && n.y >= 1 && n.y < rows);
-	}
+		for (const [dx, dy] of SpaceFillingCurveGenerator.DIRECTIONS) {
+			const newX = node.x + dx;
+			const newY = node.y + dy;
 
-	private generateIntersectionPoints(spanningTree: TSpanningTreeEdge[]): [number, number][] {
-		const intersectionPoints = new Set<string>();
-
-		for (const [start, end] of spanningTree) {
-			if (start.x === end.x) {
-				const minY = Math.min(start.y, end.y);
-				const maxY = Math.max(start.y, end.y);
-				for (let y = minY + 1; y < maxY; y++) {
-					intersectionPoints.add(`${start.x},${y}`);
-				}
-			} else if (start.y === end.y) {
-				const minX = Math.min(start.x, end.x);
-				const maxX = Math.max(start.x, end.x);
-				for (let x = minX + 1; x < maxX; x++) {
-					intersectionPoints.add(`${x},${start.y}`);
+			if (newX >= 1 && newX < cols && newY >= 1 && newY < rows) {
+				const neighbor = { x: newX, y: newY };
+				if (!visited.has(this.pointToString(neighbor))) {
+					neighbors.push(neighbor);
 				}
 			}
 		}
 
-		return Array.from(intersectionPoints).map((p) => p.split(',').map(Number) as [number, number]);
+		return neighbors;
 	}
 
-	private calculateBitmaskValues(
-		nodes: TPoint[],
-		intersectionPoints: [number, number][]
-	): number[][] {
+	/**
+	 * Generates points where the spanning tree edges intersect with the fine grid.
+	 */
+	private generateIntersectionPoints(spanningTree: TSpanningTreeEdge[]): TPoint[] {
+		const intersectionPoints = new Set<string>();
+
+		for (const [start, end] of spanningTree) {
+			// Vertical edge - generate points along y-axis
+			if (start.x === end.x) {
+				const minY = Math.min(start.y, end.y);
+				const maxY = Math.max(start.y, end.y);
+				for (let y = minY + 1; y < maxY; y++) {
+					intersectionPoints.add(this.pointToString({ x: start.x, y }));
+				}
+			}
+			// Horizontal edge - generate points along x-axis
+			else if (start.y === end.y) {
+				const minX = Math.min(start.x, end.x);
+				const maxX = Math.max(start.x, end.x);
+				for (let x = minX + 1; x < maxX; x++) {
+					intersectionPoints.add(this.pointToString({ x, y: start.y }));
+				}
+			}
+		}
+
+		return Array.from(intersectionPoints, (point) => {
+			const [x, y] = point.split(',');
+			return { x: Number(x), y: Number(y) };
+		});
+	}
+
+	/**
+	 * Converts the geometric representation (nodes and intersections) into a bitmask grid.
+	 * Each cell's bitmask indicates which of its corners contain path points.
+	 */
+	private calculateBitmaskValues(nodes: TPoint[], intersectionPoints: TPoint[]): number[][] {
 		const { cols, rows } = this.config;
-		const bitmaskValues = Array(cols)
-			.fill(null)
-			.map(() => Array(rows).fill(0));
+		const bitmaskValues = Array.from({ length: cols }, () => new Array(rows).fill(0));
 		const allPoints = new Set([
 			...nodes.map(this.pointToString),
-			...intersectionPoints.map(([x, y]) => `${x},${y}`)
+			...intersectionPoints.map((point) => this.pointToString(point))
 		]);
-
-		const hasPoint = (x: number, y: number) => allPoints.has(`${x},${y}`);
 
 		for (let i = 0; i < cols; i++) {
 			for (let j = 0; j < rows; j++) {
+				let bitmask = 0;
+				if (allPoints.has(this.pointToString({ x: i, y: j }))) bitmask |= 1; // Top-left
+				if (allPoints.has(this.pointToString({ x: i + 1, y: j }))) bitmask |= 2; // Top-right
+				if (allPoints.has(this.pointToString({ x: i + 1, y: j + 1 }))) bitmask |= 4; // Bottom-right
+				if (allPoints.has(this.pointToString({ x: i, y: j + 1 }))) bitmask |= 8; // Bottom-left
 				// @ts-expect-error -- bitmask grid has size of cols x rows
-				if (hasPoint(i, j)) bitmaskValues[i][j] += 1; // Top-left
-				// @ts-expect-error -- bitmask grid has size of cols x rows
-				if (hasPoint(i + 1, j)) bitmaskValues[i][j] += 2; // Top-right
-				// @ts-expect-error -- bitmask grid has size of cols x rows
-				if (hasPoint(i + 1, j + 1)) bitmaskValues[i][j] += 4; // Bottom-right
-				// @ts-expect-error -- bitmask grid has size of cols x rows
-				if (hasPoint(i, j + 1)) bitmaskValues[i][j] += 8; // Bottom-left
+				bitmaskValues[i][j] = bitmask;
 			}
 		}
 
 		return bitmaskValues;
 	}
 
-	private generatePathFromBitmask(bitmaskValues: number[][]): [number, number][] {
-		const { cols, rows } = this.config;
-		const path: [number, number][] = [[0, 0]];
-		let [currentX, currentY] = [0, 0];
+	/**
+	 * Generates the final space-filling curve path using the bitmask grid.
+	 * Follows the path indicated by the bitmasks, moving from cell to cell
+	 * based on the pattern of points in each cell.
+	 */
+	private generatePathFromBitmask(bitmaskValues: number[][]): TPoint[] {
+		const path: TPoint[] = [{ x: 0, y: 0 }];
+		let currentPoint: TPoint = { x: 0, y: 0 };
 
-		while (path.length < cols * rows) {
-			const value = bitmaskValues[currentX]?.[currentY];
+		while (path.length < this.gridSize) {
+			const value = bitmaskValues[currentPoint.x]?.[currentPoint.y];
 			if (value == null) {
-				console.warn('Path generation failed: Invalid bitmask value');
-				return path;
+				break;
 			}
-			const direction = this.getDirectionFromBitmask(value);
 
-			const [nextX, nextY] = this.getNextPosition([currentX, currentY], direction);
-			if (!this.isValidPosition(nextX, nextY)) {
+			const direction = SpaceFillingCurveGenerator.BITMASK_TO_DIRECTION[value] ?? '';
+			currentPoint = this.getNextPosition(currentPoint, direction);
+
+			if (!this.isValidPosition(currentPoint)) {
 				console.warn('Path generation failed: Invalid position');
-				return path;
+				break;
 			}
-
-			currentX = nextX;
-			currentY = nextY;
-			path.push([currentX, currentY]);
+			path.push(currentPoint);
 		}
 
 		return path;
 	}
 
-	private getDirectionFromBitmask(value: number): 'N' | 'E' | 'S' | 'W' | '' {
-		if ([2, 6, 14].includes(value)) return 'N';
-		if ([4, 12, 13].includes(value)) return 'E';
-		if ([8, 9, 11].includes(value)) return 'S';
-		if ([1, 3, 7].includes(value)) return 'W';
-		return '';
-	}
-
-	private getNextPosition(
-		[x, y]: [number, number],
-		direction: 'N' | 'E' | 'S' | 'W' | ''
-	): [number, number] {
+	/**
+	 * Calculates the next position based on the current position and direction.
+	 */
+	private getNextPosition(current: TPoint, direction: TDirection): TPoint {
 		switch (direction) {
 			case 'N':
-				return [x, y - 1];
+				return { x: current.x, y: current.y - 1 };
 			case 'E':
-				return [x + 1, y];
+				return { x: current.x + 1, y: current.y };
 			case 'S':
-				return [x, y + 1];
+				return { x: current.x, y: current.y + 1 };
 			case 'W':
-				return [x - 1, y];
+				return { x: current.x - 1, y: current.y };
 			default:
-				return [x, y];
+				console.warn(`Invalid direction at ${current.x},${current.y}`);
+				return current;
 		}
 	}
 
-	private isValidPosition(x: number, y: number): boolean {
+	/**
+	 * Checks if a position is within the grid boundaries.
+	 */
+	private isValidPosition(point: TPoint): boolean {
 		const { cols, rows } = this.config;
-		return x >= 0 && x < cols && y >= 0 && y < rows;
+		return point.x >= 0 && point.x < cols && point.y >= 0 && point.y < rows;
 	}
 
+	/**
+	 * Converts a point object to a string representation for use as Set keys.
+	 */
 	private pointToString(point: TPoint): string {
 		return `${point.x},${point.y}`;
 	}
 }
 
-export type TPoint = {
+type TDirection = 'N' | 'E' | 'S' | 'W' | '';
+
+export interface TPoint {
 	x: number;
 	y: number;
-};
+}
 
 export type TSpanningTreeEdge = [TPoint, TPoint];
 
 export interface TSpaceFillingCurveGeneratorConfig {
 	cols: number;
 	rows: number;
-	subGridSize: number;
 }
 
 export type TSpaceFillingCurveGeneratorOptions = Partial<TSpaceFillingCurveGeneratorConfig>;
@@ -243,9 +296,9 @@ export interface TGeneratorResult {
 	/** Edges of the spanning tree connecting coarse grid nodes */
 	spanningTree: TSpanningTreeEdge[];
 	/** Points where the spanning tree intersects with the fine grid */
-	intersectionPoints: [number, number][];
+	intersectionPoints: TPoint[];
 	/** Bitmask values for each cell in the fine grid */
 	bitmaskValues: number[][];
 	/** Final space-filling curve path coordinates */
-	path: [number, number][];
+	path: TPoint[];
 }

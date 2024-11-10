@@ -2,6 +2,7 @@
 
 ## References
 
+- [P5.Js Sandbox](https://codesandbox.io/p/sandbox/space-filling-curve-n2mtmy)
 - ["I've created a 'Random Marble Run' Generator" by @ferjerez3d on X](https://x.com/ferjerez3d/status/1233730556661305344)
 - [Digital Halftoning Using Space-Filling Curves](https://dspace.jaist.ac.jp/dspace/bitstream/10119/4724/1/71.pdf)
 
