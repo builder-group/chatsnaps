@@ -19,6 +19,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\bfyi\\b': 'just so you know,',
 	'\\bbtw\\b': 'by the way',
 	'\\bsm\\b': 'some what',
+	'\\bjk\\b': 'Just Kidding',
 
 	// Common contractions
 	'\\bu\\b': 'you',
@@ -30,6 +31,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\bkk\\b': 'okay, okay',
 	'\\byh\\b': 'yeah',
 	'\\bbf\\b': 'boyfriend',
+	'\\bgf\\b': 'girlfriend',
 
 	// Exclamations and emotions
 	'\\bsry\\b': 'sorry!',
