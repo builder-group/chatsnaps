@@ -4,7 +4,7 @@ let rows = 8;
 let cellSize = 50; // Size of each cell for the 8x8 grid
 
 function setup() {
-	createCanvas(400, 400);
+	createCanvas(cols * cellSize, rows * cellSize);
 	grid = new SpaceFillingGrid(cols, rows, cellSize);
 	grid.generateSpanningTree();
 }
