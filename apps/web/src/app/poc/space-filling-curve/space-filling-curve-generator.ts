@@ -1,3 +1,5 @@
+import seedrandom from 'seedrandom';
+
 /**
  * Generates space-filling curves using a random spanning tree approach.
  * The algorithm works by:
@@ -41,22 +43,29 @@ export class SpaceFillingCurveGenerator {
 	};
 
 	private readonly config: Required<TSpaceFillingCurveGeneratorConfig>;
-	private readonly gridSize: number;
 
 	constructor(options: TSpaceFillingCurveGeneratorOptions = {}) {
 		this.config = {
 			cols: options.cols ?? 8,
 			rows: options.rows ?? 8
 		};
-		this.gridSize = this.config.cols * this.config.rows;
+	}
+
+	public get gridSize(): number {
+		return this.config.cols * this.config.rows;
 	}
 
 	/**
 	 * Generates all components needed to construct and visualize the space-filling curve.
 	 */
-	public generate(): TGeneratorResult {
+	public generate(seed?: string): TGeneratorResult {
+		let rng: (() => number) | undefined;
+		if (seed != null) {
+			rng = seedrandom(seed);
+		}
+
 		const nodes = this.generateCoarseGridNodes();
-		const spanningTree = this.generateSpanningTree(nodes);
+		const spanningTree = this.generateSpanningTree(nodes, rng);
 		const intersectionPoints = this.generateIntersectionPoints(spanningTree);
 		const bitmaskValues = this.calculateBitmaskValues(nodes, intersectionPoints);
 		const path = this.generatePathFromBitmask(bitmaskValues);
@@ -73,7 +82,12 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Generates only the final path of the space-filling curve.
 	 */
-	public generatePath(): TPoint[] {
+	public generatePath(seed?: string): TPoint[] {
+		let rng: (() => number) | undefined;
+		if (seed != null) {
+			rng = seedrandom(seed);
+		}
+
 		return this.generatePathFromBitmask(
 			this.calculateBitmaskValues(
 				this.generateCoarseGridNodes(),
@@ -103,12 +117,15 @@ export class SpaceFillingCurveGenerator {
 	 * Generates a random spanning tree connecting the coarse grid nodes.
 	 * Uses a depth-first search approach with randomized neighbor selection.
 	 */
-	private generateSpanningTree(nodes: TPoint[]): TSpanningTreeEdge[] {
+	private generateSpanningTree(
+		nodes: TPoint[],
+		rng: () => number = Math.random
+	): TSpanningTreeEdge[] {
 		const visited = new Set<string>();
 		const spanningTree: TSpanningTreeEdge[] = [];
 		const stack: TPoint[] = [];
 
-		const startNode = nodes[Math.floor(Math.random() * nodes.length)] as TPoint;
+		const startNode = nodes[Math.floor(rng() * nodes.length)] as TPoint;
 		stack.push(startNode);
 		visited.add(this.pointToString(startNode));
 
@@ -118,9 +135,7 @@ export class SpaceFillingCurveGenerator {
 
 			if (unvisitedNeighbors.length > 0) {
 				stack.push(current);
-				const next = unvisitedNeighbors[
-					Math.floor(Math.random() * unvisitedNeighbors.length)
-				] as TPoint;
+				const next = unvisitedNeighbors[Math.floor(rng() * unvisitedNeighbors.length)] as TPoint;
 				spanningTree.push([current, next]);
 				visited.add(this.pointToString(next));
 				stack.push(next);

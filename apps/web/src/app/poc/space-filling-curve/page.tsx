@@ -9,11 +9,16 @@ import { SpaceFillingCurveVisualization } from './components';
 import { SpaceFillingCurveGenerator } from './space-filling-curve-generator';
 
 export default function SpaceFillingCurvePage() {
-	const { cols, rows, cellSize } = useControls({ cols: 8, rows: 8, cellSize: 1 });
+	const { cols, rows, cellSize, seed } = useControls({
+		cols: 8,
+		rows: 8,
+		cellSize: 1,
+		seed: 'test'
+	});
 	const data = React.useMemo(() => {
 		const generator = new SpaceFillingCurveGenerator({ cols, rows });
-		return generator.generate();
-	}, [cols, rows]);
+		return generator.generate(seed);
+	}, [cols, rows, seed]);
 	const { gridWidth, gridHeight } = React.useMemo(() => {
 		return {
 			gridWidth: cols * cellSize,
