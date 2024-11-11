@@ -8,7 +8,7 @@
  * 5. Generating the final path
  */
 export class SpaceFillingCurveGenerator {
-	private static readonly SUB_GRID_SIZE = 2;
+	public static readonly SUB_GRID_SIZE = 2;
 
 	// Pre-computed direction vectors for grid traversal
 	// Using 2-unit steps to account for the subgrid structure
