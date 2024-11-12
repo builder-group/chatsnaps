@@ -43,6 +43,7 @@ const Page = () => {
 					<Physics debug={debug} colliders={false}>
 						<TrackPart046 />
 						<TrackPart046WithMaterial />
+						<TrackPart054 />
 						<Sphere position={[0.75, 1, 0]} />
 						{debug && <PhysicsGridFloor />}
 					</Physics>
@@ -99,7 +100,8 @@ const TrackPart046WithMaterial = (props: MeshProps) => {
 	React.useEffect(() => {
 		console.log('Part046 with Material', {
 			plane046: nodes.Plane046,
-			wood: materials.Wood
+			wood: materials.Wood,
+			nodes
 		});
 	}, []);
 
@@ -146,13 +148,71 @@ const TrackPart046 = (props: MeshProps) => {
 	React.useEffect(() => {
 		console.log('Part046', {
 			plane046: nodes.Plane046,
-			wood: material.current
+			wood: material.current,
+			nodes
 		});
 	}, [material.current]);
 
 	return (
 		<RigidBody colliders="trimesh" type="fixed">
 			<mesh geometry={geometry} dispose={null} position={[0, 0, 0]} scale={10} {...props}>
+				<meshPhysicalMaterial
+					ref={material}
+					map={colorMap}
+					normalMap={normalMap}
+					roughness={0.7}
+					specularIntensity={0}
+					normalScale={new THREE.Vector2(0.15, -0.15)}
+					reflectivity={0.45}
+					// vertexColors={true}
+					side={2}
+					clearcoat={0.0025}
+					clearcoatRoughness={0.05}
+				/>
+			</mesh>
+		</RigidBody>
+	);
+};
+
+const TrackPart054 = (props: MeshProps) => {
+	const { nodes } = useGLTF('/static/3d/mesh/.local/marble-race_track-part_054.glb');
+	const geometry = (nodes.Plane054 as any).geometry;
+	const [colorMap, normalMap] = useTexture(
+		['/static/3d/texture/wood_albedo_color.jpg', '/static/3d/texture/wood_albedo_normal.jpg'],
+		([cM, nM]) => {
+			if (cM != null) {
+				cM.repeat.set(1.5, 1.5);
+				cM.offset.set(0, -0.5);
+				cM.flipY = false;
+				cM.wrapS = 1000;
+				cM.wrapT = 1000;
+				cM.colorSpace = 'srgb';
+			}
+			if (nM != null) {
+				nM.repeat.set(1.5, 1.5);
+				nM.offset.set(0, -0.5);
+				nM.flipY = false;
+				nM.wrapS = 1000;
+				nM.wrapT = 1000;
+				nM.colorSpace = '';
+			}
+		}
+	);
+	const material = React.useRef<THREE.MeshPhysicalMaterial>(null);
+
+	React.useEffect(() => {
+		console.log('Part054', {
+			plane054: nodes.Plane054,
+			start: nodes.Start,
+			end: nodes.End,
+			wood: material.current,
+			nodes
+		});
+	}, [material.current]);
+
+	return (
+		<RigidBody colliders="trimesh" type="fixed">
+			<mesh geometry={geometry} dispose={null} position={[6, 0, 0]} scale={10} {...props}>
 				<meshPhysicalMaterial
 					ref={material}
 					map={colorMap}
