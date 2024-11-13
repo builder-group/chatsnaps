@@ -8,15 +8,15 @@ import {
 	GizmoViewport,
 	Grid,
 	OrbitControls,
-	Sky,
-	useGLTF,
-	useTexture
+	Sky
 } from '@react-three/drei';
 import { Canvas, MeshProps } from '@react-three/fiber';
 import { Physics, RigidBody } from '@react-three/rapier';
 import { useControls } from 'leva';
 import React from 'react';
 import * as THREE from 'three';
+
+import { Track } from './Track/Track';
 
 const Page = () => {
 	const { debug } = useControls({ debug: true });
@@ -41,9 +41,7 @@ const Page = () => {
 					<Environment preset="city" />
 					<Sky />
 					<Physics debug={debug} colliders={false}>
-						<TrackPart046 />
-						<TrackPart046WithMaterial />
-						<TrackPart054 />
+						<Track length={3} debug={debug} />
 						<Sphere position={[0.75, 1, 0]} />
 						{debug && <PhysicsGridFloor />}
 					</Physics>
@@ -88,146 +86,6 @@ const PhysicsGridFloor: React.FC = () => {
 				</mesh>
 			</RigidBody>
 		</group>
-	);
-};
-
-const TrackPart046WithMaterial = (props: MeshProps) => {
-	const { nodes, materials } = useGLTF(
-		'/static/3d/mesh/.local/marble-race_track-part_046_material.glb'
-	);
-	const geometry = (nodes.Plane046 as any).geometry;
-
-	React.useEffect(() => {
-		console.log('Part046 with Material', {
-			plane046: nodes.Plane046,
-			wood: materials.Wood,
-			nodes
-		});
-	}, []);
-
-	return (
-		<RigidBody colliders="trimesh" type="fixed">
-			<mesh
-				geometry={geometry}
-				material={materials.Wood}
-				dispose={null}
-				position={[3, 0, 0]}
-				scale={10}
-				{...props}
-			></mesh>
-		</RigidBody>
-	);
-};
-
-const TrackPart046 = (props: MeshProps) => {
-	const { nodes } = useGLTF('/static/3d/mesh/.local/marble-race_track-part_046.glb');
-	const geometry = (nodes.Plane046 as any).geometry;
-	const [colorMap, normalMap] = useTexture(
-		['/static/3d/texture/wood_albedo_color.jpg', '/static/3d/texture/wood_albedo_normal.jpg'],
-		([cM, nM]) => {
-			if (cM != null) {
-				cM.repeat.set(1.5, 1.5);
-				cM.offset.set(0, -0.5);
-				cM.flipY = false;
-				cM.wrapS = 1000;
-				cM.wrapT = 1000;
-				cM.colorSpace = 'srgb';
-			}
-			if (nM != null) {
-				nM.repeat.set(1.5, 1.5);
-				nM.offset.set(0, -0.5);
-				nM.flipY = false;
-				nM.wrapS = 1000;
-				nM.wrapT = 1000;
-				nM.colorSpace = '';
-			}
-		}
-	);
-	const material = React.useRef<THREE.MeshPhysicalMaterial>(null);
-
-	React.useEffect(() => {
-		console.log('Part046', {
-			plane046: nodes.Plane046,
-			wood: material.current,
-			nodes
-		});
-	}, [material.current]);
-
-	return (
-		<RigidBody colliders="trimesh" type="fixed">
-			<mesh geometry={geometry} dispose={null} position={[0, 0, 0]} scale={10} {...props}>
-				<meshPhysicalMaterial
-					ref={material}
-					map={colorMap}
-					normalMap={normalMap}
-					roughness={0.7}
-					specularIntensity={0}
-					normalScale={new THREE.Vector2(0.15, -0.15)}
-					reflectivity={0.45}
-					// vertexColors={true}
-					side={2}
-					clearcoat={0.0025}
-					clearcoatRoughness={0.05}
-				/>
-			</mesh>
-		</RigidBody>
-	);
-};
-
-const TrackPart054 = (props: MeshProps) => {
-	const { nodes } = useGLTF('/static/3d/mesh/.local/marble-race_track-part_054.glb');
-	const geometry = (nodes.Plane054 as any).geometry;
-	const [colorMap, normalMap] = useTexture(
-		['/static/3d/texture/wood_albedo_color.jpg', '/static/3d/texture/wood_albedo_normal.jpg'],
-		([cM, nM]) => {
-			if (cM != null) {
-				cM.repeat.set(1.5, 1.5);
-				cM.offset.set(0, -0.5);
-				cM.flipY = false;
-				cM.wrapS = 1000;
-				cM.wrapT = 1000;
-				cM.colorSpace = 'srgb';
-			}
-			if (nM != null) {
-				nM.repeat.set(1.5, 1.5);
-				nM.offset.set(0, -0.5);
-				nM.flipY = false;
-				nM.wrapS = 1000;
-				nM.wrapT = 1000;
-				nM.colorSpace = '';
-			}
-		}
-	);
-	const material = React.useRef<THREE.MeshPhysicalMaterial>(null);
-
-	React.useEffect(() => {
-		console.log('Part054', {
-			plane054: nodes.Plane054,
-			start: nodes.Start,
-			end: nodes.End,
-			wood: material.current,
-			nodes
-		});
-	}, [material.current]);
-
-	return (
-		<RigidBody colliders="trimesh" type="fixed">
-			<mesh geometry={geometry} dispose={null} position={[6, 0, 0]} scale={10} {...props}>
-				<meshPhysicalMaterial
-					ref={material}
-					map={colorMap}
-					normalMap={normalMap}
-					roughness={0.7}
-					specularIntensity={0}
-					normalScale={new THREE.Vector2(0.15, -0.15)}
-					reflectivity={0.45}
-					// vertexColors={true}
-					side={2}
-					clearcoat={0.0025}
-					clearcoatRoughness={0.05}
-				/>
-			</mesh>
-		</RigidBody>
 	);
 };
 
