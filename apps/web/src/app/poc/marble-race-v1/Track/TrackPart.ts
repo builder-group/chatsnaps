@@ -101,18 +101,23 @@ export class TrackPart {
 
 	public alignWithPrevious(previousTrack: TrackPart): void {
 		const previousEndPoint = previousTrack.getWorldEndPoint();
-		const previousDirection = previousTrack.getWorldDirection();
 
-		// Calculate rotation to align with previous track
-		const angle = Math.atan2(
-			previousDirection.cross(this._direction).y,
-			previousDirection.dot(this._direction)
-		);
-		this._rotation.set(0, previousTrack.rotation.y + angle, 0);
+		// TODO: Calculate rotation
 
 		// Calculate position to align start point with previous end point
 		const worldStartPoint = this.getWorldStartPoint();
 		this._position.copy(previousEndPoint).sub(worldStartPoint);
+	}
+
+	public getXZAngleInRad(): number {
+		const directionXZ = this._direction.clone();
+		directionXZ.y = 0;
+		directionXZ.normalize();
+
+		// Calculate angle relative to positive Z axis
+		const angle = Math.atan2(directionXZ.x, directionXZ.z);
+
+		return angle;
 	}
 }
 

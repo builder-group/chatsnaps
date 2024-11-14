@@ -2,6 +2,7 @@ import { MeshProps } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
 import React from 'react';
 import * as THREE from 'three';
+import { radToDeg } from '@blgc/utils';
 
 import { TrackPart } from './TrackPart';
 import { TTrackTextureConfig, useTrackTexture } from './useTrackTexture';
@@ -30,6 +31,11 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 	if (trackPart.geometry == null) {
 		return null;
 	}
+
+	console.log(trackPart.id, {
+		trackPart,
+		angle: Math.round(radToDeg(trackPart.getXZAngleInRad()))
+	});
 
 	return (
 		<>
