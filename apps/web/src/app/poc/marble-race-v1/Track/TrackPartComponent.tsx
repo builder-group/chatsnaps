@@ -1,33 +1,47 @@
-import { useGLTF } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
 import React from 'react';
 import * as THREE from 'three';
 
+import { TrackPart } from './TrackPart';
 import { TTrackTextureConfig, useTrackTexture } from './useTrackTexture';
 
-export const TrackPart: React.FC<TTrackPartProps> = (props) => {
+export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) => {
 	const {
-		modelPath,
-		planeName,
-		position = [0, 0, 0],
+		trackPart,
 		texture = {
 			colorPath: '/static/3d/texture/wood_albedo_color.jpg',
 			normalPath: '/static/3d/texture/wood_albedo_normal.jpg'
 		},
 		debug,
-		startPoint,
-		endPoint,
-		...other
+		...meshProps
 	} = props;
-	const { nodes } = useGLTF(modelPath);
-	const geometry = (nodes[planeName] as any).geometry;
+
 	const { colorMap, normalMap } = useTrackTexture(texture);
+
+	// Get world positions for debug visualization
+	const [worldStartPoint, worldEndPoint] = React.useMemo(() => {
+		if (debug) {
+			return [trackPart.getWorldStartPoint(), trackPart.getWorldEndPoint()];
+		}
+		return [null, null];
+	}, [trackPart, debug]);
+
+	if (trackPart.geometry == null) {
+		return null;
+	}
 
 	return (
 		<>
 			<RigidBody colliders="trimesh" type="fixed">
-				<mesh geometry={geometry} dispose={null} position={position} scale={10} {...other}>
+				<mesh
+					geometry={trackPart.geometry}
+					dispose={null}
+					position={trackPart.position.toArray()}
+					rotation={trackPart.rotation.toArray()}
+					scale={trackPart.scale}
+					{...meshProps}
+				>
 					<meshPhysicalMaterial
 						map={colorMap}
 						normalMap={normalMap}
@@ -43,16 +57,16 @@ export const TrackPart: React.FC<TTrackPartProps> = (props) => {
 					/>
 				</mesh>
 			</RigidBody>
-			{debug && startPoint != null && endPoint != null && (
+			{worldStartPoint != null && worldEndPoint != null && (
 				<>
 					{/* Start point */}
-					<mesh position={startPoint.toArray()}>
-						<sphereGeometry args={[0.05]} />
+					<mesh position={worldStartPoint.toArray()}>
+						<sphereGeometry args={[0.025]} />
 						<meshBasicMaterial color="green" />
 					</mesh>
 					{/* End point */}
-					<mesh position={endPoint.toArray()}>
-						<sphereGeometry args={[0.05]} />
+					<mesh position={worldEndPoint.toArray()}>
+						<sphereGeometry args={[0.025]} />
 						<meshBasicMaterial color="red" />
 					</mesh>
 					{/* Direction line */}
@@ -61,7 +75,7 @@ export const TrackPart: React.FC<TTrackPartProps> = (props) => {
 							<bufferAttribute
 								attach="attributes-position"
 								count={2}
-								array={new Float32Array([...startPoint.toArray(), ...endPoint.toArray()])}
+								array={new Float32Array([...worldStartPoint.toArray(), ...worldEndPoint.toArray()])}
 								itemSize={3}
 							/>
 						</bufferGeometry>
@@ -73,12 +87,8 @@ export const TrackPart: React.FC<TTrackPartProps> = (props) => {
 	);
 };
 
-export type TTrackPartProps = MeshProps & {
-	modelPath: string;
-	planeName: string;
-	position?: [number, number, number];
+export type TTrackPartComponentProps = Omit<MeshProps, 'position' | 'rotation'> & {
+	trackPart: TrackPart;
 	texture?: TTrackTextureConfig;
 	debug?: boolean;
-	startPoint?: THREE.Vector3;
-	endPoint?: THREE.Vector3;
 };

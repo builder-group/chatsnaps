@@ -1,89 +1,48 @@
 import React from 'react';
-import * as THREE from 'three';
 
-import { calculateNextTrackTransform } from './calculate-next-track-transform';
-import { getTrackMetadata } from './track-metadata';
-import { TrackPart } from './TrackPart';
-import { TTrackInstance, TTrackReference } from './types';
+import { TrackPart, TTrackReference } from './TrackPart';
+import { TrackPartComponent } from './TrackPartComponent';
 
-const TRACK_PARTS: TTrackReference[] = [
-	{
-		modelPath: '/static/3d/mesh/.local/marble-race_track-part_046.glb',
-		planeName: 'Plane046'
-	},
-	{
-		modelPath: '/static/3d/mesh/.local/marble-race_track-part_054.glb',
-		planeName: 'Plane054'
-	},
-	{
-		modelPath: '/static/3d/mesh/.local/marble-race_track-part_087.glb',
-		planeName: 'Plane087'
-	}
+const TRACK_PATHS: TTrackReference[] = [
+	{ modelPath: '/static/3d/mesh/.local/marble-race_track-part_046.glb', id: '046' },
+	{ modelPath: '/static/3d/mesh/.local/marble-race_track-part_054.glb', id: '054' },
+	{ modelPath: '/static/3d/mesh/.local/marble-race_track-part_087.glb', id: '087' }
 ];
 
 export const Track: React.FC<TProps> = (props) => {
 	const { length, debug } = props;
-	const [trackInstances, setTrackInstances] = React.useState<TTrackInstance[]>([]);
+	const [trackParts, setTrackParts] = React.useState<TrackPart[]>([]);
 	const [isLoading, setIsLoading] = React.useState(true);
 
 	React.useEffect(() => {
 		const initializeTracks = async () => {
 			setIsLoading(true);
+			const parts: TrackPart[] = [];
 
-			const instances: TTrackInstance[] = [];
+			// Initialize first track
+			const firstTrack = await TrackPart.load(TRACK_PATHS[0] as TTrackReference);
+			parts.push(firstTrack);
 
-			// Place first track at origin
-			const firstTrackMeta = await getTrackMetadata(
-				(TRACK_PARTS[0] as TTrackReference).modelPath,
-				(TRACK_PARTS[0] as TTrackReference).planeName
-			);
-			instances.push({
-				...firstTrackMeta,
-				position: new THREE.Vector3(),
-				rotation: new THREE.Euler()
-			});
-
-			// Place subsequent tracks
+			// Add subsequent tracks
 			for (let i = 1; i < length; i++) {
-				const trackPart = TRACK_PARTS[i % TRACK_PARTS.length] as TTrackReference;
-				const trackMeta = await getTrackMetadata(trackPart.modelPath, trackPart.planeName);
-
-				const { position, rotation } = calculateNextTrackTransform(
-					instances[i - 1] as TTrackInstance,
-					trackMeta
-				);
-
-				instances.push({
-					...trackMeta,
-					position,
-					rotation
-				});
+				const track = await TrackPart.load(TRACK_PATHS[i % TRACK_PATHS.length] as TTrackReference);
+				track.alignWithPrevious(parts[i - 1] as TrackPart);
+				parts.push(track);
 			}
 
-			setTrackInstances(instances);
+			setTrackParts(parts);
 			setIsLoading(false);
 		};
 
 		initializeTracks();
 	}, [length]);
 
-	if (isLoading) {
-		return null;
-	}
+	if (isLoading) return null;
 
 	return (
 		<>
-			{trackInstances.map((track, index) => (
-				<TrackPart
-					key={`${track.id}-${index}`}
-					modelPath={track.modelPath}
-					planeName={track.planeName}
-					position={track.position.toArray()}
-					rotation={track.rotation.toArray()}
-					debug={debug}
-					startPoint={track.startPoint}
-					endPoint={track.endPoint}
-				/>
+			{trackParts.map((trackPart, index) => (
+				<TrackPartComponent key={`track-${index}`} trackPart={trackPart} debug={debug} />
 			))}
 		</>
 	);
