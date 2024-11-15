@@ -101,28 +101,19 @@ export class TrackPart {
 	 * Aligns this track piece with the previous track piece by:
 	 * 1. Calculating the correct rotation to match the previous piece's orientation
 	 * 2. Positioning this piece so its start anchors align with the previous piece's end anchors
-	 *
-	 * Think of it like connecting train tracks - we need both rails (left and right anchors)
-	 * to line up perfectly while maintaining the correct direction of the track.
 	 */
 	public alignWithPrevious(previousTrack: TrackPart): void {
-		// Step 1: Get the connection points we need to align
+		// Get the end points of the previous track piece
 		const previousEndLeft = previousTrack.getWorldEndLeftAnchor();
 		const previousEndRight = previousTrack.getWorldEndRightAnchor();
 
-		// Step 2: Calculate track directions
-		// We zero out the Y component because we only want to rotate around the Y axis
-		// This preserves the designed slopes of the track pieces
-		const previousEndForward = previousTrack.getWorldDirection();
-		previousEndForward.y = 0;
-		previousEndForward.normalize();
+		// Get the track directions and zero out Y to work in XZ plane
+		const previousDirection = previousTrack.getWorldDirection();
+		previousDirection.y = 0;
+		previousDirection.normalize();
 
-		const ourStartForward = this._direction.clone();
-		ourStartForward.y = 0;
-		ourStartForward.normalize();
-
-		// Step 3: Calculate the width vectors (from right to left anchor)
-		// These vectors help us determine the correct orientation of the track
+		// Calculate width vectors (left to right) for both pieces
+		// These are crucial for correct orientation of corner pieces
 		const previousEndWidth = new THREE.Vector3()
 			.subVectors(previousEndLeft, previousEndRight)
 			.setY(0)
@@ -133,32 +124,20 @@ export class TrackPart {
 			.setY(0)
 			.normalize();
 
-		// Step 4: Calculate the initial rotation angle between the width vectors
+		// Calculate rotation angle between width vectors
 		let angle = Math.atan2(
 			previousEndWidth.x * ourStartWidth.z - previousEndWidth.z * ourStartWidth.x,
 			previousEndWidth.x * ourStartWidth.x + previousEndWidth.z * ourStartWidth.z
 		);
 
-		// Step 5: Check if we need to flip the track piece 180 degrees
-		// This happens when the calculated rotation would make the track piece
-		// face the wrong direction
-		const ourRotatedForward = ourStartForward
-			.clone()
-			.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-
-		if (ourRotatedForward.dot(previousEndForward) < 0) {
-			angle += Math.PI; // Add 180 degrees if facing wrong direction
-		}
-
-		// Step 6: Apply the calculated rotation (only around Y axis)
+		// Apply the calculated rotation
 		this._rotation.set(0, angle, 0);
 
-		// Step 7: Calculate the position to align the anchor points
-		// First, transform our start anchors by the calculated rotation
+		// Calculate position to align connection points
 		const startLeft = this._relativeStartLeftAnchor.clone().applyEuler(this._rotation);
 		const startRight = this._relativeStartRightAnchor.clone().applyEuler(this._rotation);
 
-		// Use midpoints for more stable positioning
+		// Use midpoints for stable positioning
 		const previousEndMidpoint = new THREE.Vector3()
 			.addVectors(previousEndLeft, previousEndRight)
 			.multiplyScalar(0.5);
@@ -167,10 +146,10 @@ export class TrackPart {
 			.addVectors(startLeft, startRight)
 			.multiplyScalar(0.5);
 
-		// Step 8: Set the final position
+		// Set final position
 		this._position.copy(previousEndMidpoint).sub(ourStartMidpoint);
 
-		// Step 9: Verify the alignment is within tolerance
+		// Verify the alignment
 		this.verifyAlignment(previousTrack);
 	}
 
