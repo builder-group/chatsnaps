@@ -21,11 +21,17 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 	const { colorMap, normalMap } = useTrackTexture(texture);
 
 	// Get world positions for debug visualization
-	const [worldStartPoint, worldEndPoint] = React.useMemo(() => {
-		if (debug) {
-			return [trackPart.getWorldStartPoint(), trackPart.getWorldEndPoint()];
+	const debugPoints = React.useMemo(() => {
+		if (!debug) {
+			return null;
 		}
-		return [null, null];
+
+		return {
+			startLeftAnchor: trackPart.getWorldStartLeftAnchor(),
+			startRightAnchor: trackPart.getWorldStartRightAnchor(),
+			endLeftAnchor: trackPart.getWorldEndLeftAnchor(),
+			endRightAnchor: trackPart.getWorldEndRightAnchor()
+		};
 	}, [trackPart, debug]);
 
 	if (trackPart.geometry == null) {
@@ -34,7 +40,8 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 
 	console.log(trackPart.id, {
 		trackPart,
-		angle: Math.round(radToDeg(trackPart.getXZAngleInRad()))
+		angle: Math.round(radToDeg(trackPart.getXZAngleInRad())),
+		position: trackPart.position.toArray()
 	});
 
 	return (
@@ -63,30 +70,62 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 					/>
 				</mesh>
 			</RigidBody>
-			{worldStartPoint != null && worldEndPoint != null && (
+			{debug && debugPoints != null && (
 				<>
-					{/* Start point */}
-					<mesh position={worldStartPoint.toArray()}>
+					{/* Start anchor points */}
+					<mesh position={debugPoints.startLeftAnchor.toArray()}>
 						<sphereGeometry args={[0.025]} />
 						<meshBasicMaterial color="green" />
 					</mesh>
-					{/* End point */}
-					<mesh position={worldEndPoint.toArray()}>
+					<mesh position={debugPoints.startRightAnchor.toArray()}>
+						<sphereGeometry args={[0.025]} />
+						<meshBasicMaterial color="lightgreen" />
+					</mesh>
+
+					{/* End anchor points */}
+					<mesh position={debugPoints.endLeftAnchor.toArray()}>
 						<sphereGeometry args={[0.025]} />
 						<meshBasicMaterial color="red" />
 					</mesh>
-					{/* Direction line */}
+					<mesh position={debugPoints.endRightAnchor.toArray()}>
+						<sphereGeometry args={[0.025]} />
+						<meshBasicMaterial color="pink" />
+					</mesh>
+
+					{/* Connection lines */}
 					<line>
 						<bufferGeometry>
 							<bufferAttribute
 								attach="attributes-position"
 								count={2}
-								array={new Float32Array([...worldStartPoint.toArray(), ...worldEndPoint.toArray()])}
+								array={
+									new Float32Array([
+										...debugPoints.startLeftAnchor.toArray(),
+										...debugPoints.endLeftAnchor.toArray()
+									])
+								}
 								itemSize={3}
 							/>
 						</bufferGeometry>
 						<lineBasicMaterial color="blue" />
 					</line>
+					<line>
+						<bufferGeometry>
+							<bufferAttribute
+								attach="attributes-position"
+								count={2}
+								array={
+									new Float32Array([
+										...debugPoints.startRightAnchor.toArray(),
+										...debugPoints.endRightAnchor.toArray()
+									])
+								}
+								itemSize={3}
+							/>
+						</bufferGeometry>
+						<lineBasicMaterial color="red" />
+					</line>
+					<arrowHelper args={[trackPart.getWorldDirection(), trackPart.position, 2, 0xff0000]} />
 				</>
 			)}
 		</>

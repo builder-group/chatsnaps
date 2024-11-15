@@ -41,19 +41,15 @@ const Page = () => {
 					<Environment preset="city" />
 					<Sky />
 					<Physics debug={debug} colliders={false}>
-						<Track length={3} debug={debug} />
+						<Track length={10} debug={debug} />
 						<Sphere position={[0.75, 1, 0]} />
 						{debug && <PhysicsGridFloor />}
 					</Physics>
 
-					{debug && (
-						<>
-							<OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
-							<GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-								<GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
-							</GizmoHelper>
-						</>
-					)}
+					<OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+					<GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+						<GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
+					</GizmoHelper>
 				</React.Suspense>
 			</Canvas>
 		</div>

@@ -37,7 +37,9 @@ export const Track: React.FC<TProps> = (props) => {
 		initializeTracks();
 	}, [length]);
 
-	if (isLoading) return null;
+	if (isLoading) {
+		return null;
+	}
 
 	return (
 		<>
