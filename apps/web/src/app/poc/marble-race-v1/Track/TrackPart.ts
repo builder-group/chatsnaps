@@ -231,22 +231,6 @@ export class TrackPart {
 	public getWorldEndRightAnchor(): THREE.Vector3 {
 		return this._relativeEndRightAnchor.clone().applyEuler(this._rotation).add(this._position);
 	}
-
-	private getStartDirection(): THREE.Vector3 {
-		return new THREE.Vector3()
-			.subVectors(this._relativeStartRightAnchor, this._relativeStartLeftAnchor)
-			.normalize()
-			.cross(this._direction)
-			.normalize();
-	}
-
-	private getEndDirection(): THREE.Vector3 {
-		return new THREE.Vector3()
-			.subVectors(this._relativeEndRightAnchor, this._relativeEndLeftAnchor)
-			.normalize()
-			.cross(this._direction)
-			.normalize();
-	}
 }
 
 export interface TTrackReference {
