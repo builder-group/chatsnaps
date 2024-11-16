@@ -24,5 +24,13 @@ export const TRACK_PIECES: TTrackPieceReference[] = [
 		gridSize: 1,
 		turnAngleRad: Math.PI / 2,
 		slopeAngleRad: 0
+	},
+	{
+		modelPath: '/static/3d/mesh/.local/marble-race_track-part_117.glb',
+		id: '117',
+		variant: TTrackVariant.NORMAL,
+		gridSize: 1,
+		turnAngleRad: -(Math.PI / 2),
+		slopeAngleRad: 0
 	}
 ];
