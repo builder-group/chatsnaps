@@ -4,12 +4,12 @@ import React from 'react';
 import * as THREE from 'three';
 import { radToDeg } from '@blgc/utils';
 
-import { TrackPart } from './TrackPart';
+import { TrackPiece } from './TrackPiece';
 import { TTrackTextureConfig, useTrackTexture } from './useTrackTexture';
 
-export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) => {
+export const TrackPieceComponent: React.FC<TTrackPieceComponentProps> = (props) => {
 	const {
-		trackPart,
+		trackPiece,
 		texture = {
 			colorPath: '/static/3d/texture/wood_albedo_color.jpg',
 			normalPath: '/static/3d/texture/wood_albedo_normal.jpg'
@@ -27,32 +27,32 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 		}
 
 		return {
-			startLeftAnchor: trackPart.getWorldStartLeftAnchor(),
-			startRightAnchor: trackPart.getWorldStartRightAnchor(),
-			endLeftAnchor: trackPart.getWorldEndLeftAnchor(),
-			endRightAnchor: trackPart.getWorldEndRightAnchor()
+			startLeftAnchor: trackPiece.getWorldStartLeftAnchor(),
+			startRightAnchor: trackPiece.getWorldStartRightAnchor(),
+			endLeftAnchor: trackPiece.getWorldEndLeftAnchor(),
+			endRightAnchor: trackPiece.getWorldEndRightAnchor()
 		};
-	}, [trackPart, debug]);
+	}, [trackPiece, debug]);
 
-	if (trackPart.geometry == null) {
+	if (trackPiece.geometry == null) {
 		return null;
 	}
 
-	console.log(trackPart.id, {
-		trackPart,
-		angle: Math.round(radToDeg(trackPart.getXZAngleInRad())),
-		position: trackPart.position.toArray()
+	console.log(`TrackPieceComponent: ${trackPiece.id}`, {
+		trackPiece,
+		angle: Math.round(radToDeg(trackPiece.getXZAngleInRad())),
+		position: trackPiece.position.toArray()
 	});
 
 	return (
 		<>
 			<RigidBody colliders="trimesh" type="fixed">
 				<mesh
-					geometry={trackPart.geometry}
+					geometry={trackPiece.geometry}
 					dispose={null}
-					position={trackPart.position.toArray()}
-					rotation={trackPart.rotation.toArray()}
-					scale={trackPart.scale}
+					position={trackPiece.position.toArray()}
+					rotation={trackPiece.rotation.toArray()}
+					scale={trackPiece.scale}
 					{...meshProps}
 				>
 					<meshPhysicalMaterial
@@ -125,15 +125,15 @@ export const TrackPartComponent: React.FC<TTrackPartComponentProps> = (props) =>
 						</bufferGeometry>
 						<lineBasicMaterial color="red" />
 					</line>
-					<arrowHelper args={[trackPart.getWorldDirection(), trackPart.position, 2, 0xff0000]} />
+					<arrowHelper args={[trackPiece.getWorldDirection(), trackPiece.position, 2, 0xff0000]} />
 				</>
 			)}
 		</>
 	);
 };
 
-export type TTrackPartComponentProps = Omit<MeshProps, 'position' | 'rotation'> & {
-	trackPart: TrackPart;
+export type TTrackPieceComponentProps = Omit<MeshProps, 'position' | 'rotation'> & {
+	trackPiece: TrackPiece;
 	texture?: TTrackTextureConfig;
 	debug?: boolean;
 };

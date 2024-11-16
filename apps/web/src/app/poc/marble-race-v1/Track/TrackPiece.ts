@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { GLTF } from './GLTF';
 
-export class TrackPart {
+export class TrackPiece {
 	private static readonly ALIGNMENT_TOLERANCE = 0.001;
 
 	public readonly id: string;
@@ -48,7 +48,7 @@ export class TrackPart {
 		this._rotation = new THREE.Euler();
 	}
 
-	public static async load(trackReference: TTrackReference, scale = 10): Promise<TrackPart> {
+	public static async load(trackReference: TTrackPieceReference, scale = 10): Promise<TrackPiece> {
 		const { modelPath, id } = trackReference;
 		const gltf = await GLTF.load(modelPath);
 
@@ -70,7 +70,7 @@ export class TrackPart {
 			throw new Error(`Missing required anchor nodes for track ${id}`);
 		}
 
-		return new TrackPart(
+		return new TrackPiece(
 			gltf,
 			id,
 			scale,
@@ -102,7 +102,7 @@ export class TrackPart {
 	 * 1. Calculating the correct rotation to match the previous piece's orientation
 	 * 2. Positioning this piece so its start anchors align with the previous piece's end anchors
 	 */
-	public alignWithPrevious(previousTrack: TrackPart): void {
+	public alignWithPrevious(previousTrack: TrackPiece): void {
 		// Get the end points of the previous track piece
 		const previousEndLeft = previousTrack.getWorldEndLeftAnchor();
 		const previousEndRight = previousTrack.getWorldEndRightAnchor();
@@ -113,7 +113,6 @@ export class TrackPart {
 		previousDirection.normalize();
 
 		// Calculate width vectors (left to right) for both pieces
-		// These are crucial for correct orientation of corner pieces
 		const previousEndWidth = new THREE.Vector3()
 			.subVectors(previousEndLeft, previousEndRight)
 			.setY(0)
@@ -153,7 +152,7 @@ export class TrackPart {
 		this.verifyAlignment(previousTrack);
 	}
 
-	private verifyAlignment(previousTrack: TrackPart): void {
+	private verifyAlignment(previousTrack: TrackPiece): void {
 		const worldStartLeft = this.getWorldStartLeftAnchor();
 		const worldStartRight = this.getWorldStartRightAnchor();
 		const previousEndLeft = previousTrack.getWorldEndLeftAnchor();
@@ -162,25 +161,12 @@ export class TrackPart {
 		const leftDist = worldStartLeft.distanceTo(previousEndLeft);
 		const rightDist = worldStartRight.distanceTo(previousEndRight);
 
-		if (leftDist > TrackPart.ALIGNMENT_TOLERANCE || rightDist > TrackPart.ALIGNMENT_TOLERANCE) {
+		if (leftDist > TrackPiece.ALIGNMENT_TOLERANCE || rightDist > TrackPiece.ALIGNMENT_TOLERANCE) {
 			console.warn(
 				`Track alignment exceeded tolerance: Left=${leftDist}, Right=${rightDist}`,
 				`Track ID: ${this.id}, Previous ID: ${previousTrack.id}`
 			);
 		}
-
-		// TODO: REMOVE
-		console.debug('Track alignment:', {
-			trackId: this.id,
-			previousId: previousTrack.id,
-			rotation: {
-				x: THREE.MathUtils.radToDeg(this._rotation.x),
-				y: THREE.MathUtils.radToDeg(this._rotation.y),
-				z: THREE.MathUtils.radToDeg(this._rotation.z)
-			},
-			position: this._position.toArray(),
-			distances: { left: leftDist, right: rightDist }
-		});
 	}
 
 	public getXZAngleInRad(): number {
@@ -212,7 +198,18 @@ export class TrackPart {
 	}
 }
 
-export interface TTrackReference {
+export enum TTrackVariant {
+	START = 'start',
+	END = 'end',
+	NORMAL = 'normal',
+	SPECIAL = 'special'
+}
+
+export interface TTrackPieceReference {
 	modelPath: string;
 	id: string;
+	variant: TTrackVariant;
+	gridSize: number; // How many grid cells this piece occupies
+	turnAngleRad: number; // Angle in radians (0 for straight, +PI/2 for right turn, -PI/2 for left turn)
+	slopeAngleRad: number; // Angle in radians (0 for flat, positive for upward, negative for downward)
 }

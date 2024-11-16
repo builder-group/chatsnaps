@@ -17,7 +17,10 @@ export default function SpaceFillingCurvePage() {
 	});
 	const data = React.useMemo(() => {
 		const generator = new SpaceFillingCurveGenerator({ cols, rows });
-		return generator.generate(seed);
+
+		const result = generator.generate(seed);
+		console.log({ result });
+		return result;
 	}, [cols, rows, seed]);
 	const { gridWidth, gridHeight } = React.useMemo(() => {
 		return {
