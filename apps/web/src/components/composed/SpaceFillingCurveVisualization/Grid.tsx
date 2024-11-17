@@ -1,7 +1,6 @@
 import { Line } from '@react-three/drei';
 import React from 'react';
-
-import { SpaceFillingCurveGenerator } from '../../space-filling-curve-generator';
+import { SpaceFillingCurveGenerator } from '@/lib';
 
 export const Grid: React.FC<TProps> = (props) => {
 	const { bitmaskValues, cellSize } = props;

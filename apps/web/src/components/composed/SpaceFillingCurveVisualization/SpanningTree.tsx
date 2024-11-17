@@ -1,7 +1,6 @@
 import { Line } from '@react-three/drei';
 import React from 'react';
-
-import { TPoint } from '../../space-filling-curve-generator';
+import { TPoint } from '@/lib';
 
 export const SpanningTree: React.FC<TProps> = (props) => {
 	const { spanningTree, nodes, intersectionPoints, cellSize } = props;

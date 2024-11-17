@@ -1,6 +1,8 @@
-import React from 'react';
+'use client';
 
-import { TGeneratorResult } from '../../space-filling-curve-generator';
+import React from 'react';
+import { TGeneratorResult } from '@/lib';
+
 import { Grid } from './Grid';
 import { SpaceFillingCurve } from './SpaceFillingCurve';
 import { SpanningTree } from './SpanningTree';

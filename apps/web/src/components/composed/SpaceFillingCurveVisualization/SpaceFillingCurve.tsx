@@ -1,7 +1,6 @@
 import { Line } from '@react-three/drei';
 import React from 'react';
-
-import { TPoint } from '../../space-filling-curve-generator';
+import { TPoint } from '@/lib';
 
 export const SpaceFillingCurve: React.FC<Props> = (props) => {
 	const { path, cellSize } = props;
