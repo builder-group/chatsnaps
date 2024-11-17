@@ -1,6 +1,6 @@
 import { Line } from '@react-three/drei';
 import React from 'react';
-import { TPoint } from '@/lib';
+import { TSpaceFillingCurvePoint } from '@/lib';
 
 export const SpaceFillingCurve: React.FC<Props> = (props) => {
 	const { path, cellSize } = props;
@@ -18,6 +18,6 @@ export const SpaceFillingCurve: React.FC<Props> = (props) => {
 };
 
 interface Props {
-	path: TPoint[];
+	path: TSpaceFillingCurvePoint[];
 	cellSize: number;
 }

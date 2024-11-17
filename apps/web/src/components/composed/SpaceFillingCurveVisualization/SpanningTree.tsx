@@ -1,6 +1,6 @@
 import { Line } from '@react-three/drei';
 import React from 'react';
-import { TPoint } from '@/lib';
+import { TSpaceFillingCurvePoint } from '@/lib';
 
 export const SpanningTree: React.FC<TProps> = (props) => {
 	const { spanningTree, nodes, intersectionPoints, cellSize } = props;
@@ -44,8 +44,8 @@ export const SpanningTree: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	spanningTree: [TPoint, TPoint][];
-	nodes: TPoint[];
-	intersectionPoints: TPoint[];
+	spanningTree: [TSpaceFillingCurvePoint, TSpaceFillingCurvePoint][];
+	nodes: TSpaceFillingCurvePoint[];
+	intersectionPoints: TSpaceFillingCurvePoint[];
 	cellSize: number;
 }

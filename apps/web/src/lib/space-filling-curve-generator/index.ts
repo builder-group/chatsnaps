@@ -58,7 +58,7 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Generates all components needed to construct and visualize the space-filling curve.
 	 */
-	public generate(seed?: string): TGeneratorResult {
+	public generate(seed?: string): TSpaceFillingCurveGeneratorResult {
 		let rng: (() => number) | undefined;
 		if (seed != null) {
 			rng = seedrandom(seed);
@@ -82,7 +82,7 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Generates only the final path of the space-filling curve.
 	 */
-	public generatePath(seed?: string): TPoint[] {
+	public generatePath(seed?: string): TSpaceFillingCurvePoint[] {
 		let rng: (() => number) | undefined;
 		if (seed != null) {
 			rng = seedrandom(seed);
@@ -100,9 +100,9 @@ export class SpaceFillingCurveGenerator {
 	 * Creates the initial coarse grid nodes that will be connected by the spanning tree.
 	 * These nodes are placed at the center of each subgrid.
 	 */
-	private generateCoarseGridNodes(): TPoint[] {
+	private generateCoarseGridNodes(): TSpaceFillingCurvePoint[] {
 		const { cols, rows } = this.config;
-		const nodes: TPoint[] = [];
+		const nodes: TSpaceFillingCurvePoint[] = [];
 
 		for (let i = 0; i < cols; i += SpaceFillingCurveGenerator.SUB_GRID_SIZE) {
 			for (let j = 0; j < rows; j += SpaceFillingCurveGenerator.SUB_GRID_SIZE) {
@@ -118,24 +118,26 @@ export class SpaceFillingCurveGenerator {
 	 * Uses a depth-first search approach with randomized neighbor selection.
 	 */
 	private generateSpanningTree(
-		nodes: TPoint[],
+		nodes: TSpaceFillingCurvePoint[],
 		rng: () => number = Math.random
 	): TSpanningTreeEdge[] {
 		const visited = new Set<string>();
 		const spanningTree: TSpanningTreeEdge[] = [];
-		const stack: TPoint[] = [];
+		const stack: TSpaceFillingCurvePoint[] = [];
 
-		const startNode = nodes[Math.floor(rng() * nodes.length)] as TPoint;
+		const startNode = nodes[Math.floor(rng() * nodes.length)] as TSpaceFillingCurvePoint;
 		stack.push(startNode);
 		visited.add(this.pointToString(startNode));
 
 		while (stack.length > 0) {
-			const current = stack.pop() as TPoint;
+			const current = stack.pop() as TSpaceFillingCurvePoint;
 			const unvisitedNeighbors = this.getUnvisitedNeighbors(current, visited);
 
 			if (unvisitedNeighbors.length > 0) {
 				stack.push(current);
-				const next = unvisitedNeighbors[Math.floor(rng() * unvisitedNeighbors.length)] as TPoint;
+				const next = unvisitedNeighbors[
+					Math.floor(rng() * unvisitedNeighbors.length)
+				] as TSpaceFillingCurvePoint;
 				spanningTree.push([current, next]);
 				visited.add(this.pointToString(next));
 				stack.push(next);
@@ -149,9 +151,12 @@ export class SpaceFillingCurveGenerator {
 	 * Finds all unvisited neighboring nodes within the grid bounds.
 	 * Used during spanning tree generation to ensure proper connectivity.
 	 */
-	private getUnvisitedNeighbors(node: TPoint, visited: Set<string>): TPoint[] {
+	private getUnvisitedNeighbors(
+		node: TSpaceFillingCurvePoint,
+		visited: Set<string>
+	): TSpaceFillingCurvePoint[] {
 		const { cols, rows } = this.config;
-		const neighbors: TPoint[] = [];
+		const neighbors: TSpaceFillingCurvePoint[] = [];
 
 		for (const [dx, dy] of SpaceFillingCurveGenerator.DIRECTIONS) {
 			const newX = node.x + dx;
@@ -171,7 +176,7 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Generates points where the spanning tree edges intersect with the fine grid.
 	 */
-	private generateIntersectionPoints(spanningTree: TSpanningTreeEdge[]): TPoint[] {
+	private generateIntersectionPoints(spanningTree: TSpanningTreeEdge[]): TSpaceFillingCurvePoint[] {
 		const intersectionPoints = new Set<string>();
 
 		for (const [start, end] of spanningTree) {
@@ -203,7 +208,10 @@ export class SpaceFillingCurveGenerator {
 	 * Converts the geometric representation (nodes and intersections) into a bitmask grid.
 	 * Each cell's bitmask indicates which of its corners contain path points.
 	 */
-	private calculateBitmaskValues(nodes: TPoint[], intersectionPoints: TPoint[]): number[][] {
+	private calculateBitmaskValues(
+		nodes: TSpaceFillingCurvePoint[],
+		intersectionPoints: TSpaceFillingCurvePoint[]
+	): number[][] {
 		const { cols, rows } = this.config;
 		const bitmaskValues = Array.from({ length: cols }, () => new Array(rows).fill(0));
 		const allPoints = new Set([
@@ -231,9 +239,9 @@ export class SpaceFillingCurveGenerator {
 	 * Follows the path indicated by the bitmasks, moving from cell to cell
 	 * based on the pattern of points in each cell.
 	 */
-	private generatePathFromBitmask(bitmaskValues: number[][]): TPoint[] {
-		const path: TPoint[] = [{ x: 0, y: 0 }];
-		let currentPoint: TPoint = { x: 0, y: 0 };
+	private generatePathFromBitmask(bitmaskValues: number[][]): TSpaceFillingCurvePoint[] {
+		const path: TSpaceFillingCurvePoint[] = [{ x: 0, y: 0 }];
+		let currentPoint: TSpaceFillingCurvePoint = { x: 0, y: 0 };
 
 		while (path.length < this.gridSize) {
 			const value = bitmaskValues[currentPoint.x]?.[currentPoint.y];
@@ -257,7 +265,10 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Calculates the next position based on the current position and direction.
 	 */
-	private getNextPosition(current: TPoint, direction: TDirection): TPoint {
+	private getNextPosition(
+		current: TSpaceFillingCurvePoint,
+		direction: TDirection
+	): TSpaceFillingCurvePoint {
 		switch (direction) {
 			case 'N':
 				return { x: current.x, y: current.y - 1 };
@@ -276,7 +287,7 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Checks if a position is within the grid boundaries.
 	 */
-	private isValidPosition(point: TPoint): boolean {
+	private isValidPosition(point: TSpaceFillingCurvePoint): boolean {
 		const { cols, rows } = this.config;
 		return point.x >= 0 && point.x < cols && point.y >= 0 && point.y < rows;
 	}
@@ -284,19 +295,19 @@ export class SpaceFillingCurveGenerator {
 	/**
 	 * Converts a point object to a string representation for use as Set keys.
 	 */
-	private pointToString(point: TPoint): string {
+	private pointToString(point: TSpaceFillingCurvePoint): string {
 		return `${point.x},${point.y}`;
 	}
 }
 
 type TDirection = 'N' | 'E' | 'S' | 'W' | '';
 
-export interface TPoint {
+export interface TSpaceFillingCurvePoint {
 	x: number;
 	y: number;
 }
 
-export type TSpanningTreeEdge = [TPoint, TPoint];
+export type TSpanningTreeEdge = [TSpaceFillingCurvePoint, TSpaceFillingCurvePoint];
 
 export interface TSpaceFillingCurveGeneratorConfig {
 	cols: number;
@@ -305,15 +316,15 @@ export interface TSpaceFillingCurveGeneratorConfig {
 
 export type TSpaceFillingCurveGeneratorOptions = Partial<TSpaceFillingCurveGeneratorConfig>;
 
-export interface TGeneratorResult {
+export interface TSpaceFillingCurveGeneratorResult {
 	/** Nodes of the coarse grid (centers of subgrids) */
-	nodes: TPoint[];
+	nodes: TSpaceFillingCurvePoint[];
 	/** Edges of the spanning tree connecting coarse grid nodes */
 	spanningTree: TSpanningTreeEdge[];
 	/** Points where the spanning tree intersects with the fine grid */
-	intersectionPoints: TPoint[];
+	intersectionPoints: TSpaceFillingCurvePoint[];
 	/** Bitmask values for each cell in the fine grid */
 	bitmaskValues: number[][];
 	/** Final space-filling curve path coordinates */
-	path: TPoint[];
+	path: TSpaceFillingCurvePoint[];
 }

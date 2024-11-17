@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
-import { TGeneratorResult } from '@/lib';
+import { TSpaceFillingCurveGeneratorResult } from '@/lib';
 
 import { Grid } from './Grid';
 import { SpaceFillingCurve } from './SpaceFillingCurve';
 import { SpanningTree } from './SpanningTree';
 
 export const SpaceFillingCurveVisualization: React.FC<TProps> = (props) => {
-	const { data, gridWidth, gridHeight, cellSize = 1 } = props;
+	const { data, cellSize = 1 } = props;
 
 	return (
-		<group position={[-gridWidth / 2, 0, -gridHeight / 2]}>
+		<group>
 			<Grid bitmaskValues={data.bitmaskValues} cellSize={cellSize} />
 			<SpanningTree
 				spanningTree={data.spanningTree}
@@ -25,8 +25,6 @@ export const SpaceFillingCurveVisualization: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	data: TGeneratorResult;
-	gridWidth: number;
-	gridHeight: number;
+	data: TSpaceFillingCurveGeneratorResult;
 	cellSize?: number;
 }

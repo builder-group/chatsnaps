@@ -41,7 +41,7 @@ const Page = () => {
 					<Environment preset="city" />
 					<Sky />
 					<Physics debug={debug} colliders={false}>
-						<Track length={8} debug={debug} />
+						<Track length={36} debug={debug} mode="spaceFilling" />
 						<Sphere position={[0.75, 1, 0]} />
 						{debug && <PhysicsGridFloor />}
 					</Physics>

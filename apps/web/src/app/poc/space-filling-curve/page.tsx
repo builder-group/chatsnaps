@@ -18,10 +18,19 @@ const Page: React.FC = () => {
 		const generator = new SpaceFillingCurveGenerator({ cols, rows });
 		return generator.generate(seed);
 	}, [cols, rows, seed]);
-	const { gridWidth, gridHeight } = React.useMemo(() => {
+
+	const { gridWidth, gridHeight, cameraDistance } = React.useMemo(() => {
+		const gridWidth = cols * cellSize;
+		const gridHeight = rows * cellSize;
+
+		const largestDimension = Math.max(gridWidth, gridHeight);
+		// Add some padding (1.2 = 20% extra space around the grid)
+		const cameraDistance = largestDimension * 1.2;
+
 		return {
-			gridWidth: cols * cellSize,
-			gridHeight: rows * cellSize
+			gridWidth,
+			gridHeight,
+			cameraDistance
 		};
 	}, [cols, rows, cellSize]);
 
@@ -31,19 +40,18 @@ const Page: React.FC = () => {
 		<div className="h-screen w-full">
 			<Canvas
 				camera={{
-					position: [gridWidth / 2, gridWidth * 0.8, gridHeight / 2],
-					fov: 100
+					position: [gridWidth / 2, cameraDistance, gridHeight / 2],
+					fov: 50
 				}}
 			>
 				<ambientLight intensity={0.8} />
 				<pointLight position={[10, 10, 10]} />
-				<SpaceFillingCurveVisualization
-					data={data}
-					gridWidth={gridWidth}
-					gridHeight={gridHeight}
-					cellSize={cellSize}
+				<SpaceFillingCurveVisualization data={data} cellSize={cellSize} />
+				<OrbitControls
+					target={[gridWidth / 2, 0, gridHeight / 2]}
+					minDistance={2}
+					maxDistance={cameraDistance * 2}
 				/>
-				<OrbitControls target={[0, 0, 0]} minDistance={2} maxDistance={50} />
 			</Canvas>
 		</div>
 	);
