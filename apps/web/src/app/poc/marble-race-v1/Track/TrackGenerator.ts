@@ -53,6 +53,44 @@ export class TrackGenerator {
 		);
 	}
 
+	private calculateTrackBounds(pieces: TrackPiece[]): TTrackBounds {
+		if (!pieces?.length) {
+			return {
+				min: new THREE.Vector3(),
+				max: new THREE.Vector3(),
+				center: new THREE.Vector3(),
+				size: new THREE.Vector3()
+			};
+		}
+
+		const min = new THREE.Vector3(Infinity, Infinity, Infinity);
+		const max = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+		const bbox = new THREE.Box3();
+		const matrix = new THREE.Matrix4();
+
+		for (const piece of pieces) {
+			if (piece?.geometry?.boundingBox == null) {
+				continue;
+			}
+
+			bbox.copy(piece.geometry.boundingBox);
+
+			matrix.makeRotationFromEuler(piece.rotation);
+			matrix.setPosition(piece.position);
+
+			bbox.applyMatrix4(matrix);
+			min.min(bbox.min);
+			max.max(bbox.max);
+		}
+
+		return {
+			min,
+			max,
+			center: new THREE.Vector3().addVectors(min, max).multiplyScalar(0.5),
+			size: new THREE.Vector3().subVectors(max, min)
+		};
+	}
+
 	public async generateRandom(length: number): Promise<TRandomTrackGeneratorResult> {
 		const pieces: TrackPiece[] = [];
 		const firstPiece = await TrackPiece.load(this.getStartPiece());
@@ -66,7 +104,8 @@ export class TrackGenerator {
 			pieces.push(piece);
 		}
 
-		return { pieces };
+		const bounds = this.calculateTrackBounds(pieces);
+		return { pieces, bounds };
 	}
 
 	public async generateSpaceFilling(length: number): Promise<TSpaceFillingTrackGeneratorResult> {
@@ -98,7 +137,8 @@ export class TrackGenerator {
 			pieces.push(piece);
 		}
 
-		return { pieces, curveData };
+		const bounds = this.calculateTrackBounds(pieces);
+		return { pieces, curveData, bounds };
 	}
 
 	private getTrackPieceForDirection(
@@ -127,6 +167,7 @@ export class TrackGenerator {
 
 export interface TTrackGeneratorBaseResult {
 	pieces: TrackPiece[];
+	bounds: TTrackBounds;
 }
 
 export interface TSpaceFillingTrackGeneratorResult extends TTrackGeneratorBaseResult {
@@ -134,3 +175,10 @@ export interface TSpaceFillingTrackGeneratorResult extends TTrackGeneratorBaseRe
 }
 
 export interface TRandomTrackGeneratorResult extends TTrackGeneratorBaseResult {}
+
+export interface TTrackBounds {
+	min: THREE.Vector3;
+	max: THREE.Vector3;
+	center: THREE.Vector3;
+	size: THREE.Vector3;
+}

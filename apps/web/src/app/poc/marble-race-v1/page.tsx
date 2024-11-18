@@ -42,7 +42,7 @@ const Page = () => {
 					<Sky />
 					<Physics debug={debug} colliders={false}>
 						<Track length={36} debug={debug} mode="spaceFilling" />
-						<Sphere position={[0.75, 1, 0]} />
+						<Sphere position={[0.75, 10, 0]} />
 						{debug && <PhysicsGridFloor />}
 					</Physics>
 
@@ -86,7 +86,7 @@ const PhysicsGridFloor: React.FC = () => {
 };
 
 const Sphere = (props: MeshProps) => (
-	<RigidBody colliders="ball" restitution={0.7} type="fixed">
+	<RigidBody colliders="ball" restitution={0.7}>
 		<mesh castShadow receiveShadow {...props}>
 			<sphereGeometry args={[0.1, 16, 16]} />
 			<meshStandardMaterial color="white" />

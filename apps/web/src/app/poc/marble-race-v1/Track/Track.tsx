@@ -3,7 +3,7 @@ import { SpaceFillingCurveVisualization } from '@/components';
 
 import { analyzeTrackPiece } from './analyze-track-piece';
 import { TRACK_PIECES } from './track-pieces';
-import { TrackGenerator, TSpaceFillingTrackGeneratorResult } from './TrackGenerator';
+import { TrackGenerator, TSpaceFillingTrackGeneratorResult, TTrackBounds } from './TrackGenerator';
 import { TrackPiece } from './TrackPiece';
 import { TrackPieceComponent } from './TrackPieceComponent';
 
@@ -14,6 +14,11 @@ export const Track: React.FC<TProps> = (props) => {
 		TSpaceFillingTrackGeneratorResult['curveData'] | null
 	>(null);
 	const [isLoading, setIsLoading] = React.useState(true);
+
+	const [trackBounds, setTrackBounds] = React.useState<TTrackBounds | null>(null);
+	const yOffset = React.useMemo(() => {
+		return trackBounds != null ? -trackBounds.min.y : 0;
+	}, [trackBounds]);
 
 	React.useEffect(() => {
 		const initializeTracks = async () => {
@@ -33,6 +38,7 @@ export const Track: React.FC<TProps> = (props) => {
 				case 'spaceFilling': {
 					const result = await generator.generateSpaceFilling(length);
 					setTrackPieces(result.pieces);
+					setTrackBounds(result.bounds);
 					if (debug) {
 						setCurveData(result.curveData ?? null);
 					}
@@ -41,6 +47,7 @@ export const Track: React.FC<TProps> = (props) => {
 				case 'random': {
 					const result = await generator.generateRandom(length);
 					setTrackPieces(result.pieces);
+					setTrackBounds(result.bounds);
 					break;
 				}
 			}
@@ -56,7 +63,7 @@ export const Track: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<>
+		<group position={[0, yOffset, 0]}>
 			{debug && curveData != null && (
 				<group position={[-1, 1, -1]}>
 					<SpaceFillingCurveVisualization data={curveData} cellSize={2} />
@@ -65,7 +72,7 @@ export const Track: React.FC<TProps> = (props) => {
 			{trackPieces.map((trackPiece, index) => (
 				<TrackPieceComponent key={`track-${index}`} trackPiece={trackPiece} debug={debug} />
 			))}
-		</>
+		</group>
 	);
 };
 
