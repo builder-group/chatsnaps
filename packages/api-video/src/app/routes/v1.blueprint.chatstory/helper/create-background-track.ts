@@ -132,7 +132,10 @@ function createSingleVideoBackground(
 			objectFit: 'cover',
 			src: selectedVideo.src,
 			startFrom: selectedVideo.startFrom,
-			author: selectedVideo.metadata?.author
+			author:
+				selectedVideo.metadata?.author != null && selectedVideo.metadata.author !== 'BennoBuilder'
+					? selectedVideo.metadata.author
+					: undefined
 		}
 	});
 }
