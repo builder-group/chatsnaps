@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import {
 	SpaceFillingCurveGenerator,
 	TSpaceFillingCurveGeneratorResult,
@@ -8,14 +9,14 @@ import { TRACK_PIECES } from './track-pieces';
 import { TrackPiece, TTrackPieceReference, TTrackVariant } from './TrackPiece';
 
 export class TrackGenerator {
-	private readonly trackPieces: TTrackPieceReference[];
+	private readonly _trackPieces: TTrackPieceReference[];
 
 	constructor(trackPieces: TTrackPieceReference[] = TRACK_PIECES) {
-		this.trackPieces = trackPieces;
+		this._trackPieces = trackPieces;
 	}
 
 	private findTrackPieces(criteria: Partial<TTrackPieceReference>): TTrackPieceReference[] {
-		return this.trackPieces.filter((piece) =>
+		return this._trackPieces.filter((piece) =>
 			Object.entries(criteria).every(
 				([key, value]) => piece[key as keyof TTrackPieceReference] === value
 			)
@@ -52,40 +53,6 @@ export class TrackGenerator {
 		);
 	}
 
-	private getTrackPieceForDirection(
-		previous: TSpaceFillingCurvePoint | null,
-		current: TSpaceFillingCurvePoint,
-		next: TSpaceFillingCurvePoint,
-		isFirst: boolean
-	): TTrackPieceReference {
-		if (isFirst) {
-			return this.getStartPiece();
-		}
-
-		if (!previous) {
-			return this.getStraightPiece();
-		}
-
-		// Calculate current and next direction
-		const currentDx = current.x - previous.x;
-		const currentDy = current.y - previous.y;
-		const nextDx = next.x - current.x;
-		const nextDy = next.y - current.y;
-
-		// If direction changes, we need a turn piece
-		if ((currentDx !== 0 && nextDy !== 0) || (currentDy !== 0 && nextDx !== 0)) {
-			// Determine if it's a right or left turn
-			const turnRight =
-				(currentDx < 0 && nextDy > 0) || // West to South
-				(currentDx > 0 && nextDy < 0) || // East to North
-				(currentDy > 0 && nextDx > 0) || // South to East
-				(currentDy < 0 && nextDx < 0); // North to West
-			return this.getTurnPiece(turnRight);
-		}
-
-		return this.getStraightPiece();
-	}
-
 	public async generateRandom(length: number): Promise<TRandomTrackGeneratorResult> {
 		const pieces: TrackPiece[] = [];
 		const firstPiece = await TrackPiece.load(this.getStartPiece());
@@ -108,30 +75,53 @@ export class TrackGenerator {
 		const curveData = generator.generate();
 
 		const pieces: TrackPiece[] = [];
-		const pathLength = Math.min(length, curveData.path.length - 1);
 
-		for (let i = 0; i < pathLength; i++) {
-			const previous = i > 0 ? curveData.path[i - 1] : null;
+		const firstPiece = await TrackPiece.load(this.getStartPiece());
+		firstPiece.rotate(new THREE.Euler(0, Math.PI / 2, 0));
+		pieces.push(firstPiece);
+
+		for (let i = 1; i < curveData.path.length; i++) {
+			const previous = curveData.path[i - 1];
 			const current = curveData.path[i];
 			const next = curveData.path[i + 1];
 
-			if (!current || !next) break;
-
-			const trackRef = this.getTrackPieceForDirection(
-				previous as TSpaceFillingCurvePoint,
-				current,
-				next,
-				i === 0
-			);
-
-			const piece = await TrackPiece.load(trackRef);
-			if (i > 0 && pieces[i - 1]) {
-				piece.alignWithPrevious(pieces[i - 1] as TrackPiece);
+			if (current == null || next == null || previous == null) {
+				break;
 			}
+
+			const piece = await TrackPiece.load(
+				previous == null
+					? this.getStartPiece()
+					: this.getTrackPieceForDirection(previous, current, next)
+			);
+			piece.alignWithPrevious(pieces[i - 1] as TrackPiece);
 			pieces.push(piece);
 		}
 
 		return { pieces, curveData };
+	}
+
+	private getTrackPieceForDirection(
+		previous: TSpaceFillingCurvePoint,
+		current: TSpaceFillingCurvePoint,
+		next: TSpaceFillingCurvePoint
+	): TTrackPieceReference {
+		const currentDx = current.x - previous.x;
+		const currentDy = current.y - previous.y;
+		const nextDx = next.x - current.x;
+		const nextDy = next.y - current.y;
+
+		// If direction changes, we need a turn piece
+		if ((currentDx !== 0 && nextDy !== 0) || (currentDy !== 0 && nextDx !== 0)) {
+			const turnRight =
+				(currentDx < 0 && nextDy < 0) || // West to North
+				(currentDx > 0 && nextDy > 0) || // East to South
+				(currentDy > 0 && nextDx < 0) || // South to West
+				(currentDy < 0 && nextDx > 0); // North to East
+			return this.getTurnPiece(turnRight);
+		}
+
+		return this.getStraightPiece();
 	}
 }
 

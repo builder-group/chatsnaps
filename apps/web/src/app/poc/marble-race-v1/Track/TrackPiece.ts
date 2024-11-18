@@ -93,6 +93,12 @@ export class TrackPiece {
 		return this._gltf.getNodeAs<THREE.Mesh>(`Plane${this.id}`)?.geometry ?? null;
 	}
 
+	public rotate(rotation: THREE.Euler): void {
+		this._rotation.x += rotation.x;
+		this._rotation.y += rotation.y;
+		this._rotation.z += rotation.z;
+	}
+
 	public getWorldDirection(): THREE.Vector3 {
 		return this._direction.clone().applyEuler(this._rotation);
 	}

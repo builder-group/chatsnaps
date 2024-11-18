@@ -57,7 +57,7 @@ export const Track: React.FC<TProps> = (props) => {
 
 	return (
 		<>
-			{curveData != null && (
+			{debug && curveData != null && (
 				<group position={[-1, 1, -1]}>
 					<SpaceFillingCurveVisualization data={curveData} cellSize={2} />
 				</group>
