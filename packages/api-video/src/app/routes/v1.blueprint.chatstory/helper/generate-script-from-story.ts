@@ -22,7 +22,7 @@ export async function generateScriptFromStory(
 	} = config;
 
 	const promptResult = mapErr(
-		await getResource('prompts/chat-story_v4-2-3.txt'),
+		await getResource('prompts/chat-story_v4-2-4.txt'),
 		(err) => new AppError(`#ERR_READ_PROMPT`, 500, { description: err.message, throwable: err })
 	);
 	if (promptResult.isErr()) {
@@ -51,7 +51,7 @@ export async function generateScriptFromStory(
 					]
 				}
 			],
-			temperature: 0.0 // So that it strictly follows the prompt and doesn't get too creative and comes up with secret agents, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
+			temperature: 0.3 // Not above 0.5 so that it follows prompt and doesn't get too creative and comes up with secret agents, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
 		});
 	} catch (err) {
 		if (err instanceof Anthropic.APIError) {
