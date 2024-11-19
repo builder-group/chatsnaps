@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AppError } from '@blgc/openapi-router';
 import { Err, extractErrorData, mapErr, Ok, type TResult } from '@blgc/utils';
-import { anthropicClient } from '@/environment';
+import { anthropicClient, logger } from '@/environment';
 import { calculateAnthropicPrice, getResource } from '@/lib';
 
 import { isChatStoryScriptDto, type TAnthropicUsage, type TChatStoryScriptDto } from '../schema';
@@ -10,8 +10,8 @@ export async function generateScriptFromStory(
 	config: TGenerateScriptFromStoryConfig
 ): Promise<TResult<TGenerateScriptFromStoryResponse, AppError>> {
 	const {
-		originalStory,
-		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
+		storyConcept,
+		storyDirection = '',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
 		targetLength = '40-60 seconds conversation with approximately 40-60 messages (3-4k tokens)',
 		availableVoices = `- "Elli": American Emotional Young Female Narration
@@ -29,7 +29,7 @@ export async function generateScriptFromStory(
 		return Err(promptResult.error);
 	}
 	const prompt = promptResult.value
-		.replace('{{ORIGINAL_STORY}}', originalStory)
+		.replace('{{STORY_CONCEPT}}', storyConcept)
 		.replace('{{STORY_DIRECTION}}', storyDirection)
 		.replace('{{TARGET_AUDIENCE}}', targetAudience)
 		.replace('{{TARGET_LENGTH}}', targetLength)
@@ -86,6 +86,8 @@ function parseContentBlockToScript(
 		return Err(new AppError('#ERR_ANTHROPIC', 500, { description: 'Invalid content response' }));
 	}
 
+	logger.info('To parse script', { rawText: content.text });
+
 	let parsedContent: unknown;
 	try {
 		let contentString: string;
@@ -120,7 +122,7 @@ function extractContentFromTags(text: string, tagName: string): string | null {
 }
 
 interface TGenerateScriptFromStoryConfig {
-	originalStory: string;
+	storyConcept: string;
 	storyDirection?: string;
 	targetAudience?: string;
 	targetLength?: string;

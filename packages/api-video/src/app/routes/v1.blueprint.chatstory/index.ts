@@ -39,18 +39,18 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 
 router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	const {
-		originalStory: bodyOrginalStory,
+		storyConcept: bodyStoryConcept,
 		storyDirection,
 		targetAudience,
 		targetLength,
 		availableVoices
 	} = c.req.valid('json');
 
-	const originalStory = (await resolveStory(bodyOrginalStory)).unwrap();
-	logger.info('Resolved orginalStory', { originalStory });
+	const storyConcept = (await resolveStory(bodyStoryConcept)).unwrap();
+	logger.info('Resolved story concept', { storyConcept });
 	const { script, usage } = (
 		await generateScriptFromStory({
-			originalStory,
+			storyConcept,
 			storyDirection,
 			targetAudience,
 			targetLength,
