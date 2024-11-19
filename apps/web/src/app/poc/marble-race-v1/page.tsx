@@ -42,8 +42,8 @@ const Page = () => {
 					<Sky />
 					<Physics debug={debug} colliders={false}>
 						<Track length={36} debug={debug} mode="spaceFilling" />
-						<Sphere position={[0.75, 10, 0]} />
-						{debug && <PhysicsGridFloor />}
+						<Sphere position={[0.25, 12, 0]} />
+						<PhysicsGridFloor debug={debug} />
 					</Physics>
 
 					<OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
@@ -59,26 +59,30 @@ const Page = () => {
 export default Page;
 
 // https://codesandbox.io/p/sandbox/19uq2u?file=%2Fsrc%2FApp.js%3A1%2C1-64%2C1
-const PhysicsGridFloor: React.FC = () => {
+const PhysicsGridFloor: React.FC<{ debug: boolean }> = (props) => {
+	const { debug } = props;
+
 	return (
 		<group>
 			{/* Visual infinite grid */}
-			<Grid
-				position={[0, 0, 0]}
-				args={[100, 100]}
-				infiniteGrid
-				cellSize={0.5}
-				sectionSize={1}
-				sectionColor={'#9d4b4b'}
-				cellColor={'#6f6f6f'}
-				fadeFrom={0}
-			/>
+			{debug && (
+				<Grid
+					position={[0, 0, 0]}
+					args={[100, 100]}
+					infiniteGrid
+					cellSize={0.5}
+					sectionSize={1}
+					sectionColor={'#9d4b4b'}
+					cellColor={'#6f6f6f'}
+					fadeFrom={0}
+				/>
+			)}
 
 			{/* Physical floor */}
 			<RigidBody type="fixed" colliders="cuboid">
-				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]}>
 					<planeGeometry args={[100, 100]} />
-					<meshBasicMaterial color="white" visible={false} />
+					<meshBasicMaterial color="white" visible={true} />
 				</mesh>
 			</RigidBody>
 		</group>
@@ -86,9 +90,9 @@ const PhysicsGridFloor: React.FC = () => {
 };
 
 const Sphere = (props: MeshProps) => (
-	<RigidBody colliders="ball" restitution={0.7}>
+	<RigidBody colliders="ball" mass={1}>
 		<mesh castShadow receiveShadow {...props}>
-			<sphereGeometry args={[0.1, 16, 16]} />
+			<sphereGeometry args={[0.075, 16, 16]} />
 			<meshStandardMaterial color="white" />
 		</mesh>
 	</RigidBody>

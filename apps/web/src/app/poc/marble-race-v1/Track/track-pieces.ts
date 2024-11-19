@@ -17,20 +17,36 @@ export const TRACK_PIECES: TTrackPieceReference[] = [
 		turnAngleRad: 0,
 		slopeAngleRad: -0.1244
 	},
+	// {
+	// 	modelPath: '/static/3d/mesh/.local/marble-race_track-part_087.glb',
+	// 	id: '087',
+	// 	variant: TTrackVariant.NORMAL,
+	// 	gridSize: 1,
+	// 	turnAngleRad: Math.PI / 2,
+	// 	slopeAngleRad: 0
+	// },
+	// {
+	// 	modelPath: '/static/3d/mesh/.local/marble-race_track-part_117.glb',
+	// 	id: '117',
+	// 	variant: TTrackVariant.NORMAL,
+	// 	gridSize: 1,
+	// 	turnAngleRad: -(Math.PI / 2),
+	// 	slopeAngleRad: 0
+	// },
 	{
-		modelPath: '/static/3d/mesh/.local/marble-race_track-part_087.glb',
-		id: '087',
-		variant: TTrackVariant.NORMAL,
-		gridSize: 1,
-		turnAngleRad: Math.PI / 2,
-		slopeAngleRad: 0
-	},
-	{
-		modelPath: '/static/3d/mesh/.local/marble-race_track-part_117.glb',
-		id: '117',
+		modelPath: '/static/3d/mesh/.local/marble-race_track-part_140.glb',
+		id: '140',
 		variant: TTrackVariant.NORMAL,
 		gridSize: 1,
 		turnAngleRad: -(Math.PI / 2),
-		slopeAngleRad: 0
+		slopeAngleRad: -0.175
+	},
+	{
+		modelPath: '/static/3d/mesh/.local/marble-race_track-part_141.glb',
+		id: '141',
+		variant: TTrackVariant.NORMAL,
+		gridSize: 1,
+		turnAngleRad: Math.PI / 2,
+		slopeAngleRad: -0.175
 	}
 ];

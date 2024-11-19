@@ -46,7 +46,7 @@ export const TrackPieceComponent: React.FC<TTrackPieceComponentProps> = (props) 
 
 	return (
 		<>
-			<RigidBody colliders="trimesh" type="fixed">
+			<RigidBody colliders="trimesh" type="fixed" restitution={2.1}>
 				<mesh
 					geometry={trackPiece.geometry}
 					dispose={null}
