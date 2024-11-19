@@ -22,7 +22,7 @@ export async function generateScriptFromStory(
 	} = config;
 
 	const promptResult = mapErr(
-		await getResource('prompts/chat-story_v4-0-3.txt'),
+		await getResource('prompts/chat-story_v4-1-0.txt'),
 		(err) => new AppError(`#ERR_READ_PROMPT`, 500, { description: err.message, throwable: err })
 	);
 	if (promptResult.isErr()) {
@@ -79,7 +79,8 @@ export async function generateScriptFromStory(
 }
 
 function parseContentBlockToScript(
-	content?: Anthropic.Messages.ContentBlock
+	content?: Anthropic.Messages.ContentBlock,
+	contentTagName?: string
 ): TResult<TChatStoryScriptDto, AppError> {
 	if (content == null || content.type !== 'text') {
 		return Err(new AppError('#ERR_ANTHROPIC', 500, { description: 'Invalid content response' }));
@@ -87,7 +88,13 @@ function parseContentBlockToScript(
 
 	let parsedContent: unknown;
 	try {
-		parsedContent = JSON.parse(content.text);
+		let contentString: string;
+		if (contentTagName != null) {
+			contentString = extractContentFromTags(content.text, contentTagName) ?? '';
+		} else {
+			contentString = content.text;
+		}
+		parsedContent = JSON.parse(contentString);
 	} catch (e) {
 		const { error, message } = extractErrorData(e);
 		return Err(
@@ -104,6 +111,12 @@ function parseContentBlockToScript(
 	}
 
 	return Ok(parsedContent);
+}
+
+function extractContentFromTags(text: string, tagName: string): string | null {
+	const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`);
+	const match = regex.exec(text);
+	return match != null ? (match[1]?.trim() ?? null) : null;
 }
 
 interface TGenerateScriptFromStoryConfig {
