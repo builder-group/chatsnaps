@@ -22,7 +22,7 @@ export async function generateScriptFromStory(
 	} = config;
 
 	const promptResult = mapErr(
-		await getResource('prompts/chat-story_v4-1-0.txt'),
+		await getResource('prompts/chat-story_v4-2-3.txt'),
 		(err) => new AppError(`#ERR_READ_PROMPT`, 500, { description: err.message, throwable: err })
 	);
 	if (promptResult.isErr()) {
@@ -60,7 +60,7 @@ export async function generateScriptFromStory(
 		return Err(new AppError('#ERR_ANTHROPIC', 500));
 	}
 
-	const parsedScriptResult = parseContentBlockToScript(anthropicResponse.content[0]);
+	const parsedScriptResult = parseContentBlockToScript(anthropicResponse.content[0], 'final_story');
 	if (parsedScriptResult.isErr()) {
 		return Err(parsedScriptResult.error);
 	}

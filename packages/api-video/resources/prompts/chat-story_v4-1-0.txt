@@ -17,7 +17,7 @@ Here is the information you'll be working with:
 Follow these guidelines to create a viral texting story:
 
 1. Hook-Progression-Climax (HPC) Structure:
-   - Hook: Start with an attention-grabbing opening message that introduces conflict or intrigue immediately.
+   - Hook: Start with an extremely attention-grabbing opening message that introduces conflict or intrigue immediately.
    - Progression: Deliver on promises with escalating intrigue and tension.
    - Climax: Conclude with a satisfying resolution that leaves viewers feeling rewarded.
 
@@ -37,14 +37,14 @@ Follow these guidelines to create a viral texting story:
    - Conclude with a call-to-action or question to promote engagement.
    - Ensure the story naturally encourages duets, stitches, or reaction videos.
 
-Now, follow these steps to develop your viral texting story:
+To develop your viral texting story, complete the following creative process inside <viral_story_development> tags:
 
 1. Brainstorm viral elements:
    - List 5 potential hook ideas and rate their viral potential on a scale of 1-10
    - For each hook idea, explain in 1-2 sentences why it has viral potential
    - Plan 3-5 major plot twists and their placement in the story
    - Develop 2-3 unique traits for each main character
-   - Consider how each element appeals to the target audience
+   - For each element, explicitly state how it appeals to the target audience
 
 2. Outline the story structure:
    - Select the top hook idea and expand it into a full opening message
@@ -52,6 +52,7 @@ Now, follow these steps to develop your viral texting story:
    - For each plot twist, explain how it contributes to the overall story arc and maintains viewer engagement
    - Design an unexpected resolution
    - Evaluate how each element aligns with the target audience's preferences
+   - Rate the viral potential of each major plot point on a scale of 1-10, explaining your reasoning
 
 3. Draft the viral texting story:
    - Write a draft of the story, focusing on short, impactful messages
@@ -63,7 +64,7 @@ Now, follow these steps to develop your viral texting story:
 
 4. Review and refine:
    - Check against this Viral Potential Checklist:
-     - Is the hook immediate and engaging?
+     - Is the hook immediate and extremely engaging?
      - Are the stakes high and emotions exaggerated?
      - Are there major plot twists every 10-15 messages?
      - Is the pacing fast with no unnecessary filler?
@@ -74,8 +75,9 @@ Now, follow these steps to develop your viral texting story:
      - Does the adaptation effectively incorporate the specified story direction?
      - Does the story have broad appeal while still targeting the specified audience?
    - Make any necessary adjustments based on the checklist
+   - Explain the reasoning behind each adjustment
 
-After completing your analysis, output your viral texting story using the following JSON format:
+After completing your creative process, output your viral texting story using the following JSON format:
 
 {
   "title": "Catchy, Intriguing Title That Hooks Instantly",
@@ -103,4 +105,4 @@ After completing your analysis, output your viral texting story using the follow
   ]
 }
 
-Ensure your story meets the specified Target Length and incorporates all the elements discussed above to maximize its viral potential. Remember to start with an immediate, attention-grabbing hook and strictly adhere to the provided guidelines throughout the story development process. Only output the JSON structure with your completed story.
+Ensure your story meets the specified Target Length and incorporates all the elements discussed above to maximize its viral potential. Remember to start with an immediate, attention-grabbing hook and strictly adhere to the provided guidelines throughout the story development process. The success of your story depends on its ability to hook viewers instantly and keep them engaged throughout. Only output the JSON structure with your completed story after your creative process is complete.
