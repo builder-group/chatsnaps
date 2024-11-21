@@ -19,7 +19,7 @@ export class TrackPiece {
 	private readonly _relativeEndLeftAnchor: THREE.Vector3;
 	private readonly _relativeEndRightAnchor: THREE.Vector3;
 
-	private constructor(
+	protected constructor(
 		gltf: GLTF,
 		id: string,
 		scale: number,
@@ -48,36 +48,56 @@ export class TrackPiece {
 		this._rotation = new THREE.Euler();
 	}
 
-	public static async load(trackReference: TTrackPieceReference, scale = 10): Promise<TrackPiece> {
+	protected static async loadBase(trackReference: TTrackPieceReference): Promise<{
+		gltf: GLTF;
+		anchors: {
+			startLeft: THREE.Vector3;
+			startRight: THREE.Vector3;
+			endLeft: THREE.Vector3;
+			endRight: THREE.Vector3;
+		};
+	}> {
 		const { modelPath, id } = trackReference;
 		const gltf = await GLTF.load(modelPath);
 
 		const planeMesh = gltf.getNodeAs<THREE.Mesh>(`Plane${id}`);
-		if (planeMesh == null) {
-			throw new Error(`Could not find mesh Plane${id} in model ${modelPath}`);
-		}
-
 		const startLeftAnchorNode = gltf.getNode(`StartLeftAnchor${id}`);
 		const startRightAnchorNode = gltf.getNode(`StartRightAnchor${id}`);
 		const endLeftAnchorNode = gltf.getNode(`EndLeftAnchor${id}`);
 		const endRightAnchorNode = gltf.getNode(`EndRightAnchor${id}`);
+
 		if (
+			planeMesh == null ||
 			startLeftAnchorNode == null ||
 			startRightAnchorNode == null ||
 			endLeftAnchorNode == null ||
 			endRightAnchorNode == null
 		) {
-			throw new Error(`Missing required anchor nodes for track ${id}`);
+			throw new Error(`Missing required nodes for track ${id}`);
 		}
+
+		return {
+			gltf,
+			anchors: {
+				startLeft: startLeftAnchorNode.position.clone(),
+				startRight: startRightAnchorNode.position.clone(),
+				endLeft: endLeftAnchorNode.position.clone(),
+				endRight: endRightAnchorNode.position.clone()
+			}
+		};
+	}
+
+	public static async load(trackReference: TTrackPieceReference, scale = 10): Promise<TrackPiece> {
+		const { gltf, anchors } = await this.loadBase(trackReference);
 
 		return new TrackPiece(
 			gltf,
-			id,
+			trackReference.id,
 			scale,
-			startLeftAnchorNode.position.clone(),
-			startRightAnchorNode.position.clone(),
-			endLeftAnchorNode.position.clone(),
-			endRightAnchorNode.position.clone()
+			anchors.startLeft,
+			anchors.startRight,
+			anchors.endLeft,
+			anchors.endRight
 		);
 	}
 
