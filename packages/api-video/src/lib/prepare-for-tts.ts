@@ -34,6 +34,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\byh\\b': 'yeah',
 	'\\bbf\\b': 'boyfriend',
 	'\\bgf\\b': 'girlfriend',
+	'\\bpls\\b': 'please',
 
 	// Exclamations and emotions
 	'\\bsry\\b': 'sorry!',
