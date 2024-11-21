@@ -1,3 +1,4 @@
+import { Gif } from '@remotion/gif';
 import { Audio, Img, OffthreadVideo } from 'remotion';
 import { getStaticSrc } from '@/lib';
 
@@ -8,18 +9,33 @@ export const Media: React.FC<TProps> = (props) => {
 
 	switch (media.type) {
 		case 'Image':
-			return (
-				<Img
-					src={getStaticSrc(media.src)}
-					style={{
-						objectFit: media.objectFit,
-						width: media.width,
-						height: media.height,
-						...style
-					}}
-					{...elementProps}
-				/>
-			);
+			if (media.src.endsWith('.gif')) {
+				return (
+					<Gif
+						src={getStaticSrc(media.src)}
+						style={{
+							objectFit: media.objectFit,
+							width: media.width,
+							height: media.height,
+							...style
+						}}
+						{...elementProps}
+					/>
+				);
+			} else {
+				return (
+					<Img
+						src={getStaticSrc(media.src)}
+						style={{
+							objectFit: media.objectFit,
+							width: media.width,
+							height: media.height,
+							...style
+						}}
+						{...elementProps}
+					/>
+				);
+			}
 		case 'Video':
 			return (
 				<OffthreadVideo

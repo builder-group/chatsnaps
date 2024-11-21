@@ -38,6 +38,7 @@
 		"@react-three/drei": "^9.115.0",
 		"@react-three/fiber": "^8.17.10",
 		"@react-three/rapier": "^1.5.0",
+		"@remotion/gif": "4.0.227",
 		"@remotion/three": "4.0.227",
 		"@remotion/zod-types": "4.0.227",
 		"clsx": "^2.1.1",
