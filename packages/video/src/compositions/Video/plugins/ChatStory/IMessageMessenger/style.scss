@@ -66,6 +66,7 @@ $scale-factor: calc($canvas-width / $base-width);
 	background: var(--sentColor);
 
 	&:before {
+		z-index: -1;
 		right: scale(-7px);
 		background-color: var(--sentColor);
 		border-bottom-left-radius: scale(16px) scale(14px);
@@ -83,6 +84,7 @@ $scale-factor: calc($canvas-width / $base-width);
 	background: var(--receiveColor);
 
 	&:before {
+		z-index: -1;
 		left: scale(-7px);
 		background-color: var(--receiveColor);
 		border-bottom-right-radius: scale(16px) scale(14px);

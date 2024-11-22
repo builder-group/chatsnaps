@@ -472,8 +472,11 @@
 					"props": {
 						"type": "Message",
 						"content": {
-							"type": "Text",
-							"text": "What are you doing to his truck??"
+							"type": "Media",
+							"media": {
+								"type": "Image",
+								"src": "https://149881442.v2.pressablecdn.com/wp-content/uploads/2023/06/Picture1.jpg"
+							}
 						},
 						"participant": {
 							"displayName": "Bestie 👀"

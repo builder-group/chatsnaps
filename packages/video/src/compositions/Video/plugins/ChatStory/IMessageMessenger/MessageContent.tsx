@@ -9,11 +9,7 @@ export const MessageContent: React.FC<TProps> = (props) => {
 
 	return (
 		<div
-			className={cn(
-				'shared',
-				messageType === 'sent' ? 'sent' : 'received',
-				(noTail || content.type === 'Media') && 'noTail'
-			)}
+			className={cn('shared', messageType === 'sent' ? 'sent' : 'received', noTail && 'noTail')}
 			style={style}
 		>
 			{content.type === 'Text' && <div className="message-content-text">{content.text}</div>}
