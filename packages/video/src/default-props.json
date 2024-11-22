@@ -77,5 +77,1233 @@
 				"t3": { "type": "Track", "actionIds": ["a4"] }
 			}
 		}
+	},
+	"video2": {
+		"name": "Before He Cheats 🔪",
+		"timeline": {
+			"trackIds": [
+				"track_MzgyMjM3OTU0MjY5NjI2NTc2",
+				"track_MzgyMjM3OTU0MjY1NDMyMjY1",
+				"track_MzgyMjM3OTU0MjY1NDMyMjY2",
+				"track_MzgyMjM3OTU0MjY1NDMyMjY3",
+				"track_MzgyMjM3OTU0MjY5NjI2NTc0"
+			],
+			"trackMap": {
+				"track_MzgyMjM3OTU0MjY1NDMyMjY1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"messenger": {
+							"type": "IMessage",
+							"contact": {
+								"profilePicture": {
+									"type": "Image",
+									"src": "static/image/ios_contact-image.webp"
+								},
+								"name": "Bestie 👀"
+							}
+						}
+					},
+					"width": 1080,
+					"height": 800,
+					"x": 0,
+					"y": 256,
+					"actionIds": [
+						"action_MzgyMjM3NzY2NDc4MDUzNDgz",
+						"action_MzgyMjM3NzcxNDM5OTE1MTE4",
+						"action_MzgyMjM3Nzc3NTgwMzc2MTc3",
+						"action_MzgyMjM3NzgyMTEwMjI0NTAw",
+						"action_MzgyMjM3Nzg4MDE1ODA0NTM1",
+						"action_MzgyMjM3Nzk3MzQ4MTMwOTM4",
+						"action_MzgyMjM3ODA2NDEyMDIxODg1",
+						"action_MzgyMjM3ODEyMzMwMTg0ODMy",
+						"action_MzgyMjM3ODE3OTI1Mzg2Mzcx",
+						"action_MzgyMjM3ODIzNjEyODYyNTk4",
+						"action_MzgyMjM3ODI5MTcwMzE1NDAx",
+						"action_MzgyMjM3ODM2MjMzNTIzMzQw",
+						"action_MzgyMjM3ODQyMDM0MjQ1Nzc1",
+						"action_MzgyMjM3ODQ4MjIwODQ0MTc4",
+						"action_MzgyMjM3ODUzNzk1MDc0MTk3",
+						"action_MzgyMjM3ODU5MjkzODA2NzQ0",
+						"action_MzgyMjM3ODY1MzYyOTY0NjM1",
+						"action_MzgyMjM3ODcwNDEyOTA2NjU0",
+						"action_MzgyMjM3ODc1NzUyMjU1NjQ5",
+						"action_MzgyMjM3ODgxMjg4NzM2OTMy",
+						"action_MzgyMjM3ODg2Nzk1ODU4MDg3",
+						"action_MzgyMjM3ODkyMjMxNjc2MDc0",
+						"action_MzgyMjM3ODk4MzAwODMzOTY1",
+						"action_MzgyMjM3OTA0NzUxNjczNTIw",
+						"action_MzgyMjM3OTExOTExMzUwNDUx",
+						"action_MzgyMjM3OTE3Mjk2ODM2Nzkw",
+						"action_MzgyMjM3OTIzOTM2NDIwMDI1",
+						"action_MzgyMjM3OTI5ODUwMzg4NjY4",
+						"action_MzgyMjM3OTM1NjYzNjk0MDE1",
+						"action_MzgyMjM3OTQwODMxMDc2NTQ2",
+						"action_MzgyMjM3OTQ2ODEyMTU0MDUz",
+						"action_MzgyMjM3OTU0MjY1NDMyMjY0"
+					]
+				},
+				"track_MzgyMjM3OTU0MjY1NDMyMjY2": {
+					"type": "Track",
+					"actionIds": [
+						"action_MzgyMjM3NzY2NDc4MDUzNDgy",
+						"action_MzgyMjM3NzcxNDM5OTE1MTE3",
+						"action_MzgyMjM3Nzc3NTc2MTgxODcy",
+						"action_MzgyMjM3NzgyMTEwMjI0NDk5",
+						"action_MzgyMjM3Nzg4MDE1ODA0NTM0",
+						"action_MzgyMjM3Nzk3MzQ4MTMwOTM3",
+						"action_MzgyMjM3ODA2NDEyMDIxODg0",
+						"action_MzgyMjM3ODEyMzMwMTg0ODMx",
+						"action_MzgyMjM3ODE3OTI1Mzg2Mzcw",
+						"action_MzgyMjM3ODIzNjEyODYyNTk3",
+						"action_MzgyMjM3ODI5MTcwMzE1NDAw",
+						"action_MzgyMjM3ODM2MjMzNTIzMzM5",
+						"action_MzgyMjM3ODQyMDM0MjQ1Nzc0",
+						"action_MzgyMjM3ODQ4MjIwODQ0MTc3",
+						"action_MzgyMjM3ODUzNzk1MDc0MTk2",
+						"action_MzgyMjM3ODU5MjkzODA2NzQz",
+						"action_MzgyMjM3ODY1MzYyOTY0NjM0",
+						"action_MzgyMjM3ODcwNDEyOTA2NjUz",
+						"action_MzgyMjM3ODc1NzUyMjU1NjQ4",
+						"action_MzgyMjM3ODgxMjg4NzM2OTMx",
+						"action_MzgyMjM3ODg2Nzk1ODU4MDg2",
+						"action_MzgyMjM3ODkyMjMxNjc2MDcz",
+						"action_MzgyMjM3ODk4MzAwODMzOTY0",
+						"action_MzgyMjM3OTA0NzUxNjczNTE5",
+						"action_MzgyMjM3OTExOTExMzUwNDUw",
+						"action_MzgyMjM3OTE3MjkyNjQyNDg1",
+						"action_MzgyMjM3OTIzOTM2NDIwMDI0",
+						"action_MzgyMjM3OTI5ODUwMzg4NjY3",
+						"action_MzgyMjM3OTM1NjYzNjk0MDE0",
+						"action_MzgyMjM3OTQwODMxMDc2NTQ1",
+						"action_MzgyMjM3OTQ2ODEyMTU0MDUy",
+						"action_MzgyMjM3OTU0MjY1NDMyMjYz"
+					]
+				},
+				"track_MzgyMjM3OTU0MjY1NDMyMjY3": {
+					"type": "Track",
+					"actionIds": [
+						"action_MzgyMjM3NzYxMDY3NDAxMzIx",
+						"action_MzgyMjM3NzY2NDc4MDUzNDg0",
+						"action_MzgyMjM3NzcxNDM5OTE1MTE5",
+						"action_MzgyMjM3Nzc3NTgwMzc2MTc4",
+						"action_MzgyMjM3NzgyMTEwMjI0NTAx",
+						"action_MzgyMjM3Nzg4MDE1ODA0NTM2",
+						"action_MzgyMjM3Nzk3MzQ4MTMwOTM5",
+						"action_MzgyMjM3ODA2NDEyMDIxODg2",
+						"action_MzgyMjM3ODEyMzMwMTg0ODMz",
+						"action_MzgyMjM3ODE3OTI1Mzg2Mzcy",
+						"action_MzgyMjM3ODIzNjEyODYyNTk5",
+						"action_MzgyMjM3ODI5MTcwMzE1NDAy",
+						"action_MzgyMjM3ODM2MjMzNTIzMzQx",
+						"action_MzgyMjM3ODQyMDM0MjQ1Nzc2",
+						"action_MzgyMjM3ODQ4MjIwODQ0MTc5",
+						"action_MzgyMjM3ODUzNzk1MDc0MTk4",
+						"action_MzgyMjM3ODU5MjkzODA2NzQ1",
+						"action_MzgyMjM3ODY1MzYyOTY0NjM2",
+						"action_MzgyMjM3ODcwNDEyOTA2NjU1",
+						"action_MzgyMjM3ODc1NzUyMjU1NjUw",
+						"action_MzgyMjM3ODgxMjg4NzM2OTMz",
+						"action_MzgyMjM3ODg2Nzk1ODU4MDg4",
+						"action_MzgyMjM3ODkyMjMxNjc2MDc1",
+						"action_MzgyMjM3ODk4MzAwODMzOTY2",
+						"action_MzgyMjM3OTA0NzUxNjczNTIx",
+						"action_MzgyMjM3OTExOTExMzUwNDUy",
+						"action_MzgyMjM3OTE3Mjk2ODM2Nzkx",
+						"action_MzgyMjM3OTIzOTM2NDIwMDI2",
+						"action_MzgyMjM3OTI5ODUwMzg4NjY5",
+						"action_MzgyMjM3OTM1NjYzNjk0MDE2",
+						"action_MzgyMjM3OTQwODMxMDc2NTQ3",
+						"action_MzgyMjM3OTQ2ODEyMTU0MDU0"
+					]
+				},
+				"track_MzgyMjM3OTU0MjY5NjI2NTc0": {
+					"type": "Track",
+					"actionIds": ["action_MzgyMjM3OTU0MjY1NDMyMjY4", "action_MzgyMjM3OTU0MjY5NjI2NTcz"]
+				},
+				"track_MzgyMjM3OTU0MjY5NjI2NTc2": {
+					"type": "Track",
+					"actionIds": ["action_MzgyMjM3OTU0MjY5NjI2NTc1"]
+				}
+			},
+			"actionMap": {
+				"action_MzgyMjM3NzYxMDY3NDAxMzIx": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 0,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3NzY2NDc4MDUzNDgy": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/d07b4eeba8db9b0e8e1b01c9da993bc6e97539635ce8742ee4340c3e0e709667.mp3",
+					"volume": 1,
+					"startFrame": 0,
+					"durationInFrames": 48,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3NzY2NDc4MDUzNDgz": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Carving my name into leather seats rn"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 0,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3NzY2NDc4MDUzNDg0": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 48,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3NzcxNDM5OTE1MTE3": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/f9bc315afa987edac6bbc783ba05623ffde2090163c23d14fcda70eea97c4df3.mp3",
+					"volume": 1,
+					"startFrame": 48,
+					"durationInFrames": 23,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3NzcxNDM5OTE1MTE4": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "GIRL WHAT"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 48,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3NzcxNDM5OTE1MTE5": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 70,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3Nzc3NTc2MTgxODcy": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/a44fdfa6581c6853ab391c77f2653c355fdeb8cfb280fb9cfb11dfc7e7c8c462.mp3",
+					"volume": 1,
+					"startFrame": 70,
+					"durationInFrames": 30,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3Nzc3NTgwMzc2MTc3": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Is he still at the bar?"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 70,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3Nzc3NTgwMzc2MTc4": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 99,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3NzgyMTEwMjI0NDk5": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/a188d4cc61c78b5cecda678568deb000f41b625f61bea70171cc1dee91a99d56.mp3",
+					"volume": 1,
+					"startFrame": 99,
+					"durationInFrames": 13,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3NzgyMTEwMjI0NTAw": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Yep 👀"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 99,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3NzgyMTEwMjI0NTAx": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 114,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3Nzg4MDE1ODA0NTM0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/a23e6609b4d4608542eeba42f432352725ad7cb35df6965e185316914a45f8ef.mp3",
+					"volume": 1,
+					"startFrame": 114,
+					"durationInFrames": 19,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3Nzg4MDE1ODA0NTM1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "With her?"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 114,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3Nzg4MDE1ODA0NTM2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 132,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3Nzk3MzQ4MTMwOTM3": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/c70526e0e08c5b2c8e6e986416783e6bdcdf2ecd2551fcda94cc459682fefc1b.mp3",
+					"volume": 1,
+					"startFrame": 132,
+					"durationInFrames": 31,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3Nzk3MzQ4MTMwOTM4": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Teaching her pool rn"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 132,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3Nzk3MzQ4MTMwOTM5": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 163,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODA2NDEyMDIxODg0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/66778b45a0e62e4ea601e10603b3e6c2f678a93a9c8f24d3e8f3258cf75d5464.mp3",
+					"volume": 1,
+					"startFrame": 163,
+					"durationInFrames": 16,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODA2NDEyMDIxODg1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Classic 🙄"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 163,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODA2NDEyMDIxODg2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 179,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODEyMzMwMTg0ODMx": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/136a6441a9d6d3f725f27b6b3052ba07b5651121908307d78f026968b01b71c8.mp3",
+					"volume": 1,
+					"startFrame": 179,
+					"durationInFrames": 39,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODEyMzMwMTg0ODMy": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "What are you doing to his truck??"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 179,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODEyMzMwMTg0ODMz": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 217,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODE3OTI1Mzg2Mzcw": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/ff25036cc87408839ef4cd25c8ea5e5e923fb7b8031cfc046b225dbce139d96f.mp3",
+					"volume": 1,
+					"startFrame": 217,
+					"durationInFrames": 19,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODE3OTI1Mzg2Mzcx": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Making art 😊"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 217,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODE3OTI1Mzg2Mzcy": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 235,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODIzNjEyODYyNTk3": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/5e073f3eac3a37d5de7fe6abbca9a597d704d4121c3c20740deea99ea9b0aa16.mp3",
+					"volume": 1,
+					"startFrame": 235,
+					"durationInFrames": 26,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODIzNjEyODYyNTk4": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "With my keys"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 235,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODIzNjEyODYyNTk5": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 261,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODI5MTcwMzE1NDAw": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/4c93ececdd440b6f5ef010f8131469bcfd8bd413ca721599cb685b66bce15173.mp3",
+					"volume": 1,
+					"startFrame": 261,
+					"durationInFrames": 24,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODI5MTcwMzE1NDAx": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Media",
+							"media": {
+								"type": "Image",
+								"src": "https://149881442.v2.pressablecdn.com/wp-content/uploads/2023/06/Picture1.jpg"
+							}
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 261,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODI5MTcwMzE1NDAy": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 284,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODM2MjMzNTIzMzM5": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/81985987794d3b527d5c0ec78bae17bd54836de77ffc0715cdf01b2e20779993.mp3",
+					"volume": 1,
+					"startFrame": 284,
+					"durationInFrames": 22,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODM2MjMzNTIzMzQw": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "omg"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 284,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODM2MjMzNTIzMzQx": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 305,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODQyMDM0MjQ1Nzc0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/a27f1b10337057dbb1f53928cdc4da648062c9f162258439ad1cce6dfb5f4b9c.mp3",
+					"volume": 1,
+					"startFrame": 305,
+					"durationInFrames": 35,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODQyMDM0MjQ1Nzc1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "She's singing karaoke now"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 305,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODQyMDM0MjQ1Nzc2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 340,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODQ4MjIwODQ0MTc3": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/a58b0b8793efa83260a0c74bb0ab2a6de922d9b4ce30ee06c61fd67f91bd1440.mp3",
+					"volume": 1,
+					"startFrame": 340,
+					"durationInFrames": 32,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODQ4MjIwODQ0MTc4": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Louisville slugger time 🏏"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 340,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODQ4MjIwODQ0MTc5": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 372,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODUzNzk1MDc0MTk2": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/b1bd2e38964923a5ad3f98164d8510e0afc8e1f7e162720581e270407cf5bfa7.mp3",
+					"volume": 1,
+					"startFrame": 372,
+					"durationInFrames": 29,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODUzNzk1MDc0MTk3": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "NOT THE HEADLIGHTS"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 372,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODUzNzk1MDc0MTk4": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 401,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODU5MjkzODA2NzQz": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/15eed67ed8354f9335c4c839e8c0ccc2d933d6146014eef563d6b88391ea480e.mp3",
+					"volume": 1,
+					"startFrame": 401,
+					"durationInFrames": 20,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODU5MjkzODA2NzQ0": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "BOTH of them 😌"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 401,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODU5MjkzODA2NzQ1": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 421,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODY1MzYyOTY0NjM0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/69568b2bc6e8d3c55a2aee75e349b818a775f1c595f87883f3173885d0e75c12.mp3",
+					"volume": 1,
+					"startFrame": 421,
+					"durationInFrames": 46,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODY1MzYyOTY0NjM1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "He's buying her drinks now"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 421,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODY1MzYyOTY0NjM2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 467,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODcwNDEyOTA2NjUz": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/6883684b1651ef5dbec3db38d45928cc5897c74b8bb3de4fa81fe32159a1ffca.mp3",
+					"volume": 1,
+					"startFrame": 467,
+					"durationInFrames": 20,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODcwNDEyOTA2NjU0": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Fruity ones?"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 467,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODcwNDEyOTA2NjU1": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 487,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODc1NzUyMjU1NjQ4": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/c58b0575bcf594a5645d92b19450f641e6ad32b0816f7bf94e054eab24de55a0.mp3",
+					"volume": 1,
+					"startFrame": 487,
+					"durationInFrames": 24,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODc1NzUyMjU1NjQ5": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Pink af"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 487,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODc1NzUyMjU1NjUw": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 510,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODgxMjg4NzM2OTMx": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/f6407dc6f4b9a9d45eacf4d937098135198a4879e6fd82cfca889ebdf56e4202.mp3",
+					"volume": 1,
+					"startFrame": 510,
+					"durationInFrames": 29,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODgxMjg4NzM2OTMy": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Time for the tires"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 510,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODgxMjg4NzM2OTMz": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 539,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODg2Nzk1ODU4MDg2": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/dc652d9a4e966aee44cd50907f44add36f597940716310f8be45ebeb6511945f.mp3",
+					"volume": 1,
+					"startFrame": 539,
+					"durationInFrames": 24,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODg2Nzk1ODU4MDg3": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "All 4??"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 539,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODg2Nzk1ODU4MDg4": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 563,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3ODkyMjMxNjc2MDcz": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/f22bfd380204716ac4e6652f4398c194bc1c138af60eef35c2c472c953f46448.mp3",
+					"volume": 1,
+					"startFrame": 563,
+					"durationInFrames": 19,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODkyMjMxNjc2MDc0": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Obviously 💅"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 563,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODkyMjMxNjc2MDc1": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 581,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3ODk4MzAwODMzOTY0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/62c083aa95eb310290c0e909b7f9735e37cafef12b757cb81b28cdcf9fc69a0b.mp3",
+					"volume": 1,
+					"startFrame": 581,
+					"durationInFrames": 35,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3ODk4MzAwODMzOTY1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "ur actually insane"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 581,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3ODk4MzAwODMzOTY2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 615,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTA0NzUxNjczNTE5": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/5a49edd5fea7720a9b3c75b7d42e59ce1ed3fddd612fdb4daf884bb33334e679.mp3",
+					"volume": 1,
+					"startFrame": 615,
+					"durationInFrames": 12,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTA0NzUxNjczNTIw": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Done ✨"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 615,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTA0NzUxNjczNTIx": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 630,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3OTExOTExMzUwNDUw": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/c317889dcc3043efab55849ae1a444b26ae844e57c8934e61bb913dd8f41e45e.mp3",
+					"volume": 1,
+					"startFrame": 630,
+					"durationInFrames": 29,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTExOTExMzUwNDUx": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "He's gonna kill you"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 630,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTExOTExMzUwNDUy": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 659,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTE3MjkyNjQyNDg1": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/d7b19bf4be47a2fa018844ecf2847e90a287e81567c0ba12fdc1200134b55d45.mp3",
+					"volume": 1,
+					"startFrame": 659,
+					"durationInFrames": 10,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTE3Mjk2ODM2Nzkw": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Good"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 659,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTE3Mjk2ODM2Nzkx": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 674,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTIzOTM2NDIwMDI0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/d8032edbe28613d55702495355426a9cf2f9a2d56ba46a83c54ce2be598f9b7b.mp3",
+					"volume": 1,
+					"startFrame": 674,
+					"durationInFrames": 53,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTIzOTM2NDIwMDI1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "I want him to know exactly who did it"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 674,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTIzOTM2NDIwMDI2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 726,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTI5ODUwMzg4NjY3": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/731a4727892938db9f72bbc7b056763f6060a4a5da5bfd520a9282eafe08d6af.mp3",
+					"volume": 1,
+					"startFrame": 726,
+					"durationInFrames": 44,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTI5ODUwMzg4NjY4": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "That's why I carved my whole name"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 726,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTI5ODUwMzg4NjY5": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 770,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTM1NjYzNjk0MDE0": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/e5c175ff0b7a418e7c0b71eee47fdbb4f8dd91de61bb15941eed7e93bf61c96c.mp3",
+					"volume": 1,
+					"startFrame": 770,
+					"durationInFrames": 29,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTM1NjYzNjk0MDE1": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Not just for him, though."
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 770,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTM1NjYzNjk0MDE2": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 799,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTQwODMxMDc2NTQ1": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/9ce30f9b9b95874bb747723690737b1e6977eb2882b5b3e93fc69411b70887b3.mp3",
+					"volume": 1,
+					"startFrame": 799,
+					"durationInFrames": 25,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTQwODMxMDc2NTQ2": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "For her too."
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 799,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTQwODMxMDc2NTQ3": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_received.mp3",
+					"volume": 0.75,
+					"startFrame": 824,
+					"durationInFrames": 62
+				},
+				"action_MzgyMjM3OTQ2ODEyMTU0MDUy": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/97337642f2500a06a3cce3f5e43ca341370fddc4046887bebc56c1067ee6f1db.mp3",
+					"volume": 1,
+					"startFrame": 824,
+					"durationInFrames": 27,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTQ2ODEyMTU0MDUz": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "Wait... what?"
+						},
+						"participant": {
+							"displayName": "Bestie 👀"
+						},
+						"messageType": "received"
+					},
+					"startFrame": 824,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTQ2ODEyMTU0MDU0": {
+					"type": "Audio",
+					"src": "static/audio/sound/ios_sent.mp3",
+					"volume": 0.75,
+					"startFrame": 851,
+					"durationInFrames": 16
+				},
+				"action_MzgyMjM3OTU0MjY1NDMyMjYz": {
+					"type": "Audio",
+					"src": "http://localhost:4569/elevenlabs/c8d66917359c2b3b1f37a3443cf50b87fda42950e0c9313b357b84a9f5531944.mp3",
+					"volume": 1,
+					"startFrame": 851,
+					"durationInFrames": 42,
+					"playbackRate": 1.3
+				},
+				"action_MzgyMjM3OTU0MjY1NDMyMjY0": {
+					"type": "Plugin",
+					"pluginId": "chat-story",
+					"props": {
+						"type": "Message",
+						"content": {
+							"type": "Text",
+							"text": "So she knows who came before her 😘"
+						},
+						"participant": {
+							"displayName": "Me"
+						},
+						"messageType": "sent"
+					},
+					"startFrame": 851,
+					"durationInFrames": 15
+				},
+				"action_MzgyMjM3OTU0MjY1NDMyMjY4": {
+					"type": "Plugin",
+					"pluginId": "tiktok-follow",
+					"props": {
+						"media": {
+							"type": "Image",
+							"src": "static/image/chatsnap.png"
+						},
+						"text": "Hit follow! 💬"
+					},
+					"durationInFrames": 120,
+					"width": 1080,
+					"height": 500,
+					"x": 0,
+					"y": 1000,
+					"startFrame": 773
+				},
+				"action_MzgyMjM3OTU0MjY5NjI2NTcz": {
+					"type": "Plugin",
+					"pluginId": "tiktok-like",
+					"props": {
+						"text": "Feeling it? 👍"
+					},
+					"durationInFrames": 120,
+					"width": 1080,
+					"height": 500,
+					"x": 0,
+					"y": 1000,
+					"startFrame": 327
+				},
+				"action_MzgyMjM3OTU0MjY5NjI2NTc1": {
+					"type": "Rectangle",
+					"width": 1080,
+					"height": 1920,
+					"startFrame": 0,
+					"durationInFrames": 893,
+					"fill": {
+						"type": "Video",
+						"width": 1080,
+						"height": 1920,
+						"objectFit": "cover",
+						"src": "static/video/.local/steep_BennoBuilder_4.mp4",
+						"startFrom": 501
+					}
+				}
+			}
+		},
+		"durationInFrames": 893,
+		"fps": 30,
+		"width": 1080,
+		"height": 1920
 	}
 }

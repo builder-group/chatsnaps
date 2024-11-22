@@ -12,12 +12,16 @@ export const SMessageChatStoryTimelineAction = STimelineActionPlugin.extend({
 		messageType: z.enum(['sent', 'received']),
 		participant: z.object({
 			displayName: z.string(),
-			avatarSrc: z.string().optional()
+			avatar: SVisualMedia.optional()
 		}),
 		content: z.discriminatedUnion('type', [
 			z.object({
 				type: z.literal('Text'),
 				text: z.string()
+			}),
+			z.object({
+				type: z.literal('Media'),
+				media: SVisualMedia
 			})
 		])
 	})

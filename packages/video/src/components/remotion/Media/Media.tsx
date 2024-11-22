@@ -5,18 +5,18 @@ import { getStaticSrc } from '@/lib';
 import { TMedia } from './schema';
 
 export const Media: React.FC<TProps> = (props) => {
-	const { media, style, ...elementProps } = props;
+	const { content, style, ...elementProps } = props;
 
-	switch (media.type) {
+	switch (content.type) {
 		case 'Image':
-			if (media.src.endsWith('.gif')) {
+			if (content.src.endsWith('.gif')) {
 				return (
 					<Gif
-						src={getStaticSrc(media.src)}
+						src={getStaticSrc(content.src)}
 						style={{
-							objectFit: media.objectFit,
-							width: media.width,
-							height: media.height,
+							objectFit: content.objectFit,
+							width: content.width,
+							height: content.height,
 							...style
 						}}
 						{...elementProps}
@@ -25,11 +25,11 @@ export const Media: React.FC<TProps> = (props) => {
 			} else {
 				return (
 					<Img
-						src={getStaticSrc(media.src)}
+						src={getStaticSrc(content.src)}
 						style={{
-							objectFit: media.objectFit,
-							width: media.width,
-							height: media.height,
+							objectFit: content.objectFit,
+							width: content.width,
+							height: content.height,
 							...style
 						}}
 						{...elementProps}
@@ -39,24 +39,24 @@ export const Media: React.FC<TProps> = (props) => {
 		case 'Video':
 			return (
 				<OffthreadVideo
-					src={getStaticSrc(media.src)}
+					src={getStaticSrc(content.src)}
 					style={{
-						objectFit: media.objectFit,
-						width: media.width,
-						height: media.height,
+						objectFit: content.objectFit,
+						width: content.width,
+						height: content.height,
 						...style
 					}}
-					startFrom={media.startFrom}
-					endAt={media.endAt}
-					playbackRate={media.playbackRate}
+					startFrom={content.startFrom}
+					endAt={content.endAt}
+					playbackRate={content.playbackRate}
 					{...elementProps}
 				/>
 			);
 		case 'Audio':
 			return (
 				<Audio
-					src={getStaticSrc(media.src)}
-					startFrom={media.startFrom}
+					src={getStaticSrc(content.src)}
+					startFrom={content.startFrom}
 					style={style}
 					{...elementProps}
 				/>
@@ -67,7 +67,7 @@ export const Media: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	media: TMedia;
+	content: TMedia;
 	className?: string;
 	style?: React.CSSProperties;
 }

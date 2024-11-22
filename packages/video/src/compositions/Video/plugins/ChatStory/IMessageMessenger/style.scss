@@ -25,11 +25,19 @@ $scale-factor: calc($canvas-width / $base-width);
 	list-style: none;
 }
 
+.message-content-text {
+	padding: scale(10px) scale(20px);
+}
+
+.message-content-media {
+	border-radius: scale(25px);
+	overflow: hidden;
+}
+
 .shared {
 	position: relative; /* Setup a relative container for our psuedo elements */
 	max-width: scale(255px);
 	margin-bottom: scale(15px);
-	padding: scale(10px) scale(20px);
 	line-height: scale(24px);
 	word-wrap: break-word; /* Make sure the text wraps to multiple lines if long */
 	border-radius: scale(25px);

@@ -4,6 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon, Media, VideoIcon } from '@/component
 import { cn } from '@/lib';
 
 import { TIMessageChatStoryMessenger, TMessageChatStoryTimelineAction } from '../schema';
+import { MessageContent } from './MessageContent';
 
 import './style.scss';
 
@@ -36,7 +37,7 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 				<ChevronLeftIcon className="mb-14 h-24 w-24 text-[#3478F6]" />
 				<div className="ml-11 flex flex-col items-center gap-4">
 					<Media
-						media={contact.profilePicture}
+						content={contact.profilePicture}
 						className="h-[140px] w-[140px] rounded-full bg-white"
 						style={{
 							filter: 'drop-shadow(0px 12px 47px rgba(166,166,166,0.3))'
@@ -81,31 +82,23 @@ export const IMessageMessenger: React.FC<TProps> = (props) => {
 							key={JSON.stringify(content)}
 							className={cn('relative mx-16', messageType === 'sent' ? 'self-end' : 'self-start')}
 						>
-							<div className="absolute">
-								<div
-									className={cn(
-										'shared',
-										messageType === 'sent' ? 'sent' : 'received',
-										noTail && 'noTail'
-									)}
-									style={{
-										opacity,
-										transform: `translateY(${yPosition}px)`
-									}}
-								>
-									{content.type === 'Text' ? content.text : ''}
-								</div>
-							</div>
+							<MessageContent
+								content={content}
+								messageType={messageType}
+								noTail={noTail}
+								style={{
+									opacity,
+									transform: `translateY(${yPosition}px)`,
+									position: 'absolute'
+								}}
+							/>
 							{/* Invisible static component to maintain consistent layout and thus to not influence the height calculations with e.g. spring animation */}
-							<div
-								className={cn(
-									'shared opacity-0',
-									messageType === 'sent' ? 'sent' : 'received',
-									noTail && 'noTail'
-								)}
-							>
-								{content.type === 'Text' ? content.text : ''}
-							</div>
+							<MessageContent
+								content={content}
+								messageType={messageType}
+								noTail={noTail}
+								style={{ opacity: 0 }}
+							/>
 						</li>
 					);
 				})}

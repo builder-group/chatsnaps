@@ -102,7 +102,7 @@ registerTimelineActionPlugin({
 						}}
 					>
 						<Media
-							media={action.props.media}
+							content={action.props.media}
 							className="h-64 w-64 rounded-full border-4 border-white shadow-lg"
 						/>
 						<div

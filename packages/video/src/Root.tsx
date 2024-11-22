@@ -20,6 +20,17 @@ export const Root: React.FC = () => {
 				defaultProps={defaultProps.video1 as any}
 			/>
 			<Composition
+				id={'TextingStory'}
+				component={VideoComp}
+				calculateMetadata={VideoComp.calculateMetadata}
+				durationInFrames={0} // Set by calculateMetadata
+				fps={30} // Set by calculateMetadata
+				width={1080} // Set by calculateMetadata
+				height={1920} // Set by calculateMetadata
+				schema={VideoComp.schema}
+				defaultProps={defaultProps.video2 as any}
+			/>
+			<Composition
 				id={ThreeJsComp.id}
 				component={ThreeJsComp}
 				durationInFrames={300}
@@ -27,7 +38,6 @@ export const Root: React.FC = () => {
 				width={1080}
 				height={1920}
 				schema={ThreeJsComp.schema}
-				defaultProps={defaultProps.video1 as any}
 			/>
 		</>
 	);
