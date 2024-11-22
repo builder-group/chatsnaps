@@ -22,6 +22,7 @@ const DEFAULT_ABBREVIATIONS: Record<string, string> = {
 	'\\bjk\\b': 'Just Kidding',
 	'\\bidc\\b': "I don't care",
 	'\\bily\\b': 'I love you',
+	'\\bofc\\b': 'of course',
 
 	// Common contractions
 	'\\bu\\b': 'you',
