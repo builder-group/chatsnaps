@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { SChatStoryMessenger, SVideoComp } from '@repo/video';
+import { SChatStoryMessenger, SMessageChatStoryContent, SVideoComp } from '@repo/video';
 
 import {
 	BadRequestResponse,
@@ -11,9 +11,8 @@ import {
 const SChatStoryScriptEvent = z.union([
 	z.object({
 		type: z.literal('Message'),
-		content: z.string(),
-		spokenContent: z.string().optional(),
-		voiceover: z.boolean().optional(),
+		content: z.union([z.string(), SMessageChatStoryContent]),
+		spokenContent: z.union([z.string(), z.literal(false)]).optional(),
 		participantId: z.string()
 	}),
 	z.object({

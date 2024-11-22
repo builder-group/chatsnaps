@@ -6,7 +6,7 @@ import {
 } from '@repo/video';
 import { isVoiceId } from 'elevenlabs-client';
 import { AppError } from '@blgc/openapi-router';
-import { Err, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
+import { Err, notEmpty, Ok, unwrapOr, unwrapOrNull, type TResult } from '@blgc/utils';
 import {
 	elevenLabsClient,
 	elevenLabsConfig,
@@ -50,13 +50,7 @@ class ChatStoryCreator {
 	private script: TChatStoryScriptDto;
 	private config: TChatStoryCreatorConfig;
 
-	private voiceContextMap: Record<
-		string,
-		{
-			previousContent: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][];
-			previousRequestIds: string[];
-		}
-	> = {};
+	private voiceContextMap: Record<string, TVoiceContextMapItem> = {};
 
 	constructor(
 		script: TChatStoryScriptDto,
@@ -177,7 +171,7 @@ class ChatStoryCreator {
 		const startFrame = msToFrames(this.currentTimeMs, this.config.fps);
 		const participant = this.script.participants[item.participantId];
 		if (participant == null) {
-			logger.warn(`No participant for message '${item.content}' found!`);
+			logger.warn(`No participant for message '${JSON.stringify(item.content)}' found!`);
 			return Ok(undefined);
 		}
 
@@ -186,12 +180,7 @@ class ChatStoryCreator {
 		}
 
 		let voiceDurationMs = 0;
-		if (
-			this.config.voiceover.isEnabled &&
-			participant.voice != null &&
-			(item.voiceover == null || item.voiceover) &&
-			this.canBeSpoken(item.content)
-		) {
+		if (this.config.voiceover.isEnabled && participant.voice != null && this.canBeSpoken(item)) {
 			const voiceResult = await this.processVoiceover(item, participant.voice, startFrame);
 			if (voiceResult.isErr()) {
 				return Err(voiceResult.error);
@@ -224,7 +213,16 @@ class ChatStoryCreator {
 		voiceId: string,
 		startFrame: number
 	): Promise<TResult<number, AppError>> {
-		const spokenMessageFilename = `${sha256(`${voiceId}:${item.spokenContent ?? item.content}`)}.mp3`;
+		const spokenContent = this.getSpokenContent(item);
+		if (spokenContent == null) {
+			return Err(
+				new AppError('#ERR_NO_SPOKEN_CONTENT', 400, {
+					description: `No spoken content found for message '${JSON.stringify(item.content)}'`
+				})
+			);
+		}
+
+		const spokenMessageFilename = `${sha256(`${voiceId}:${spokenContent}`)}.mp3`;
 
 		const isSpokenMessageCached =
 			this.config.voiceover.usePrerecorded &&
@@ -269,15 +267,26 @@ class ChatStoryCreator {
 	): Promise<TResult<void, AppError>> {
 		const { previousContent, previousRequestIds } = this.getVoiceContext(voiceId);
 		const previousText = previousContent
-			.map((c) => prepareForTTS(c))
+			.map((c) => {
+				const spokenContent = this.getSpokenContent({ content: c });
+				return spokenContent != null ? prepareForTTS(spokenContent) : null;
+			})
+			.filter(notEmpty)
 			.join(' - ')
 			.trim();
-		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
+		const nextContent = this.getFutureContentForParticipant(
+			(item.index as number) + 1,
+			item.participantId
+		);
 		const nextText = nextContent
-			.map((c) => prepareForTTS(c))
+			.map((c) => {
+				const spokenContent = this.getSpokenContent({ content: c });
+				return spokenContent != null ? prepareForTTS(spokenContent) : null;
+			})
+			.filter(notEmpty)
 			.join(' - ')
 			.trim();
-		const currentText = prepareForTTS(item.spokenContent ?? item.content);
+		const currentText = prepareForTTS(this.getSpokenContent(item) ?? '');
 
 		// https://elevenlabs.io/docs/api-reference/how-to-use-request-stitching#conditioning-both-on-text-and-past-generations
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
@@ -363,12 +372,15 @@ class ChatStoryCreator {
 		startFrame: number
 	): void {
 		const id = pika.gen('action');
+		const content =
+			typeof item.content === 'string' ? { type: 'Text', text: item.content } : item.content;
+
 		this.actionMap[id] = {
 			type: 'Plugin',
 			pluginId: 'chat-story',
 			props: {
 				type: 'Message',
-				content: { type: 'Text', text: item.content },
+				content,
 				participant: {
 					displayName: participant.displayName
 				},
@@ -422,10 +434,7 @@ class ChatStoryCreator {
 		}
 	}
 
-	private getVoiceContext(voiceId: string): {
-		previousContent: string[];
-		previousRequestIds: string[];
-	} {
+	private getVoiceContext(voiceId: string): TVoiceContextMapItem {
 		return (
 			this.voiceContextMap[voiceId] ?? {
 				previousContent: [],
@@ -434,8 +443,28 @@ class ChatStoryCreator {
 		);
 	}
 
-	private canBeSpoken(text: string): boolean {
-		return /[a-zA-Z0-9]/.test(text);
+	private canBeSpoken(item: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>): boolean {
+		const spokenContent = this.getSpokenContent(item);
+		if (spokenContent == null) {
+			return false;
+		}
+		return /[a-zA-Z0-9]/.test(spokenContent);
+	}
+
+	private getSpokenContent(item: {
+		spokenContent?: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['spokenContent'];
+		content: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'];
+	}): string | null {
+		if (typeof item.spokenContent === 'string') {
+			return item.spokenContent;
+		}
+		if (typeof item.content === 'string') {
+			return item.content;
+		}
+		if (item.content.type === 'Text') {
+			return item.content.text;
+		}
+		return null;
 	}
 }
 
@@ -471,4 +500,9 @@ interface TChatStoryCreatorCreateResponse {
 	voiceoverTrack: TTimelineTrack;
 	notificationTrack: TTimelineTrack;
 	creditsSpent: number;
+}
+
+interface TVoiceContextMapItem {
+	previousContent: Extract<TExtendedChatStoryScriptEvent, { type: 'Message' }>['content'][];
+	previousRequestIds: string[];
 }
