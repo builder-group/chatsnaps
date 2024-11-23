@@ -32,6 +32,7 @@ $scale-factor: calc($canvas-width / $base-width);
 .message-content-media {
 	border-radius: scale(25px);
 	overflow: hidden;
+	max-width: scale(255px);
 }
 
 .shared {
