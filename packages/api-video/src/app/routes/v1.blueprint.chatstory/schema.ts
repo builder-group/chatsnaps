@@ -163,6 +163,30 @@ export const ChatStoryBlueprintFactoryRoute = createRoute({
 	}
 });
 
+export const SChatStoryBlueprintTextRoute = createRoute({
+	method: 'post',
+	path: '/v1/blueprint/chatstory/text',
+	tags: ['blueprint'],
+	operationId: 'chatStoryBlueprintText',
+	request: {
+		body: JsonRequestBody(
+			z.object({
+				script: SChatStoryScriptDto,
+				separator: z.string().optional().default('\n')
+			})
+		)
+	},
+	responses: {
+		200: JsonSuccessResponse(
+			z.object({
+				text: z.string()
+			})
+		),
+		400: BadRequestResponse,
+		500: InternalServerErrorResponse
+	}
+});
+
 export function isChatStoryScriptDto(value: unknown): value is z.infer<typeof SChatStoryScriptDto> {
 	return SChatStoryScriptDto.safeParse(value).success;
 }
