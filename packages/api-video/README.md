@@ -1,5 +1,32 @@
 # `@repo/api-video`
 
+## Video Settings
+
+### Voices
+- Elli
+  - Female
+- Adam
+  - Male
+
+### Background Music
+- 3 am walk - Slowed & Reverb Version
+  - Author:daniel
+  - Tags:Sad
+- retire (final)
+  - Author:Alvedon
+  - Tags: Sad
+- Wii Shop (Remix)
+  - Author: Ozi
+  - Tags: 
+
+### Hashtags
+- #texts
+- #storytime
+- #sadstory
+- #textstory
+- #redditstories
+- #minecraftparkour
+
 ## ❓ FAQ
 
 ### Why "Blueprint" Instead of "Template" or "Generator"?
