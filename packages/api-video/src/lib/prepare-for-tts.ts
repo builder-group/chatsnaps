@@ -36,6 +36,10 @@ const TEXT_REPLACEMENTS = new Map<string | RegExp, string>([
 	['pls', 'please'],
 	['ppl', 'people'],
 	['omw', 'on my way'],
+	['smth', 'something'],
+	['nvm', 'never mind'],
+	['yk', 'you know'],
+	['rt', 'are'],
 
 	// Exclamations and emotions
 	['sry', 'sorry!'],
