@@ -1,46 +1,62 @@
+import { Gif } from '@remotion/gif';
 import { Audio, Img, OffthreadVideo } from 'remotion';
 import { getStaticSrc } from '@/lib';
 
 import { TMedia } from './schema';
 
 export const Media: React.FC<TProps> = (props) => {
-	const { media, style, ...elementProps } = props;
+	const { content, style, ...elementProps } = props;
 
-	switch (media.type) {
+	switch (content.type) {
 		case 'Image':
-			return (
-				<Img
-					src={getStaticSrc(media.src)}
-					style={{
-						objectFit: media.objectFit,
-						width: media.width,
-						height: media.height,
-						...style
-					}}
-					{...elementProps}
-				/>
-			);
+			if (content.src.endsWith('.gif')) {
+				return (
+					<Gif
+						src={getStaticSrc(content.src)}
+						style={{
+							objectFit: content.objectFit,
+							width: content.width,
+							height: content.height,
+							...style
+						}}
+						{...elementProps}
+					/>
+				);
+			} else {
+				return (
+					<Img
+						src={getStaticSrc(content.src)}
+						style={{
+							objectFit: content.objectFit,
+							width: content.width,
+							height: content.height,
+							...style
+						}}
+						{...elementProps}
+					/>
+				);
+			}
 		case 'Video':
 			return (
 				<OffthreadVideo
-					src={getStaticSrc(media.src)}
+					src={getStaticSrc(content.src)}
 					style={{
-						objectFit: media.objectFit,
-						width: media.width,
-						height: media.height,
+						objectFit: content.objectFit,
+						width: content.width,
+						height: content.height,
 						...style
 					}}
-					startFrom={media.startFrom}
-					endAt={media.endAt}
-					playbackRate={media.playbackRate}
+					startFrom={content.startFrom}
+					endAt={content.endAt}
+					playbackRate={content.playbackRate}
 					{...elementProps}
 				/>
 			);
 		case 'Audio':
 			return (
 				<Audio
-					src={getStaticSrc(media.src)}
-					startFrom={media.startFrom}
+					src={getStaticSrc(content.src)}
+					startFrom={content.startFrom}
 					style={style}
 					{...elementProps}
 				/>
@@ -51,7 +67,7 @@ export const Media: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	media: TMedia;
+	content: TMedia;
 	className?: string;
 	style?: React.CSSProperties;
 }

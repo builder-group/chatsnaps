@@ -5,6 +5,18 @@ import { STimelineActionPlugin, STimelineTrackPlugin } from '../../schema';
 
 export { SImageMedia, SVisualMedia } from '@/components';
 
+export const SMessageChatStoryContent = z.discriminatedUnion('type', [
+	z.object({
+		type: z.literal('Text'),
+		text: z.string()
+	}),
+	z.object({
+		type: z.literal('Media'),
+		media: SVisualMedia
+	})
+]);
+export type TMessageChatStoryContent = z.infer<typeof SMessageChatStoryContent>;
+
 export const SMessageChatStoryTimelineAction = STimelineActionPlugin.extend({
 	pluginId: z.literal('chat-story'),
 	props: z.object({
@@ -12,14 +24,9 @@ export const SMessageChatStoryTimelineAction = STimelineActionPlugin.extend({
 		messageType: z.enum(['sent', 'received']),
 		participant: z.object({
 			displayName: z.string(),
-			avatarSrc: z.string().optional()
+			avatar: SVisualMedia.optional()
 		}),
-		content: z.discriminatedUnion('type', [
-			z.object({
-				type: z.literal('Text'),
-				text: z.string()
-			})
-		])
+		content: SMessageChatStoryContent
 	})
 });
 export type TMessageChatStoryTimelineAction = z.infer<typeof SMessageChatStoryTimelineAction>;

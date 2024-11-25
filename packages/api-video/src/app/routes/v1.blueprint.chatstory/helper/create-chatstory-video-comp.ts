@@ -58,9 +58,9 @@ export async function createChatStoryVideoComp(
 	const followText = [
 		'Follow for more! 🔥',
 		'Don’t miss out! 👀',
-		'Tap follow! 📲',
-		'Hit follow! 💬',
-		'Follow now! 🚀',
+		// 'Tap follow! 📲',
+		// 'Hit follow! 💬',
+		// 'Follow now! 🚀',
 		'More? Follow! 🎯',
 		// 'Stay tuned—follow! 🔥',
 		// 'Join us! 👊',

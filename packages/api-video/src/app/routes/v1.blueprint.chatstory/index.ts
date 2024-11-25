@@ -8,7 +8,8 @@ import { resolveStory } from './helper/resolve-story';
 import {
 	ChatStoryBlueprintFactoryRoute,
 	ChatStoryBlueprintPromptRoute,
-	ChatStoryBlueprintVideoRoute
+	ChatStoryBlueprintVideoRoute,
+	SChatStoryBlueprintTextRoute
 } from './schema';
 
 router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
@@ -39,17 +40,18 @@ router.openapi(ChatStoryBlueprintVideoRoute, async (c) => {
 
 router.openapi(ChatStoryBlueprintPromptRoute, async (c) => {
 	const {
-		originalStory: bodyOrginalStory,
+		storyConcept: bodyStoryConcept,
 		storyDirection,
 		targetAudience,
 		targetLength,
 		availableVoices
 	} = c.req.valid('json');
 
-	const originalStory = (await resolveStory(bodyOrginalStory)).unwrap();
+	const storyConcept = (await resolveStory(bodyStoryConcept)).unwrap();
+	logger.info('Resolved story concept', { storyConcept });
 	const { script, usage } = (
 		await generateScriptFromStory({
-			originalStory,
+			storyConcept,
 			storyDirection,
 			targetAudience,
 			targetLength,
@@ -72,21 +74,21 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 	let totalUsageUsd = 0;
 	let totalTimeMs = 0;
 
-	for (const story of stories) {
+	for (const storyConcept of stories) {
 		const videoId = pika.gen('video');
 		const startTimeMs = performance.now();
 
 		logger.info(`${videoId}: Started creating ChatStory video`);
 
-		const originalStoryResult = await resolveStory(story);
-		if (originalStoryResult.isErr()) {
-			logger.error(`${videoId}: Failed to resolve story`, originalStoryResult.error);
+		const storyConceptResult = await resolveStory(storyConcept);
+		if (storyConceptResult.isErr()) {
+			logger.error(`${videoId}: Failed to resolve story`, storyConceptResult.error);
 			videoUrls.push(null);
 			continue;
 		}
 
 		const scriptResult = await generateScriptFromStory({
-			originalStory: originalStoryResult.value
+			storyConcept: storyConceptResult.value
 		});
 		if (scriptResult.isErr()) {
 			logger.error(
@@ -143,4 +145,40 @@ router.openapi(ChatStoryBlueprintFactoryRoute, async (c) => {
 	}
 
 	return c.json({ urls: videoUrls, usageUsd: totalUsageUsd, timeMs: totalTimeMs }, 200);
+});
+
+router.openapi(SChatStoryBlueprintTextRoute, (c) => {
+	const { script, separator = '\n' } = c.req.valid('json');
+
+	const messages: string[] = [];
+	for (const event of script.events) {
+		if (event.type !== 'Message') {
+			continue;
+		}
+
+		const participant = script.participants[event.participantId];
+		if (participant == null) {
+			continue;
+		}
+
+		let content: string | null = null;
+		if (typeof event.content === 'string') {
+			content = event.content;
+		} else if ('text' in event.content) {
+			content = event.content.text;
+		}
+
+		if (content == null) {
+			continue;
+		}
+
+		messages.push(`${participant.displayName as string}: ${content}`);
+	}
+
+	return c.json(
+		{
+			text: messages.join(separator)
+		},
+		200
+	);
 });

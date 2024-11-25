@@ -1,0 +1,45 @@
+meta {
+  name: -ChatStory- Factory
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8787/v1/blueprint/chatstory/factory
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: local-secret
+}
+
+body:json {
+  {
+    "background": {
+      "type": "Sequence",
+      "categories": [
+        "hydraulic-press"
+      ],
+      "startAnchors": [
+        "hydraulic-press_hpc--official_15.mp4",
+        "hydraulic-press_hpc--official_24",
+        "hydraulic-press_hpc--official_17"
+      ],
+      "endAnchors": [
+        "hydraulic-press_hpc--official_3.mp4",
+        "hydraulic-press_hpc--official-28"
+      ]
+    },
+    "voiceover": {
+      "isEnabled": true,
+      "usePrerecorded": false
+    },
+    "stories": [
+      "https://www.tiktok.com/@textsconvo/video/7345938925715819819",
+      "https://www.tiktok.com/@textsconvo/video/7347457579850812714",
+      "https://www.tiktok.com/@textsconvo/video/7347803555681602858",
+      "https://www.tiktok.com/@textsconvo/video/7360308631213985066"
+    ]
+  }
+}

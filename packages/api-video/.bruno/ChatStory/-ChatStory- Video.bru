@@ -1,0 +1,207 @@
+meta {
+  name: -ChatStory- Video
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8787/v1/blueprint/chatstory/video
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: local-secret
+}
+
+body:json {
+  {
+    "background": {
+      "type": "Sequence",
+      "categories": [
+        "hydraulic-press"
+      ],
+      "startAnchors": [
+        "hydraulic-press_hpc--official_15.mp4",
+        "hydraulic-press_hpc--official_24.mp4",
+        "hydraulic-press_hpc--official_17.mp4"
+      ],
+      "endAnchors": [
+        "hydraulic-press_hpc--official_3.mp4",
+        "hydraulic-press_hpc--official-28.mp4"
+      ]
+    },
+    "voiceover": {
+      "isEnabled": true,
+      "usePrerecorded": true,
+      "playbackRate": 1.3
+    },
+    "script": {
+      "title": "The Test",
+      "participants": {
+        "1": {
+          "displayName": "💔 Ex?",
+          "isSelf": false,
+          "voice": "Dt2jDzhoZC0pZw5bmy2S"
+        },
+        "2": {
+          "displayName": "Me",
+          "isSelf": true,
+          "voice": "y8FeN9lFTEmQOYCaE07F"
+        }
+      },
+      "events": [
+        {
+          "type": "Message",
+          "content": "Ich glaube, wir sollten Schluss machen",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Okay",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Das war's?",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Einfach... okay?",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Was willst du, dass ich sage?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "KÄMPF UM UNS",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Du versuchst es ja nicht mal",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Warte",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Ist das ein Test?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "...",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Vielleicht",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Wenn du nur zeigen würdest, dass es dir wichtig ist",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Wow",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Also hast du es nicht ernst gemeint?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Ich nehme es zurück, wenn du um uns kämpfst",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Sag einfach, dass du mich willst",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Bitte",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": {
+            "type": "Media",
+            "media": {
+              "type": "Image",
+              "src": "https://media.tenor.com/heEyHbV8iaUAAAAM/puss-in-boots-shrek.gif",
+              "height": 200,
+              "width": 300,
+              "objectFit": "contain"
+            }
+          },
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Du hast recht",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Echt? 🥺",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Wir sollten Schluss machen",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "WAS",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "NEIN",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Ich habe dich nur getestet",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Genau",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Und DU hast versagt",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": {
+            "type": "Media",
+            "media": {
+              "type": "Image",
+              "src": "https://cdn-useast1.kapwing.com/static/templates/bike-fall-meme-template-full-02a335e1.webp"
+            }
+          },
+          "participantId": "2"
+        }
+      ]
+    }
+  }
+}

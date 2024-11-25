@@ -1,62 +1,75 @@
-const DEFAULT_ABBREVIATIONS: Record<string, string> = {
+const TEXT_REPLACEMENTS = new Map<string | RegExp, string>([
 	// Emotional expressions - with emphasis
-	'\\bOMG\\b': 'Oh my God!',
-	'\\bWTF\\b': 'WHAT the FRICK!',
-	'\\bAF\\b': ' as frick!',
-	'\\btf\\b': 'the frick!',
-	'\\bWTH\\b': 'What the heck?!',
-	'\\bLMAO\\b': 'Haha!', // TODO: Figure out how to make voice laugh
-	'\\bLOL\\b': 'Haha!', // TODO: Figure out how to make voice laugh
+	['omg', 'Oh my God!'],
+	['wtf', 'WHAT the FRICK!'],
+	['af', ' as frick!'],
+	['tf', 'the frick!'],
+	['wth', 'What the heck?!'],
+	['lmao', 'Haha!'],
+	['lol', 'Haha!'],
 
 	// Questions and statements
-	'\\bwya\\b': 'where are you at?',
-	'\\bidk\\b': "I don't know...",
-	'\\brn\\b': 'right now',
-	'\\bimo\\b': 'in my opinion,',
-	'\\bimho\\b': 'in my humble opinion,',
-	'\\btbh\\b': 'to be honest,',
-	'\\bfyi\\b': 'just so you know,',
-	'\\bbtw\\b': 'by the way',
-	'\\bsm\\b': 'some what',
+	['wya', 'where are you at?'],
+	['wdym', 'what do you mean?'],
+	['idk', "I don't know..."],
+	['rn', 'right now'],
+	['imo', 'in my opinion,'],
+	['imho', 'in my humble opinion,'],
+	['tbh', 'to be honest,'],
+	['fyi', 'just so you know,'],
+	['bbtw', 'by the way'],
+	['sm', 'some what'],
+	['jk', 'Just Kidding'],
+	['idc', "I don't care"],
+	['ily', 'I love you'],
+	['ofc', 'of course'],
 
 	// Common contractions
-	'\\bu\\b': 'you',
-	'\\bur\\b': "you're",
-	"\\bu'?r?e?\\b": "you're",
-	'\\bw\\b': 'with',
-	'\\bw/\\b': 'with',
-	'\\bk\\b': 'okay',
-	'\\bkk\\b': 'okay, okay',
+	['u', 'you'],
+	['ur', "you're"],
+	['w', 'with'],
+	['k', 'okay'],
+	['kk', 'okay, okay'],
+	['yh', 'yeah'],
+	['bf', 'boyfriend'],
+	['gf', 'girlfriend'],
+	['pls', 'please'],
+	['ppl', 'people'],
+	['omw', 'on my way'],
+	['smth', 'something'],
+	['nvm', 'never mind'],
+	['yk', 'you know'],
+	['rt', 'are'],
 
 	// Exclamations and emotions
-	'\\bsry\\b': 'sorry!',
-	'\\bdw\\b': "don't worry!",
-	'\\bfs\\b': 'for sure!',
-	'\\bfr\\b': 'for real!',
+	['sry', 'sorry!'],
+	['dw', "don't worry!"],
+	['fs', 'for sure!'],
+	['fr', 'for real!'],
 
 	// Profanity replacements
-	'\\bf[*]+\\b': 'FRICK!',
-	'\\bs[*]+\\b': 'SHOOT!',
+	[/f[*]+/i, 'FRICK!'],
+	[/s[*]+/i, 'SHOOT!'],
 
 	// Common casual speech
-	'\\bgonna\\b': 'going to',
-	'\\bwanna\\b': 'want to',
-	'\\bgotta\\b': 'got to',
-	'\\baint\\b': 'are not',
-	'\\bcuz\\b': 'because',
-	'\\bcoz\\b': 'because',
-	'\\bbc\\b': 'because',
+	['gonna', 'going to'],
+	['wanna', 'want to'],
+	['gotta', 'got to'],
+	['aint', 'are not'],
+	['cuz', 'because'],
+	['coz', 'because'],
+	['bc', 'because'],
 
 	// Gratitude
-	'\\bty\\b': 'thank you!',
-	'\\bthx\\b': 'thanks!',
+	['ty', 'thank you!'],
+	['thx', 'thanks!'],
 
 	// Formal abbreviations
-	'\\be\\.g\\.': 'for example,',
-	'\\bi\\.e\\.': 'that is,',
-	'\\betc\\.': 'et cetera,',
-	'\\baka\\b': 'also known as'
-};
+	['e.g.', 'for example,'],
+	['i.e.', 'that is,'],
+	['etc.', 'et cetera,'],
+	['aka', 'also known as']
+]);
 
 // TODO: Improve
 // https://elevenlabs.io/docs/speech-synthesis/prompting
@@ -71,7 +84,6 @@ export function prepareForTTS(text: string, options: TPrepareForTTSOptions = {})
 		abbreviations = {}
 	} = options;
 
-	const allAbbreviations = { ...DEFAULT_ABBREVIATIONS, ...abbreviations };
 	let processed = text;
 
 	// Remove emojis if enabled
@@ -92,10 +104,19 @@ export function prepareForTTS(text: string, options: TPrepareForTTSOptions = {})
 		processed = processed.replace(/[[\]{}]/g, '');
 	}
 
-	// Apply abbreviation replacements
-	for (const [pattern, replacement] of Object.entries(allAbbreviations)) {
-		processed = processed.replace(new RegExp(pattern, 'gi'), replacement);
+	// Process custom abbreviations
+	for (const [pattern, replacement] of Object.entries(abbreviations)) {
+		processed = processed.replace(createWordBoundaryRegex(pattern), replacement);
 	}
+
+	// Process default replacements
+	TEXT_REPLACEMENTS.forEach((replacement, pattern) => {
+		if (pattern instanceof RegExp) {
+			processed = processed.replace(pattern, replacement);
+		} else {
+			processed = processed.replace(createWordBoundaryRegex(pattern), replacement);
+		}
+	});
 
 	// Normalize whitespace if enabled
 	if (normalizeWhitespace) {
@@ -112,6 +133,12 @@ export function prepareForTTS(text: string, options: TPrepareForTTSOptions = {})
 		.replace(/\.{3,}/g, '...');
 
 	return processed;
+}
+
+// Helper to create Unicode-aware word boundary regex that works with special characters (like German Umlaute)
+// https://regex101.com/library/oG4rik?order=MOSTPOINTS&orderBy=MOST_DOWNVOTES&page=1&search=&filterFlavors=javascript&filterFlavors=golang
+function createWordBoundaryRegex(word: string): RegExp {
+	return new RegExp(`(?<![\\p{Letter}\\d_])${word}(?![\\p{Letter}\\d_])`, 'giu');
 }
 
 interface TPrepareForTTSOptions {

@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AppError } from '@blgc/openapi-router';
 import { Err, extractErrorData, mapErr, Ok, type TResult } from '@blgc/utils';
-import { anthropicClient } from '@/environment';
+import { anthropicClient, logger } from '@/environment';
 import { calculateAnthropicPrice, getResource } from '@/lib';
 
 import { isChatStoryScriptDto, type TAnthropicUsage, type TChatStoryScriptDto } from '../schema';
@@ -10,8 +10,8 @@ export async function generateScriptFromStory(
 	config: TGenerateScriptFromStoryConfig
 ): Promise<TResult<TGenerateScriptFromStoryResponse, AppError>> {
 	const {
-		originalStory,
-		storyDirection = 'Adapt the story in the most engaging and viral way possible. Strictly follow the guidelines below.',
+		storyConcept,
+		storyDirection = '',
 		targetAudience = 'Gen Z and young millennials (ages 13-25)',
 		targetLength = '40-60 seconds conversation with approximately 40-60 messages (3-4k tokens)',
 		availableVoices = `- "Elli": American Emotional Young Female Narration
@@ -22,14 +22,14 @@ export async function generateScriptFromStory(
 	} = config;
 
 	const promptResult = mapErr(
-		await getResource('prompts/chat-story_v4-0-3.txt'),
+		await getResource('prompts/chat-story_v4-2-4.txt'),
 		(err) => new AppError(`#ERR_READ_PROMPT`, 500, { description: err.message, throwable: err })
 	);
 	if (promptResult.isErr()) {
 		return Err(promptResult.error);
 	}
 	const prompt = promptResult.value
-		.replace('{{ORIGINAL_STORY}}', originalStory)
+		.replace('{{STORY_CONCEPT}}', storyConcept)
 		.replace('{{STORY_DIRECTION}}', storyDirection)
 		.replace('{{TARGET_AUDIENCE}}', targetAudience)
 		.replace('{{TARGET_LENGTH}}', targetLength)
@@ -51,7 +51,7 @@ export async function generateScriptFromStory(
 					]
 				}
 			],
-			temperature: 0.0 // So that it strictly follows the prompt and doesn't get too creative and comes up with secret agents, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
+			temperature: 0.3 // Not above 0.5 so that it follows prompt and doesn't get too creative and comes up with secret agents, .. (1 is ideal for generative tasks, and 0 for analyitical and deterministic thing)
 		});
 	} catch (err) {
 		if (err instanceof Anthropic.APIError) {
@@ -60,7 +60,7 @@ export async function generateScriptFromStory(
 		return Err(new AppError('#ERR_ANTHROPIC', 500));
 	}
 
-	const parsedScriptResult = parseContentBlockToScript(anthropicResponse.content[0]);
+	const parsedScriptResult = parseContentBlockToScript(anthropicResponse.content[0], 'final_story');
 	if (parsedScriptResult.isErr()) {
 		return Err(parsedScriptResult.error);
 	}
@@ -79,15 +79,24 @@ export async function generateScriptFromStory(
 }
 
 function parseContentBlockToScript(
-	content?: Anthropic.Messages.ContentBlock
+	content?: Anthropic.Messages.ContentBlock,
+	contentTagName?: string
 ): TResult<TChatStoryScriptDto, AppError> {
 	if (content == null || content.type !== 'text') {
 		return Err(new AppError('#ERR_ANTHROPIC', 500, { description: 'Invalid content response' }));
 	}
 
+	logger.info('To parse script', { rawText: content.text });
+
 	let parsedContent: unknown;
 	try {
-		parsedContent = JSON.parse(content.text);
+		let contentString: string;
+		if (contentTagName != null) {
+			contentString = extractContentFromTags(content.text, contentTagName) ?? '';
+		} else {
+			contentString = content.text;
+		}
+		parsedContent = JSON.parse(contentString);
 	} catch (e) {
 		const { error, message } = extractErrorData(e);
 		return Err(
@@ -106,8 +115,14 @@ function parseContentBlockToScript(
 	return Ok(parsedContent);
 }
 
+function extractContentFromTags(text: string, tagName: string): string | null {
+	const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`);
+	const match = regex.exec(text);
+	return match != null ? (match[1]?.trim() ?? null) : null;
+}
+
 interface TGenerateScriptFromStoryConfig {
-	originalStory: string;
+	storyConcept: string;
 	storyDirection?: string;
 	targetAudience?: string;
 	targetLength?: string;

@@ -25,11 +25,20 @@ $scale-factor: calc($canvas-width / $base-width);
 	list-style: none;
 }
 
+.message-content-text {
+	padding: scale(10px) scale(20px);
+}
+
+.message-content-media {
+	border-radius: scale(25px);
+	overflow: hidden;
+	max-width: scale(255px);
+}
+
 .shared {
 	position: relative; /* Setup a relative container for our psuedo elements */
 	max-width: scale(255px);
 	margin-bottom: scale(15px);
-	padding: scale(10px) scale(20px);
 	line-height: scale(24px);
 	word-wrap: break-word; /* Make sure the text wraps to multiple lines if long */
 	border-radius: scale(25px);
@@ -58,6 +67,7 @@ $scale-factor: calc($canvas-width / $base-width);
 	background: var(--sentColor);
 
 	&:before {
+		z-index: -1;
 		right: scale(-7px);
 		background-color: var(--sentColor);
 		border-bottom-left-radius: scale(16px) scale(14px);
@@ -75,6 +85,7 @@ $scale-factor: calc($canvas-width / $base-width);
 	background: var(--receiveColor);
 
 	&:before {
+		z-index: -1;
 		left: scale(-7px);
 		background-color: var(--receiveColor);
 		border-bottom-right-radius: scale(16px) scale(14px);

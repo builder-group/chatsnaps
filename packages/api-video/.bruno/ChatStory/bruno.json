@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "ChatStory",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

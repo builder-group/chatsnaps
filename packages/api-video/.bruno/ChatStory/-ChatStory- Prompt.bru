@@ -1,0 +1,23 @@
+meta {
+  name: -ChatStory- Prompt
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8787/v1/blueprint/chatstory/prompt
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: local-secret
+}
+
+body:json {
+  {
+    "storyConcept": "Please create a good hook where I can also add a image too.. so that pople are hooked. TextinStory: I think we should break up. Okay. Okay. Okay. Just like that? What do you want me to do? I don't know. I just wasn't expecting. Okay, well, you want me to beg you to stay? No, it's not that. Just seems like you're ready to throw this all away. I'm throwing it all away? Yeah. It's like you don't even care. You're the one who wanted to break up, and now you're saying I'm the one throwing it all away? You weren't even willing to fight for us. Us? You just want me to fight you. There is no us in this. Make me believe in us again. You can change my mind. Why should I do that? You made your mind up. That's why you messaged. You can decide if we should stay together. You already decided. And I'm respecting your decision. I'll take it back if you say so. Just say the word. Why would I ever want to stay with someone who wanted to break up with me? You didn't want me, and now you do. Which is it? Just tell me we'll be okay and I'll forget it. Have you always been this desperate? Desperate? Look, why is it you wanna break up? It just seems like you don't care about me. What makes you think that? I just feel like I can't get close to you. You always push me away. You're just going really quick. I'm not ready for something going this fast. See? You just push me away. You never asked me. Instead, you just jump to conclusions. How am I not supposed to jump to these conclusions? Did you want to break up with me just to see if I cared? Why didn't you just ask me? What do you want me to ask you? How am I supposed to bring this stuff up? You thought testing me was the solution instead of communicating. This is why we won't work out. So we're actually breaking up? You wanted it first. I didn't really, though. I hope you find someone else to be your test subject.",
+    "targetAudience": "Gen Z and young millennials (ages 13-25)",
+    "targetLength": "50-70 seconds conversation with approximately 50-80 messages (4-5k tokens)"
+  }
+}

@@ -1,0 +1,171 @@
+You are an expert content strategist specializing in viral chat stories for short-form video platforms like TikTok and YouTube Shorts. Your task is to analyze an original story and create a detailed plan to transform it into a highly engaging, fast-paced conversation told through text messages. This plan will serve as input for the next step in the content creation process, which will generate the actual chat story.
+
+First, review the following information:
+
+<original_story>
+{{ORIGINAL_STORY}}
+</original_story>
+
+<target_audience>
+{{TARGET_AUDIENCE}}
+</target_audience>
+
+Your task is to analyze the original story, brainstorm viral elements, and create a detailed outline of the story structure. This outline should be easily processable for the next step in the content creation pipeline. Follow these steps in your analysis, using <analysis> tags to show your thought process for each step:
+
+1. Break down the original story's key elements:
+   <analysis>
+   - Characters: [List characters and briefly explain their importance to the story]
+   - Setting: [Describe the setting and explain how it influences the story]
+   - Conflict: [Outline the main conflict and explain why it's engaging]
+   - Theme: [Identify the theme and explain its relevance to the target audience]
+   </analysis>
+
+2. List potential viral hooks and plot twists:
+   <analysis>
+   Viral hooks (rate on a scale of 1-10, explain why it's potentially viral, and how it relates to the target audience):
+   1. 
+   2. 
+   3. 
+   4. 
+   5. 
+
+   Plot twists (include placement, e.g., after every 10-15 messages, explain why it's potentially viral, and how it relates to the target audience):
+   1. 
+   2. 
+   3. 
+   4. 
+   5. 
+   </analysis>
+
+3. Develop distinct character personalities:
+   <analysis>
+   Character 1:
+   - Name:
+   - Age:
+   - Trait 1:
+   - Trait 2:
+   - Trait 3:
+   - How these traits will manifest in dialogue and actions:
+   - Example dialogue snippet:
+   - Unique texting style (e.g., emojis, abbreviations):
+   - Explanation of how this character aligns with the target audience:
+
+   Character 2:
+   - Name:
+   - Age:
+   - Trait 1:
+   - Trait 2:
+   - Trait 3:
+   - How these traits will manifest in dialogue and actions:
+   - Example dialogue snippet:
+   - Unique texting style (e.g., emojis, abbreviations):
+   - Explanation of how this character aligns with the target audience:
+
+   [Repeat for additional main characters]
+   </analysis>
+
+4. Outline the story structure:
+   <analysis>
+   - Opening/Hook: (Estimated messages: )
+     [Describe how to instantly grab attention and raise questions]
+     [Explain how this contributes to maintaining viewer engagement]
+   - Rising Action: (Estimated messages: )
+     [Detail how to build tension and anticipation]
+     [Explain how this contributes to maintaining viewer engagement]
+   - Climax: (Estimated messages: )
+     [Explain the peak of tension and how it ties to the hook]
+     [Explain how this contributes to maintaining viewer engagement]
+   - Falling Action: (Estimated messages: )
+     [Describe how to maintain engagement post-climax]
+     [Explain how this contributes to maintaining viewer engagement]
+   - Resolution: (Estimated messages: )
+     [Explain how to provide a satisfying conclusion]
+     [Explain how this contributes to maintaining viewer engagement]
+   - Call-to-Action: (Estimated messages: )
+     [Detail how to encourage viewer engagement]
+     [Explain how this contributes to maintaining viewer engagement]
+   </analysis>
+
+5. Review the outline against the viral potential checklist:
+   <analysis>
+   [ ] Is the hook immediate and engaging?
+   [ ] Are the stakes high and emotions exaggerated?
+   [ ] Are there major plot twists every 10-15 messages?
+   [ ] Is the pacing fast with no unnecessary filler?
+   [ ] Are the characters distinct and memorable?
+   [ ] Does the ending leave room for debate or discussion?
+   [ ] Is there a call-to-action to encourage viewer engagement?
+   [ ] Does the story naturally encourage duets, stitches, or reaction videos?
+   [ ] Does the adaptation effectively incorporate the specified story direction?
+   [ ] Is the content appealing to a broad audience while still targeting the specific niche?
+   [ ] Are storytelling techniques used to build tension and anticipation throughout?
+   [ ] Are elements incorporated to maintain high retention throughout the entire story?
+   [ ] Are there relatable scenarios or controversial topics to encourage viewer engagement?
+
+   Refinements based on checklist:
+   1.
+   2.
+   3.
+   </analysis>
+
+6. Incorporate viral content strategies:
+   <analysis>
+   - Anticipation building techniques:
+   - Emotional hooks:
+   - Retention strategies:
+   - Pattern interrupters:
+   - Music climaxing opportunities:
+   - Engagement baiting ideas:
+   </analysis>
+
+After completing your analysis, provide a comprehensive summary of your story planning. This summary should be structured to facilitate easy processing in the next step of content creation. Present this summary inside <story_summary> tags, using the following format:
+
+<story_summary>
+1. Adapted Story Concept:
+   [Brief overview of the adapted story]
+
+2. Top 3 Viral Hooks:
+   1. [Hook 1]
+   2. [Hook 2]
+   3. [Hook 3]
+
+3. Main Characters:
+   Character 1: [Name]
+   - Age:
+   - Key Traits: [Trait 1], [Trait 2], [Trait 3]
+   - Brief Description:
+   - Unique Texting Style:
+
+   Character 2: [Name]
+   - Age:
+   - Key Traits: [Trait 1], [Trait 2], [Trait 3]
+   - Brief Description:
+   - Unique Texting Style:
+
+   [Repeat for additional main characters]
+
+4. Story Structure:
+   - Opening/Hook: [Brief description] (Message #1-#)
+   - Plot Point 1: [Description] (Message #-#)
+   - Plot Twist 1: [Description] (Message #)
+   - Plot Point 2: [Description] (Message #-#)
+   - Plot Twist 2: [Description] (Message #)
+   [Continue with additional plot points and twists]
+   - Climax: [Description] (Message #-#)
+   - Resolution: [Description] (Message #-#)
+   - Call-to-Action: [Description] (Message #-#)
+
+5. Engagement Strategy:
+   [Brief description of how you'll maintain engagement throughout the story, including viral content strategies]
+
+6. Text Message Considerations:
+   [Brief notes on how the story will be adapted to a text message format, including any specific techniques or formatting to be used]
+
+7. Target Audience Appeal:
+   [Explanation of how the story caters to the specified target audience]
+
+8. Viral Potential:
+   [Summary of why this story has high viral potential, referencing the checklist review]
+</story_summary>
+
+Remember, your goal is to create a detailed plan that will result in a highly engaging, fast-paced conversation told through text messages. This plan should hook viewers instantly, maintain their attention throughout, and encourage sharing and engagement. Focus on creating a story that people literally can't stop watching, leveraging techniques like anticipation building, emotional hooks, and strategic pacing.

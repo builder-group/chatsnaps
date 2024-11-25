@@ -1,5 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { SChatStoryMessenger, SVideoComp } from '@repo/video';
+import { SChatStoryMessenger, SMessageChatStoryContent, SVideoComp } from '@repo/video';
 
 import {
 	BadRequestResponse,
@@ -11,8 +11,8 @@ import {
 const SChatStoryScriptEvent = z.union([
 	z.object({
 		type: z.literal('Message'),
-		content: z.string(),
-		spokenContent: z.string().optional(),
+		content: z.union([z.string(), SMessageChatStoryContent]),
+		spokenContent: z.union([z.string(), z.literal(false)]).optional(),
 		participantId: z.string()
 	}),
 	z.object({
@@ -119,7 +119,7 @@ export const ChatStoryBlueprintPromptRoute = createRoute({
 	request: {
 		body: JsonRequestBody(
 			z.object({
-				originalStory: z.string(),
+				storyConcept: z.string(),
 				storyDirection: z.string().optional(),
 				targetAudience: z.string().optional(),
 				targetLength: z.string().optional(),
@@ -157,6 +157,30 @@ export const ChatStoryBlueprintFactoryRoute = createRoute({
 	responses: {
 		200: JsonSuccessResponse(
 			z.object({ urls: z.array(z.string().nullable()), usageUsd: z.number(), timeMs: z.number() })
+		),
+		400: BadRequestResponse,
+		500: InternalServerErrorResponse
+	}
+});
+
+export const SChatStoryBlueprintTextRoute = createRoute({
+	method: 'post',
+	path: '/v1/blueprint/chatstory/text',
+	tags: ['blueprint'],
+	operationId: 'chatStoryBlueprintText',
+	request: {
+		body: JsonRequestBody(
+			z.object({
+				script: SChatStoryScriptDto,
+				separator: z.string().optional().default('\n')
+			})
+		)
+	},
+	responses: {
+		200: JsonSuccessResponse(
+			z.object({
+				text: z.string()
+			})
 		),
 		400: BadRequestResponse,
 		500: InternalServerErrorResponse

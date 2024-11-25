@@ -1,0 +1,195 @@
+meta {
+  name: -ChatStory- Text
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8787/v1/blueprint/chatstory/text
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: local-secret
+}
+
+body:json {
+  {
+    "separator": "\n",
+    "script": {
+      "title": "The Test",
+      "participants": {
+        "1": {
+          "displayName": "💔 Ex?",
+          "isSelf": false,
+          "voice": "Elli"
+        },
+        "2": {
+          "displayName": "Me",
+          "isSelf": true,
+          "voice": "Adam"
+        }
+      },
+      "events": [
+        {
+          "type": "Message",
+          "content": "I think we should break up",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "okay",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "that's it?",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "just... okay?",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "What do you want me to say?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "FIGHT FOR US",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "you're not even trying",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Wait",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "Is this a test?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "...",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "maybe",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "if you just showed you cared",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "wow",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "So you didn't mean it?",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "I'll take it back if you fight for us",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "just say you want me",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "please",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": {
+            "type": "Media",
+            "media": {
+              "type": "Image",
+              "src": "https://media.tenor.com/heEyHbV8iaUAAAAM/puss-in-boots-shrek.gif"
+            }
+          },
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "You're right",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "really? 🥺",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "We should break up",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "WHAT",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "NO",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "I was just testing you",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "Exactly",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "And YOU failed",
+          "participantId": "2"
+        },
+        {
+          "type": "Message",
+          "content": "wait please",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": "I'll never test you again",
+          "participantId": "1"
+        },
+        {
+          "type": "Message",
+          "content": {
+            "type": "Media",
+            "media": {
+              "type": "Image",
+              "src": "https://cdn-useast1.kapwing.com/static/templates/bike-fall-meme-template-full-02a335e1.webp"
+            }
+          },
+          "participantId": "2"
+        }
+      ]
+    }
+  }
+}
