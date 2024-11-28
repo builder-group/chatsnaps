@@ -274,10 +274,7 @@ class ChatStoryCreator {
 			.filter(notEmpty)
 			.join(' - ')
 			.trim();
-		const nextContent = this.getFutureContentForParticipant(
-			(item.index as number) + 1,
-			item.participantId
-		);
+		const nextContent = this.getFutureContentForParticipant(item.index + 1, item.participantId);
 		const nextText = nextContent
 			.map((c) => {
 				const spokenContent = this.getSpokenContent({ content: c });
@@ -292,7 +289,7 @@ class ChatStoryCreator {
 		const audioResult = await elevenLabsClient.generateTextToSpeach({
 			voice: voiceId,
 			text: currentText,
-			modelId: elevenLabsConfig.models.eleven_multilingual_v2.id, // TODO: Using turbo for speed/cost. Compare quality with 'eleven_multilingual_v2'.
+			modelId: elevenLabsConfig.models.eleven_turbo_v2_5.id, // TODO: Using turbo for speed/cost. Compare quality with 'eleven_multilingual_v2'.
 			// modelId: elevenLabsConfig.models.eleven_multilingual_v2.id,
 			// nextText: nextText.length > 0 ? nextText : undefined, // TODO: Disabled. Can cause audio overlap and partial inclusion of a cut off start from the next text with some voices (see 'out/voice-lab').
 			previousText: previousText.length > 0 ? previousText : undefined,
