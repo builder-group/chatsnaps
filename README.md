@@ -12,4 +12,4 @@ Shortify was an automation tool that could generate short-form videos for multip
 - Marble Races
 - Marble Melodies
 
-While not fully automated due to current AI limitations, Shortify significantly reduced production time. For example, a high-quality message-based story could be produced in 10-20 minutes with small manual refinements (improved hooks, images), or fully automated with slightly lower quality due to current AI constraints (e.g. in storytelling).
+While not fully automated due to technical limitations, Shortify significantly reduced production time. For example, a high-quality message-based story video could be produced in 10-20 minutes with small manual refinements (like improved hooks, images), or fully automated with slightly lower quality due to current AI constraints (e.g. in storytelling).
